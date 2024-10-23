@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   update_release_draft:
-    if: github.repository_owner == 'jazzband'
+    if: github.repository_owner == 'prettytable'
     permissions:
       # write permission is required to create a GitHub Release
       contents: write

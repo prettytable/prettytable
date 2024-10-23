@@ -1,24 +1,50 @@
 # Release checklist
 
-Jazzband guidelines: https://jazzband.co/about/releases
-
 - [ ] Get `main` to the appropriate code release state.
-      [GitHub Actions](https://github.com/jazzband/prettytable/actions) should pass on
-      `main`.
-      [![GitHub Actions status](https://github.com/jazzband/prettytable/workflows/Test/badge.svg)](https://github.com/jazzband/prettytable/actions)
+      [GitHub Actions](https://github.com/prettytable/prettytable/actions) should be
+      running cleanly for all merges to `main`.
+      [![GitHub Actions status](https://github.com/prettytable/prettytable/workflows/Test/badge.svg)](https://github.com/prettytable/prettytable/actions)
 
-- [ ] Edit release draft, adjust text if needed:
-      https://github.com/jazzband/prettytable/releases
+* [ ] Start from a freshly cloned repo:
 
-- [ ] Check next tag is correct, amend if needed
+```bash
+cd /tmp
+rm -rf prettytable
+git clone https://github.com/prettytable/prettytable
+cd prettytable
+```
 
-- [ ] Publish release
+- [ ] (Optional) Create a distribution and release on **TestPyPI**:
 
-- [ ] Once
-      [GitHub Actions](https://github.com/jazzband/prettytable/actions/workflows/release.yml)
-      has built and uploaded distributions, check files at
-      [Jazzband](https://jazzband.co/projects/prettytable) and release to
-      [PyPI](https://pypi.org/pypi/prettytable)
+```bash
+pip install -U pip build keyring twine
+rm -rf build dist
+python -m build
+twine check --strict dist/* && twine upload --repository testpypi dist/*
+```
+
+- [ ] (Optional) Check **test** installation:
+
+```bash
+pip3 uninstall -y prettytable
+pip3 install -U -i https://test.pypi.org/simple/ prettytable --pre
+python3 -c "import prettytable; print(prettytable.__version__)"
+```
+
+- [ ] Tag with the version number:
+
+```bash
+git tag -a 2.1.0 -m "Release 2.1.0"
+```
+
+- [ ] Create a distribution and release on **live PyPI**:
+
+```bash
+pip install -U pip build keyring twine
+rm -rf build dist
+python -m build
+twine check --strict dist/* && twine upload --repository pypi dist/*
+```
 
 - [ ] Check installation:
 
@@ -27,3 +53,16 @@ pip uninstall -y prettytable
 pip install -U prettytable
 python3 -c "import prettytable; print(prettytable.__version__)"
 ```
+
+- [ ] Push tag:
+
+```bash
+git push --tags
+```
+
+- [ ] Edit release draft, adjust text if needed:
+      https://github.com/prettytable/prettytable/releases
+
+- [ ] Check next tag is correct, amend if needed
+
+- [ ] Publish release
