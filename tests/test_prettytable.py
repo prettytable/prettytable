@@ -1713,6 +1713,135 @@ class TestStyle:
             t.set_style(HRuleStyle.ALL)  # type: ignore[arg-type]
 
     @pytest.mark.parametrize(
+        "original_style,style, expected",
+        [
+            pytest.param(
+                TableStyle.MARKDOWN,
+                TableStyle.DEFAULT,
+                """
++---+---------+---------+---------+
+|   | Field 1 | Field 2 | Field 3 |
++---+---------+---------+---------+
+| 1 | value 1 |  value2 |  value3 |
+| 4 | value 4 |  value5 |  value6 |
+| 7 | value 7 |  value8 |  value9 |
++---+---------+---------+---------+
+""",
+                id="DEFAULT",
+            ),
+            pytest.param(
+                TableStyle.MSWORD_FRIENDLY,
+                TableStyle.MARKDOWN,
+                """
+|     | Field 1 | Field 2 | Field 3 |
+| :-: | :-----: | :-----: | :-----: |
+|  1  | value 1 |  value2 |  value3 |
+|  4  | value 4 |  value5 |  value6 |
+|  7  | value 7 |  value8 |  value9 |
+""",
+                id="MARKDOWN",
+            ),
+            pytest.param(
+                TableStyle.MARKDOWN,
+                TableStyle.MSWORD_FRIENDLY,
+                """
+|   | Field 1 | Field 2 | Field 3 |
+| 1 | value 1 |  value2 |  value3 |
+| 4 | value 4 |  value5 |  value6 |
+| 7 | value 7 |  value8 |  value9 |
+""",
+                id="MSWORD_FRIENDLY",
+            ),
+            pytest.param(
+                TableStyle.MARKDOWN,
+                TableStyle.ORGMODE,
+                """
+|---+---------+---------+---------|
+|   | Field 1 | Field 2 | Field 3 |
+|---+---------+---------+---------|
+| 1 | value 1 |  value2 |  value3 |
+| 4 | value 4 |  value5 |  value6 |
+| 7 | value 7 |  value8 |  value9 |
+|---+---------+---------+---------|
+""",
+                id="ORGMODE",
+            ),
+            pytest.param(
+                TableStyle.MARKDOWN,
+                TableStyle.PLAIN_COLUMNS,
+                """
+         Field 1        Field 2        Field 3        
+1        value 1         value2         value3        
+4        value 4         value5         value6        
+7        value 7         value8         value9
+""",  # noqa: W291
+                id="PLAIN_COLUMNS",
+            ),
+            pytest.param(
+                TableStyle.MARKDOWN,
+                TableStyle.RANDOM,
+                """
+'^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
+%    1     value 1     value2     value3%
+%    4     value 4     value5     value6%
+%    7     value 7     value8     value9%
+'^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
+""",
+                id="RANDOM",
+            ),
+            pytest.param(
+                TableStyle.MARKDOWN,
+                TableStyle.DOUBLE_BORDER,
+                """
+╔═══╦═════════╦═════════╦═════════╗
+║   ║ Field 1 ║ Field 2 ║ Field 3 ║
+╠═══╬═════════╬═════════╬═════════╣
+║ 1 ║ value 1 ║  value2 ║  value3 ║
+║ 4 ║ value 4 ║  value5 ║  value6 ║
+║ 7 ║ value 7 ║  value8 ║  value9 ║
+╚═══╩═════════╩═════════╩═════════╝
+""",
+                id="DOUBLE_BORDER"
+            ),
+            pytest.param(
+                TableStyle.MARKDOWN,
+                TableStyle.SINGLE_BORDER,
+                """
+┌───┬─────────┬─────────┬─────────┐
+│   │ Field 1 │ Field 2 │ Field 3 │
+├───┼─────────┼─────────┼─────────┤
+│ 1 │ value 1 │  value2 │  value3 │
+│ 4 │ value 4 │  value5 │  value6 │
+│ 7 │ value 7 │  value8 │  value9 │
+└───┴─────────┴─────────┴─────────┘
+""",
+                id="SINGLE_BORDER"
+            ),
+        ],
+    )
+
+    def test_style_reset(self,original_style,style,expected) -> None:
+        """
+            Testing to ensure that default styling is reset between changes
+            of styles on a PrettyTable
+
+        Args:
+            style (str): Style to be used (Default, markdown, etc)
+            expected (str): The expected format of style as a string representation
+        """
+        # Arrange
+        t = helper_table()
+        random.seed(1234)
+
+        # Act
+        t.set_style(original_style)
+        t.set_style(style)
+
+        # Assert
+        result = t.get_string()
+        assert result.strip() == expected.strip()
+
+    @pytest.mark.parametrize(
         "style, expected",
         [
             pytest.param(

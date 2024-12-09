@@ -1454,6 +1454,7 @@ class PrettyTable:
 
     def set_style(self, style: TableStyle) -> None:
         self._style = style
+        self._set_default_style()
         if style == TableStyle.DEFAULT:
             self._set_default_style()
         elif style == TableStyle.MSWORD_FRIENDLY:
@@ -1475,7 +1476,6 @@ class PrettyTable:
             raise ValueError(msg)
 
     def _set_orgmode_style(self) -> None:
-        self._set_default_style()
         self.orgmode = True
 
     def _set_markdown_style(self) -> None:
