@@ -2354,6 +2354,132 @@ class TestMaxTableWidth:
 +---+-----------------+---+-----------------+---+-----------------+""".strip()
         )
 
+    def test_table_width_on_init_wo_columns(self) -> None:
+        """See also #272"""
+        table = PrettyTable(max_width=10)
+        table.add_row(
+            [
+                "Lorem",
+                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam ",
+                "ipsum",
+                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam ",
+                "dolor",
+                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam ",
+            ]
+        )
+
+        assert (
+            table.get_string().strip()
+            == """
++---------+------------+---------+------------+---------+------------+
+| Field 1 |  Field 2   | Field 3 |  Field 4   | Field 5 |  Field 6   |
++---------+------------+---------+------------+---------+------------+
+|  Lorem  |   Lorem    |  ipsum  |   Lorem    |  dolor  |   Lorem    |
+|         |   ipsum    |         |   ipsum    |         |   ipsum    |
+|         | dolor sit  |         | dolor sit  |         | dolor sit  |
+|         |   amet,    |         |   amet,    |         |   amet,    |
+|         | consetetur |         | consetetur |         | consetetur |
+|         | sadipscing |         | sadipscing |         | sadipscing |
+|         | elitr, sed |         | elitr, sed |         | elitr, sed |
+|         |    diam    |         |    diam    |         |    diam    |
++---------+------------+---------+------------+---------+------------+""".strip()
+        )
+
+    def test_table_width_on_init_with_columns(self) -> None:
+        """See also #272"""
+        table = PrettyTable(
+            ["Field 1", "Field 2", "Field 3", "Field 4", "Field 5", "Field 6"],
+            max_width=10,
+        )
+        table.add_row(
+            [
+                "Lorem",
+                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam ",
+                "ipsum",
+                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam ",
+                "dolor",
+                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam ",
+            ]
+        )
+
+        assert (
+            table.get_string().strip()
+            == """
++---------+------------+---------+------------+---------+------------+
+| Field 1 |  Field 2   | Field 3 |  Field 4   | Field 5 |  Field 6   |
++---------+------------+---------+------------+---------+------------+
+|  Lorem  |   Lorem    |  ipsum  |   Lorem    |  dolor  |   Lorem    |
+|         |   ipsum    |         |   ipsum    |         |   ipsum    |
+|         | dolor sit  |         | dolor sit  |         | dolor sit  |
+|         |   amet,    |         |   amet,    |         |   amet,    |
+|         | consetetur |         | consetetur |         | consetetur |
+|         | sadipscing |         | sadipscing |         | sadipscing |
+|         | elitr, sed |         | elitr, sed |         | elitr, sed |
+|         |    diam    |         |    diam    |         |    diam    |
++---------+------------+---------+------------+---------+------------+""".strip()
+        )
+
+    def test_table_float_formatting_on_init_wo_columns(self) -> None:
+        """See also #243"""
+        table = prettytable.PrettyTable(float_format="10.2")
+        table.field_names = ["Metric", "Initial sol.", "Best sol."]
+        table.add_rows([["foo", 1.0 / 3.0, 1.0 / 3.0]])
+
+        assert (
+            table.get_string().strip()
+            == """
++--------+--------------+------------+
+| Metric | Initial sol. | Best sol.  |
++--------+--------------+------------+
+|  foo   |        0.33  |       0.33 |
++--------+--------------+------------+""".strip()
+        )
+
+    def test_table_formatted_html_autoindex(self) -> None:
+        """See also #199"""
+        table = PrettyTable(["Field 1", "Field 2", "Field 3"])
+        for row in range(1, 3 * 3, 3):
+            table.add_row(
+                [f"value {row*100}", f"value {row+1*100}", f"value {row+2*100}"]
+            )
+        table.format = True
+        table.add_autoindex("I")
+
+        assert (
+            table.get_html_string().strip()
+            == """
+<table frame="box" rules="cols">
+    <thead>
+        <tr>
+            <th style="padding-left: 1em; padding-right: 1em; text-align: center">I</th>
+            <th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 1</th>
+            <th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 2</th>
+            <th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 3</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 100</td>
+            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 101</td>
+            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 201</td>
+        </tr>
+        <tr>
+            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2</td>
+            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 400</td>
+            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 104</td>
+            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 204</td>
+        </tr>
+        <tr>
+            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 700</td>
+            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 107</td>
+            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 207</td>
+        </tr>
+    </tbody>
+</table>""".strip()  # noqa: E501
+        )
+
     def test_max_table_width_wide_vrules_frame(self) -> None:
         table = PrettyTable()
         table.max_table_width = 52
