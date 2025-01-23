@@ -2,8 +2,7 @@ name: Test
 
 on: [push, pull_request, workflow_dispatch]
 
-permissions:
-  contents: read
+permissions: {}
 
 env:
   FORCE_COLOR: 1
@@ -29,18 +28,17 @@ jobs:
           allow-prereleases: true
 
       - name: Install uv
-        uses: hynek/setup-cached-uv@v2
+        uses: astral-sh/setup-uv@v5
 
       - name: Tox tests
         run: |
           uvx --with tox-uv tox -e py
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           flags: ${{ matrix.os }}
           name: ${{ matrix.os }} Python ${{ matrix.python-version }}
-          token: ${{ secrets.CODECOV_TOKEN }}
 
   success:
     needs: test

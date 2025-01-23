@@ -8,8 +8,7 @@ on:
       - published
   workflow_dispatch:
 
-permissions:
-  contents: read
+permissions: {}
 
 env:
   FORCE_COLOR: 1
