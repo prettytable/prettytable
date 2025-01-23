@@ -55,9 +55,9 @@ fix = true
 
 lint.select = [
   "C4",     # flake8-comprehensions
-  "E",      # pycodestyle errors
+  "E",      # pycodestyle
   "EM",     # flake8-errmsg
-  "F",      # pyflakes errors
+  "F",      # pyflakes
   "I",      # isort
   "ICN",    # flake8-import-conventions
   "ISC",    # flake8-implicit-str-concat
@@ -67,14 +67,15 @@ lint.select = [
   "RUF022", # unsorted-dunder-all
   "RUF100", # unused noqa (yesqa)
   "UP",     # pyupgrade
-  "W",      # pycodestyle warnings
+  "W",      # pycodestyle
   "YTT",    # flake8-2020
 ]
 lint.ignore = [
-  "E203", # Whitespace before ':'
-  "E221", # Multiple spaces before operator
-  "E226", # Missing whitespace around arithmetic operator
-  "E241", # Multiple spaces after ','
+  "E203",  # Whitespace before ':'
+  "E221",  # Multiple spaces before operator
+  "E226",  # Missing whitespace around arithmetic operator
+  "E241",  # Multiple spaces after ','
+  "UP038", # Makes code slower and more verbose
 ]
 lint.flake8-import-conventions.aliases.datetime = "dt"
 lint.flake8-import-conventions.banned-from = [ "datetime" ]
