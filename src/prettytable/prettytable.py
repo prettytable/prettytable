@@ -1469,7 +1469,7 @@ class PrettyTable:
             self._set_single_border_style()
         elif style == TableStyle.RANDOM:
             self._set_random_style()
-        else:
+        elif style != TableStyle.DEFAULT:
             msg = "Invalid pre-set style"
             raise ValueError(msg)
 
