@@ -7,3 +7,7 @@ exclude_also =
     if 0:
     if __name__ == .__main__.:
     def main()
+
+[run]
+omit =
+    **/__main__.py

@@ -38,6 +38,14 @@ Or from `requirements.txt`:
 
     -e git://github.com/prettytable/prettytable.git#egg=prettytable
 
+## Demo
+
+To see demo output, run:
+
+```bash
+python3 -m prettytable
+```
+
 ## Tutorial on how to use the PrettyTable API
 
 ### Getting your data into (and out of) the table
