@@ -1453,11 +1453,9 @@ class PrettyTable:
     ##############################
 
     def set_style(self, style: TableStyle) -> None:
-        self._style = style
         self._set_default_style()
-        if style == TableStyle.DEFAULT:
-            self._set_default_style()
-        elif style == TableStyle.MSWORD_FRIENDLY:
+        self._style = style
+        if style == TableStyle.MSWORD_FRIENDLY:
             self._set_msword_style()
         elif style == TableStyle.PLAIN_COLUMNS:
             self._set_columns_style()
