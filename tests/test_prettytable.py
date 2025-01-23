@@ -1801,7 +1801,7 @@ class TestStyle:
 ║ 7 ║ value 7 ║  value8 ║  value9 ║
 ╚═══╩═════════╩═════════╩═════════╝
 """,
-                id="DOUBLE_BORDER"
+                id="DOUBLE_BORDER",
             ),
             pytest.param(
                 TableStyle.MARKDOWN,
@@ -1815,12 +1815,11 @@ class TestStyle:
 │ 7 │ value 7 │  value8 │  value9 │
 └───┴─────────┴─────────┴─────────┘
 """,
-                id="SINGLE_BORDER"
+                id="SINGLE_BORDER",
             ),
         ],
     )
-
-    def test_style_reset(self,original_style,style,expected) -> None:
+    def test_style_reset(self, original_style, style, expected) -> None:
         """
             Testing to ensure that default styling is reset between changes
             of styles on a PrettyTable
