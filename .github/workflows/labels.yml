@@ -1,8 +1,5 @@
 name: Sync labels
 
-permissions:
-  pull-requests: write
-
 on:
   push:
     branches:
@@ -13,9 +10,13 @@ on:
 
 jobs:
   sync:
+    permissions:
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: micnncim/action-label-syncer@v1
         with:
           prune: false
