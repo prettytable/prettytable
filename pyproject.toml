@@ -2,7 +2,7 @@
 build-backend = "hatchling.build"
 requires = [
   "hatch-vcs",
-  "hatchling",
+  "hatchling>=1.27",
 ]
 
 [project]
@@ -10,11 +10,11 @@ name = "prettytable"
 description = "A simple Python library for easily displaying tabular data in a visually appealing ASCII table format"
 readme = "README.md"
 license = "BSD-3-Clause"
+license-files = [ "LICENSE" ]
 maintainers = [ { name = "Hugo van Kemenade" } ]
 authors = [ { name = "Luke Maurits", email = "luke@maurits.id.au" } ]
 requires-python = ">=3.9"
 classifiers = [
-  "License :: OSI Approved :: BSD License",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.9",
