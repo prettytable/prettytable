@@ -414,7 +414,7 @@ class PrettyTable:
         self._xhtml = kwargs["xhtml"] or False
         self._attributes = kwargs["attributes"] or {}
 
-    def _column_specific_args(self):
+    def _column_specific_args(self) -> None:
         # Column specific arguments, use property.setters
         self.align = self._kwargs["align"] or {}
         self.valign = self._kwargs["valign"] or {}
