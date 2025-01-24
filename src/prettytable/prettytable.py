@@ -440,7 +440,7 @@ class PrettyTable:
         else:
             self._break_on_hyphens = True
 
-    def _column_specific_args(self):
+    def _column_specific_args(self) -> None:
         # Column specific arguments, use property.setters
         for attr in (
             "align",
