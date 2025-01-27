@@ -208,6 +208,12 @@ class TestNoneOption:
         )
 
 
+class TestSortByOption:
+    def test_init_table_with_sortby(self) -> None:
+        table = PrettyTable(["Field 1", "Field 2", "Field 3"], sortby="Field 2")
+        assert table.sortby == "Field 2"
+
+
 class TestBuildEquivalence:
     """Make sure that building a table row-by-row and column-by-column yield the same
     results"""

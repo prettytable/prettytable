@@ -326,6 +326,7 @@ class PrettyTable:
         ]
 
         self._kwargs = {}
+        self._field_names = field_names or []
         for option in self._options:
             if option in kwargs:
                 self._validate_option(option, kwargs[option])
