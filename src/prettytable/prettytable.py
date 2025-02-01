@@ -106,6 +106,7 @@ class OptionsType(TypedDict):
     sortby: str | None
     reversesort: bool
     sort_key: Callable[[RowType], SupportsRichComparison]
+    rowfilter: Callable[[RowType], bool]
     attributes: dict[str, str]
     format: bool
     hrules: HRuleStyle
@@ -170,6 +171,7 @@ class PrettyTable:
     _sortby: str | None
     _reversesort: bool
     _sort_key: Callable[[RowType], SupportsRichComparison]
+    _rowfilter: Callable[[RowType], bool]
     _header: bool
     _header_style: HeaderStyleType
     _border: bool
@@ -256,6 +258,7 @@ class PrettyTable:
             single character string used to draw bottom-left line junctions
         sortby - name of field to sort rows by
         sort_key - sorting key function, applied to data points before sorting
+        rowfilter - filter function applied on rows
         align - default align for each column (None, "l", "c" or "r")
         valign - default valign for each row (None, "t", "m" or "b")
         reversesort - True or False to sort in descending or ascending order
@@ -288,6 +291,7 @@ class PrettyTable:
             "sortby",
             "reversesort",
             "sort_key",
+            "rowfilter",
             "attributes",
             "format",
             "hrules",
@@ -367,6 +371,7 @@ class PrettyTable:
         else:
             self._reversesort = False
         self._sort_key = kwargs["sort_key"] or (lambda x: x)
+        self._rowfilter = kwargs["rowfilter"] or (lambda x: True)
 
         if kwargs["escape_data"] in (True, False):
             self._escape_data = kwargs["escape_data"]
@@ -524,7 +529,7 @@ class PrettyTable:
             self._validate_nonnegative_int(option, val)
         elif option == "sortby":
             self._validate_field_name(option, val)
-        elif option == "sort_key":
+        elif option in ("sort_key", "rowfilter"):
             self._validate_function(option, val)
         elif option == "hrules":
             self._validate_hrules(option, val)
@@ -987,6 +992,20 @@ class PrettyTable:
     def sort_key(self, val: Callable[[RowType], SupportsRichComparison]) -> None:
         self._validate_option("sort_key", val)
         self._sort_key = val
+
+    @property
+    def rowfilter(self) -> Callable[[RowType], bool]:
+        """Filter function, applied to data points
+
+        Arguments:
+
+        rowfilter - a function which takes one argument and returns a boolean"""
+        return self._rowfilter
+
+    @rowfilter.setter
+    def rowfilter(self, val: Callable[[RowType], bool]) -> None:
+        self._validate_option("rowfilter", val)
+        self._rowfilter = val
 
     @property
     def header(self) -> bool:
@@ -1868,6 +1887,8 @@ class PrettyTable:
         else:
             rows = copy.deepcopy(self._rows)
 
+        rows = [row for row in rows if options["rowfilter"](row)]
+
         # Sort
         if options["sortby"]:
             sortindex = self._field_names.index(options["sortby"])
@@ -1960,6 +1981,7 @@ class PrettyTable:
         sortby - name of field to sort rows by
         sort_key - sorting key function, applied to data points before sorting
         reversesort - True or False to sort in descending or ascending order
+        rowfilter - filter function applied on rows
         print empty - if True, stringify just the header for an empty table,
             if False return an empty string"""
 
@@ -2392,6 +2414,7 @@ class PrettyTable:
         right_padding_width - number of spaces on right hand side of column data
         sortby - name of field to sort rows by
         sort_key - sorting key function, applied to data points before sorting
+        rowfilter - filter function applied on rows
         attributes - dictionary of name/value pairs to include as HTML attributes in the
             <table> tag
         format - Controls whether or not HTML tables are formatted to match
@@ -2597,6 +2620,7 @@ class PrettyTable:
         float_format - controls formatting of floating point data
         sortby - name of field to sort rows by
         sort_key - sorting key function, applied to data points before sorting
+        rowfilter - filter function applied on rows
         format - Controls whether or not HTML tables are formatted to match
             styling options (True or False)
         """
