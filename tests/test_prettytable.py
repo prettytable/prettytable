@@ -2547,7 +2547,7 @@ class TestMaxTableWidth:
 +---+-----------------+---+-----------------+---+-----------------+""".strip()
         )
 
-    def test_table_maxwidth_wo_headers(self) -> None:
+    def test_table_maxwidth_wo_headerwidth(self) -> None:
         """See also #165"""
         table = PrettyTable(
             [
@@ -2566,6 +2566,36 @@ class TestMaxTableWidth:
             ],
             use_header_width=False,
         )
+        table.add_row([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
+
+        assert (
+            table.get_string()
+            == """+---+---+---+---+---+---+---+---+---+---+----+----+
+| A | B | D | E | F | G | H | I | J | K | L  | M  |
++---+---+---+---+---+---+---+---+---+---+----+----+
+| 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 |
++---+---+---+---+---+---+---+---+---+---+----+----+"""
+        )
+
+    def test_table_maxwidth_wo_headerwidth_setter(self) -> None:
+        """See also #165"""
+        table = PrettyTable(
+            [
+                "A Field Name",
+                "B Field Name",
+                "D Field Name",
+                "E Field Name",
+                "F Field Name",
+                "G Field Name",
+                "H Field Name",
+                "I Field Name",
+                "J Field Name",
+                "K Field Name",
+                "L Field Name",
+                "M Field Name",
+            ]
+        )
+        table.use_header_width = False
         table.add_row([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
 
         assert (
