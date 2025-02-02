@@ -33,6 +33,7 @@
 
 from __future__ import annotations
 
+import functools
 import io
 import re
 import warnings
@@ -148,6 +149,7 @@ class OptionsType(TypedDict):
 _re = re.compile(r"\033\[[0-9;]*m|\033\(B")
 
 
+@functools.lru_cache
 def _get_size(text: str) -> tuple[int, int]:
     lines = text.split("\n")
     height = len(lines)
@@ -1861,12 +1863,11 @@ class PrettyTable:
         Arguments:
 
         options - dictionary of option settings."""
-        import copy
 
         if options["oldsortslice"]:
-            rows = copy.deepcopy(self._rows[options["start"] : options["end"]])
+            rows = self._rows[options["start"] : options["end"]]
         else:
-            rows = copy.deepcopy(self._rows)
+            rows = self._rows
 
         # Sort
         if options["sortby"]:
@@ -1890,12 +1891,10 @@ class PrettyTable:
         Arguments:
 
         options - dictionary of option settings."""
-        import copy
-
         if options["oldsortslice"]:
-            dividers = copy.deepcopy(self._dividers[options["start"] : options["end"]])
+            dividers = self._dividers[options["start"] : options["end"]]
         else:
-            dividers = copy.deepcopy(self._dividers)
+            dividers = self._dividers
 
         if options["sortby"]:
             dividers = [False for divider in dividers]
@@ -2707,6 +2706,7 @@ class PrettyTable:
 ##############################
 
 
+@functools.lru_cache
 def _str_block_width(val: str) -> int:
     import wcwidth  # type: ignore[import-untyped]
 
