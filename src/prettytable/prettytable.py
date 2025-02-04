@@ -143,6 +143,7 @@ class OptionsType(TypedDict):
     none_format: str | dict[str, str | None] | None
     escape_header: bool
     escape_data: bool
+    break_on_hyphens: bool
 
 
 _re = re.compile(r"\033\[[0-9;]*m|\033\(B")
@@ -204,6 +205,7 @@ class PrettyTable:
     orgmode: bool
     _widths: list[int]
     _hrule: str
+    _break_on_hyphens: bool
 
     def __init__(self, field_names: Sequence[str] | None = None, **kwargs) -> None:
         """Return a new PrettyTable instance
@@ -259,8 +261,9 @@ class PrettyTable:
         align - default align for each column (None, "l", "c" or "r")
         valign - default valign for each row (None, "t", "m" or "b")
         reversesort - True or False to sort in descending or ascending order
-        oldsortslice - Slice rows before sorting in the "old style" """
-
+        oldsortslice - Slice rows before sorting in the "old style"
+        break_on_hyphens - Whether long lines are broken on hypens or not, default: True
+        """
         self.encoding = kwargs.get("encoding", "UTF-8")
 
         # Data
@@ -323,6 +326,7 @@ class PrettyTable:
             "none_format",
             "escape_header",
             "escape_data",
+            "break_on_hyphens",
         ]
 
         self._none_format: dict[str, str | None] = {}
@@ -412,6 +416,10 @@ class PrettyTable:
         self._format = kwargs["format"] or False
         self._xhtml = kwargs["xhtml"] or False
         self._attributes = kwargs["attributes"] or {}
+        if kwargs["break_on_hyphens"] in (True, False):
+            self._break_on_hyphens = kwargs["break_on_hyphens"]
+        else:
+            self._break_on_hyphens = True
 
     def _column_specific_args(self):
         # Column specific arguments, use property.setters
@@ -543,6 +551,7 @@ class PrettyTable:
             "oldsortslice",
             "escape_header",
             "escape_data",
+            "break_on_hyphens",
         ):
             self._validate_true_or_false(option, val)
         elif option == "header_style":
@@ -1438,6 +1447,16 @@ class PrettyTable:
         self._validate_option("escape_data", val)
         self._escape_data = val
 
+    @property
+    def break_on_hyphens(self) -> bool:
+        """Break longlines on hyphens (True or False)"""
+        return self._break_on_hyphens
+
+    @break_on_hyphens.setter
+    def break_on_hyphens(self, val: bool) -> None:
+        self._validate_option("break_on_hyphens", val)
+        self._break_on_hyphens = val
+
     ##############################
     # OPTION MIXER               #
     ##############################
@@ -2189,7 +2208,9 @@ class PrettyTable:
                 ):
                     line = none_val
                 if _str_block_width(line) > width:
-                    line = textwrap.fill(line, width)
+                    line = textwrap.fill(
+                        line, width, break_on_hyphens=options["break_on_hyphens"]
+                    )
                 new_lines.append(line)
             lines = new_lines
             value = "\n".join(lines)
@@ -2397,7 +2418,9 @@ class PrettyTable:
         format - Controls whether or not HTML tables are formatted to match
             styling options (True or False)
         escape_data - escapes the text within a data field (True or False)
-        xhtml - print <br/> tags if True, <br> tags if False"""
+        xhtml - print <br/> tags if True, <br> tags if False
+        break_on_hyphens - Whether long lines are broken on hypens or not, default: True
+        """
 
         options = self._get_options(kwargs)
 
