@@ -502,6 +502,7 @@ The options are:
 | `top_left_junction_char`     | Single character string used to draw top-left line junctions. Default: `junction_char`.                                                                                                          |
 | `bottom_right_junction_char` | Single character string used to draw bottom-right line junctions. Default: `junction_char`.                                                                                                      |
 | `bottom_left_junction_char`  | Single character string used to draw bottom-left line junctions. Default: `junction_char`.                                                                                                       |
+| `break_on_hyphens`           | Whether long lines are wrapped on hyphens. Default: `True`.                                                                                                                                      |
 
 You can set the style options to your own settings in two ways:
 

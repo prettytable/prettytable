@@ -2470,6 +2470,68 @@ class TestMinTableWidth:
                 ]
 
 
+class TestBreakOnHyphens:
+    row = [
+        "bluedevil breeze breeze-gtk eos-bash-shared glib2 kactivitymanagerd kde-cli-tools kde-gtk-config kdecoration kdeplasma-addons khotkeys kinfocenter kmenuedit kpipewire kscreen kscreenlocker ksystemstats kwallet-pam kwin layer-shell-qt lib32-glib2 libarchive libkscreen libksysguard libwebp milou oxygen-sounds plasma-desktop plasma-disks plasma-integration plasma-nm plasma-pa plasma-workspace polkit-kde-agent powerdevil python-gobject qt5-webengine sddm-kcm sqlite systemsettings vivaldi"  # noqa: E501
+    ]
+    expected_true = """+------------------------------------------+
+|                 Field 1                  |
++------------------------------------------+
+|  bluedevil breeze breeze-gtk eos-bash-   |
+| shared glib2 kactivitymanagerd kde-cli-  |
+|     tools kde-gtk-config kdecoration     |
+|  kdeplasma-addons khotkeys kinfocenter   |
+|       kmenuedit kpipewire kscreen        |
+|  kscreenlocker ksystemstats kwallet-pam  |
+|     kwin layer-shell-qt lib32-glib2      |
+|    libarchive libkscreen libksysguard    |
+|   libwebp milou oxygen-sounds plasma-    |
+| desktop plasma-disks plasma-integration  |
+|   plasma-nm plasma-pa plasma-workspace   |
+|   polkit-kde-agent powerdevil python-    |
+|  gobject qt5-webengine sddm-kcm sqlite   |
+|          systemsettings vivaldi          |
++------------------------------------------+"""
+    expected_false = """+------------------------------------------+
+|                 Field 1                  |
++------------------------------------------+
+|       bluedevil breeze breeze-gtk        |
+| eos-bash-shared glib2 kactivitymanagerd  |
+| kde-cli-tools kde-gtk-config kdecoration |
+|  kdeplasma-addons khotkeys kinfocenter   |
+|       kmenuedit kpipewire kscreen        |
+|  kscreenlocker ksystemstats kwallet-pam  |
+|     kwin layer-shell-qt lib32-glib2      |
+|    libarchive libkscreen libksysguard    |
+|       libwebp milou oxygen-sounds        |
+|       plasma-desktop plasma-disks        |
+|  plasma-integration plasma-nm plasma-pa  |
+|    plasma-workspace polkit-kde-agent     |
+| powerdevil python-gobject qt5-webengine  |
+|  sddm-kcm sqlite systemsettings vivaldi  |
++------------------------------------------+"""
+
+    def test_break_on_hyphens(self) -> None:
+        table = PrettyTable(max_width=40)
+        table.break_on_hyphens = False
+        assert not table.break_on_hyphens
+        table.add_row(self.row)
+        assert table.get_string().strip() == self.expected_false
+
+    def test_break_on_hyphens_on_init(self) -> None:
+        table = PrettyTable(max_width=40, break_on_hyphens=False)
+        assert not table._break_on_hyphens
+        assert not table.break_on_hyphens
+        table.add_row(self.row)
+        assert table.get_string().strip() == self.expected_false
+
+    def test_break_on_hyphens_default(self) -> None:
+        table = PrettyTable(max_width=40)
+        assert table.break_on_hyphens
+        table.add_row(self.row)
+        assert table.get_string().strip() == self.expected_true
+
+
 class TestMaxTableWidth:
     def test_max_table_width(self) -> None:
         table = PrettyTable()
