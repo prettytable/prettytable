@@ -999,7 +999,7 @@ class PrettyTable:
 
         Arguments:
 
-        rowfilter - a function which takes one argument and returns a boolean"""
+        row_filter - a function which takes one argument and returns a Boolean"""
         return self._rowfilter
 
     @rowfilter.setter
