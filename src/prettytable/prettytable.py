@@ -38,6 +38,7 @@ import re
 import warnings
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from enum import IntEnum
+from functools import lru_cache
 from html.parser import HTMLParser
 from typing import TYPE_CHECKING, Any, Final, Literal, TypedDict, cast
 
@@ -148,7 +149,7 @@ class OptionsType(TypedDict):
 _re = re.compile(r"\033\[[0-9;]*m|\033\(B")
 
 
-@functools.lru_cache
+@lru_cache
 def _get_size(text: str) -> tuple[int, int]:
     lines = text.split("\n")
     height = len(lines)
