@@ -2547,65 +2547,40 @@ class TestMaxTableWidth:
 +---+-----------------+---+-----------------+---+-----------------+""".strip()
         )
 
-    def test_table_maxwidth_wo_headerwidth(self) -> None:
-        """See also #165"""
-        table = PrettyTable(
-            [
-                "A Field Name",
-                "B Field Name",
-                "D Field Name",
-                "E Field Name",
-                "F Field Name",
-                "G Field Name",
-                "H Field Name",
-                "I Field Name",
-                "J Field Name",
-                "K Field Name",
-                "L Field Name",
-                "M Field Name",
-            ],
-            use_header_width=False,
-        )
-        table.add_row([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
-
-        assert (
-            table.get_string()
-            == """+---+---+---+---+---+---+---+---+---+---+----+----+
+    @pytest.mark.parametrize("set_with_parameter", [True, False])
+    def test_table_max_width_wo_header_width(self, set_with_parameter) -> None:
+        # Arrange
+        headers = [
+            "A Field Name",
+            "B Field Name",
+            "D Field Name",
+            "E Field Name",
+            "F Field Name",
+            "G Field Name",
+            "H Field Name",
+            "I Field Name",
+            "J Field Name",
+            "K Field Name",
+            "L Field Name",
+            "M Field Name",
+        ]
+        row = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+        expected = """+---+---+---+---+---+---+---+---+---+---+----+----+
 | A | B | D | E | F | G | H | I | J | K | L  | M  |
 +---+---+---+---+---+---+---+---+---+---+----+----+
 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 |
 +---+---+---+---+---+---+---+---+---+---+----+----+"""
-        )
 
-    def test_table_maxwidth_wo_headerwidth_setter(self) -> None:
-        """See also #165"""
-        table = PrettyTable(
-            [
-                "A Field Name",
-                "B Field Name",
-                "D Field Name",
-                "E Field Name",
-                "F Field Name",
-                "G Field Name",
-                "H Field Name",
-                "I Field Name",
-                "J Field Name",
-                "K Field Name",
-                "L Field Name",
-                "M Field Name",
-            ]
-        )
-        table.use_header_width = False
-        table.add_row([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
+        # Act
+        if set_with_parameter:
+            table = PrettyTable(headers, use_header_width=False)
+        else:
+            table = PrettyTable(headers)
+            table.use_header_width = False
+        table.add_row(row)
 
-        assert (
-            table.get_string()
-            == """+---+---+---+---+---+---+---+---+---+---+----+----+
-| A | B | D | E | F | G | H | I | J | K | L  | M  |
-+---+---+---+---+---+---+---+---+---+---+----+----+
-| 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 |
-+---+---+---+---+---+---+---+---+---+---+----+----+"""
-        )
+        # Assert
+        assert table.get_string() == expected
 
     def test_table_width_on_init_wo_columns(self) -> None:
         """See also #272"""
