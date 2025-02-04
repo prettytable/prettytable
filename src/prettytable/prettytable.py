@@ -33,7 +33,7 @@
 
 from __future__ import annotations
 
-import functools
+from functools import lru_cache
 import io
 import re
 import warnings
