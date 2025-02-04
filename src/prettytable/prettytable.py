@@ -1950,7 +1950,7 @@ class PrettyTable:
         end - index of last data row to include in output PLUS ONE (list slice style)
         fields - names of fields (columns) to include
         header - print a header showing field names (True or False)
-        use_header_width - reflect width of header
+        use_header_width - reflect width of header (True or False)
         border - print a border around the table (True or False)
         preserve_internal_border - print a border inside the table even if
             border is disabled (True or False)
