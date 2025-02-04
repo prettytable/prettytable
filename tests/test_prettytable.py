@@ -888,7 +888,7 @@ class TestRowFilter:
     def test_row_filter_at_class_declaration(self) -> None:
         table = PrettyTable(
             field_names=["City name", "Area", "Population", "Annual Rainfall"],
-            rowfilter=self.filter_function,
+            row_filter=self.filter_function,
         )
         table.add_row(["Adelaide", 1295, 1158259, 600.5])
         table.add_row(["Brisbane", 5905, 1857594, 1146.4])
