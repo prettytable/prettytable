@@ -1013,7 +1013,7 @@ class PrettyTable:
 
     @property
     def use_header_width(self) -> bool:
-        """Controls whether header is icluded in computing width computation
+        """Controls whether header is included in computing width
 
         Arguments:
 
