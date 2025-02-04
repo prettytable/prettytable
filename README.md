@@ -270,6 +270,36 @@ prints:
 +-----------+------+------------+-----------------+
 ```
 
+#### Filtering your table
+
+You can make sure that your tables are filtered by giving `get_string` a `row_filter`
+keyword argument, which must a function with one argument `row` returning a bool value.
+The `row`is the list of fields in a row.
+
+For example, to print the example table we built earlier of Australian capital city
+data, so that cities with a population with more than 1000000, we can do this:
+
+```python
+def filter_function(self, vals: list[str]) -> bool:
+    return vals[2] > 999999
+
+print(table.get_string(row_filter=filter_function))
+```
+
+to get:
+
+```
++-----------+------+------------+-----------------+
+| City name | Area | Population | Annual Rainfall |
++-----------+------+------------+-----------------+
+|  Adelaide | 1295 |  1158259   |      600.5      |
+|  Brisbane | 5905 |  1857594   |      1146.4     |
+|   Sydney  | 2058 |  4336374   |      1214.8     |
+| Melbourne | 1566 |  3806092   |      646.9      |
+|   Perth   | 5386 |  1554769   |      869.4      |
++-----------+------+------------+-----------------+
+```
+
 #### Changing the alignment of columns
 
 By default, all columns in a table are centre aligned.

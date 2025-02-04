@@ -866,6 +866,41 @@ class TestSorting:
         )
 
 
+class TestRowFilter:
+    EXPECTED_RESULT = """+-----------+------+------------+-----------------+
+| City name | Area | Population | Annual Rainfall |
++-----------+------+------------+-----------------+
+|  Adelaide | 1295 |  1158259   |      600.5      |
+|  Brisbane | 5905 |  1857594   |      1146.4     |
+|   Sydney  | 2058 |  4336374   |      1214.8     |
+| Melbourne | 1566 |  3806092   |      646.9      |
+|   Perth   | 5386 |  1554769   |      869.4      |
++-----------+------+------------+-----------------+"""
+
+    def filter_function(self, vals: list[str]) -> bool:
+        return vals[2] > 999999
+
+    def test_row_filter(self, city_data_prettytable: PrettyTable) -> None:
+        city_data_prettytable.row_filter = self.filter_function
+        assert city_data_prettytable.row_filter == self.filter_function
+        assert self.EXPECTED_RESULT == city_data_prettytable.get_string()
+
+    def test_row_filter_at_class_declaration(self) -> None:
+        table = PrettyTable(
+            field_names=["City name", "Area", "Population", "Annual Rainfall"],
+            row_filter=self.filter_function,
+        )
+        table.add_row(["Adelaide", 1295, 1158259, 600.5])
+        table.add_row(["Brisbane", 5905, 1857594, 1146.4])
+        table.add_row(["Darwin", 112, 120900, 1714.7])
+        table.add_row(["Hobart", 1357, 205556, 619.5])
+        table.add_row(["Sydney", 2058, 4336374, 1214.8])
+        table.add_row(["Melbourne", 1566, 3806092, 646.9])
+        table.add_row(["Perth", 5386, 1554769, 869.4])
+        assert table.row_filter == self.filter_function
+        assert self.EXPECTED_RESULT == table.get_string().strip()
+
+
 @pytest.fixture(scope="function")
 def float_pt() -> PrettyTable:
     table = PrettyTable(["Constant", "Value"])
