@@ -219,7 +219,7 @@ class PrettyTable:
         start - index of first data row to include in output
         end - index of last data row to include in output PLUS ONE (list slice style)
         header - print a header showing field names (True or False)
-        use_header_width - reflect width of header
+        use_header_width - reflect width of header (True or False)
         header_style - stylisation to apply to field names in header
             ("cap", "title", "upper", "lower" or None)
         border - print a border around the table (True or False)
