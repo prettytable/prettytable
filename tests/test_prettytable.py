@@ -2547,6 +2547,41 @@ class TestMaxTableWidth:
 +---+-----------------+---+-----------------+---+-----------------+""".strip()
         )
 
+    @pytest.mark.parametrize("set_with_parameter", [True, False])
+    def test_table_max_width_wo_header_width(self, set_with_parameter) -> None:
+        # Arrange
+        headers = [
+            "A Field Name",
+            "B Field Name",
+            "D Field Name",
+            "E Field Name",
+            "F Field Name",
+            "G Field Name",
+            "H Field Name",
+            "I Field Name",
+            "J Field Name",
+            "K Field Name",
+            "L Field Name",
+            "M Field Name",
+        ]
+        row = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+        expected = """+---+---+---+---+---+---+---+---+---+---+----+----+
+| A | B | D | E | F | G | H | I | J | K | L  | M  |
++---+---+---+---+---+---+---+---+---+---+----+----+
+| 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 |
++---+---+---+---+---+---+---+---+---+---+----+----+"""
+
+        # Act
+        if set_with_parameter:
+            table = PrettyTable(headers, use_header_width=False)
+        else:
+            table = PrettyTable(headers)
+            table.use_header_width = False
+        table.add_row(row)
+
+        # Assert
+        assert table.get_string() == expected
+
     def test_table_width_on_init_wo_columns(self) -> None:
         """See also #272"""
         table = PrettyTable(max_width=10)

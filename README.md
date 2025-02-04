@@ -502,6 +502,11 @@ The options are:
 | `top_left_junction_char`     | Single character string used to draw top-left line junctions. Default: `junction_char`.                                                                                                          |
 | `bottom_right_junction_char` | Single character string used to draw bottom-right line junctions. Default: `junction_char`.                                                                                                      |
 | `bottom_left_junction_char`  | Single character string used to draw bottom-left line junctions. Default: `junction_char`.                                                                                                       |
+| `min_table_width`            | Number of characters used for the minimum total table width                                                                                                                                      |
+| `max_table_width`            | Number of characters used for the maximum total table width                                                                                                                                      |
+| `max_width`                  | Number of characters used for maximum width of a column                                                                                                                                          |
+| `min_width`                  | Number of characters used for minimum width of a column                                                                                                                                          |
+| `use_header_width`           | A Boolean option (must be `True` or `False`). Controls whether the width of the header is used for compuzting column width. Default `True`                                                       |
 
 You can set the style options to your own settings in two ways:
 
