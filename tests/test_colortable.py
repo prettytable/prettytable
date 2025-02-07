@@ -68,8 +68,9 @@ class TestColorTable:
         dict2 = table2.__dict__
 
         # So we don't compare functions
-        del dict1["_sort_key"]
-        del dict2["_sort_key"]
+        for func in ("_sort_key", "_row_filter"):
+            del dict1[func]
+            del dict2[func]
 
         assert dict1 == dict2
 
