@@ -273,11 +273,11 @@ prints:
 #### Filtering your table
 
 You can make sure that your tables are filtered by giving `get_string` a `row_filter`
-keyword argument, which must a function with one argument `row` returning a bool value.
-The `row`is the list of fields in a row.
+keyword argument, which must be a function with one argument `row` returning a Boolean value.
+The `row` is the list of fields in a row.
 
 For example, to print the example table we built earlier of Australian capital city
-data, so that cities with a population with more than 1000000, we can do this:
+data, so that cities with a population with more than 1,000,000, we can do this:
 
 ```python
 def filter_function(self, vals: list[str]) -> bool:
