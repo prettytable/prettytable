@@ -757,35 +757,6 @@ class TestBreakLine:
         result = table.get_string(hrules=hrule)
         assert result.strip() == expected_result.strip()
 
-    def test_break_line_html(self) -> None:
-        table = PrettyTable(["Field 1", "Field 2"])
-        table.add_row(["value 1", "value2\nsecond line"])
-        table.add_row(["value 3", "value4"])
-        result = table.get_html_string(hrules=HRuleStyle.ALL)
-        assert (
-            result.strip()
-            == """
-<table>
-    <thead>
-        <tr>
-            <th>Field 1</th>
-            <th>Field 2</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>value 1</td>
-            <td>value2<br>second line</td>
-        </tr>
-        <tr>
-            <td>value 3</td>
-            <td>value4</td>
-        </tr>
-    </tbody>
-</table>
-""".strip()
-        )
-
 
 class TestFromDB:
     @pytest.mark.usefixtures("init_db")

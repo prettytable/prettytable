@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from prettytable import PrettyTable, from_html, from_html_one
+from prettytable import HRuleStyle, PrettyTable, from_html, from_html_one
 
 
 class TestHtmlConstructor:
@@ -524,4 +524,62 @@ class TestHtmlOutput:
     </tbody>
 </table>
 """.strip()  # noqa: E501
+        )
+
+    def test_break_line_html(self) -> None:
+        table = PrettyTable(["Field 1", "Field 2"])
+        table.add_row(["value 1", "value2\nsecond line"])
+        table.add_row(["value 3", "value4"])
+        result = table.get_html_string(hrules=HRuleStyle.ALL)
+        assert (
+            result.strip()
+            == """
+<table>
+    <thead>
+        <tr>
+            <th>Field 1</th>
+            <th>Field 2</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>value 1</td>
+            <td>value2<br>second line</td>
+        </tr>
+        <tr>
+            <td>value 3</td>
+            <td>value4</td>
+        </tr>
+    </tbody>
+</table>
+""".strip()
+        )
+
+    def test_break_line_xhtml(self) -> None:
+        table = PrettyTable(["Field 1", "Field 2"])
+        table.add_row(["value 1", "value2\nsecond line"])
+        table.add_row(["value 3", "value4"])
+        result = table.get_html_string(hrules=HRuleStyle.ALL, xhtml=True)
+        assert (
+            result.strip()
+            == """
+<table>
+    <thead>
+        <tr>
+            <th>Field 1</th>
+            <th>Field 2</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>value 1</td>
+            <td>value2<br/>second line</td>
+        </tr>
+        <tr>
+            <td>value 3</td>
+            <td>value4</td>
+        </tr>
+    </tbody>
+</table>
+""".strip()
         )
