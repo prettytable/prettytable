@@ -210,7 +210,7 @@ class TestBuildEquivalence:
         assert left_hand.get_latex_string() == right_hand.get_latex_string()
 
 
-class TestDeleteColumn:
+class TestDelete:
     def test_delete_column(self, col_prettytable: PrettyTable) -> None:
         col_prettytable.del_column("Area")
 
@@ -234,6 +234,27 @@ class TestDeleteColumn:
     ) -> None:
         with pytest.raises(ValueError):
             col_prettytable.del_column("City not-a-name")
+
+    def test_delete_row(self, city_data: PrettyTable) -> None:
+        city_data.del_row(2)
+
+        assert (
+            city_data.get_string()
+            == """+-----------+------+------------+-----------------+
+| City name | Area | Population | Annual Rainfall |
++-----------+------+------------+-----------------+
+|  Adelaide | 1295 |  1158259   |      600.5      |
+|  Brisbane | 5905 |  1857594   |      1146.4     |
+|   Hobart  | 1357 |   205556   |      619.5      |
+|   Sydney  | 2058 |  4336374   |      1214.8     |
+| Melbourne | 1566 |  3806092   |      646.9      |
+|   Perth   | 5386 |  1554769   |      869.4      |
++-----------+------+------------+-----------------+"""
+        )
+
+    def test_delete_row_unavailable(self, city_data: PrettyTable) -> None:
+        with pytest.raises(IndexError):
+            city_data.del_row(10)
 
 
 class TestFieldNameLessTable:
