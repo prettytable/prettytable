@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from test_prettytable import helper_table
-
 from prettytable import PrettyTable, TableStyle
 
 
@@ -38,18 +36,16 @@ class TestRowEndSection:
 
 
 class TestClearing:
-    def test_clear_rows(self) -> None:
-        t = helper_table()
-        t.add_row([0, "a", "b", "c"], divider=True)
-        t.clear_rows()
-        assert t.rows == []
-        assert t.dividers == []
-        assert t.field_names == ["", "Field 1", "Field 2", "Field 3"]
+    def test_clear_rows(self, helper_table) -> None:
+        helper_table.add_row([0, "a", "b", "c"], divider=True)
+        helper_table.clear_rows()
+        assert helper_table.rows == []
+        assert helper_table.dividers == []
+        assert helper_table.field_names == ["", "Field 1", "Field 2", "Field 3"]
 
-    def test_clear(self) -> None:
-        t = helper_table()
-        t.add_row([0, "a", "b", "c"], divider=True)
-        t.clear()
-        assert t.rows == []
-        assert t.dividers == []
-        assert t.field_names == []
+    def test_clear(self, helper_table) -> None:
+        helper_table.add_row([0, "a", "b", "c"], divider=True)
+        helper_table.clear()
+        assert helper_table.rows == []
+        assert helper_table.dividers == []
+        assert helper_table.field_names == []

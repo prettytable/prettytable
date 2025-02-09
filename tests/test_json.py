@@ -1,14 +1,11 @@
 from __future__ import annotations
 
-from test_prettytable import helper_table
-
 from prettytable import PrettyTable, from_json
 
 
 class TestJSONOutput:
-    def test_json_output(self) -> None:
-        t = helper_table()
-        result = t.get_json_string()
+    def test_json_output(self, helper_table) -> None:
+        result = helper_table.get_json_string()
         assert (
             result.strip()
             == """
@@ -40,7 +37,7 @@ class TestJSONOutput:
 ]""".strip()
         )
         options = {"fields": ["Field 1", "Field 3"]}
-        result = t.get_json_string(**options)
+        result = helper_table.get_json_string(**options)
         assert (
             result.strip()
             == """
@@ -64,9 +61,10 @@ class TestJSONOutput:
 ]""".strip()
         )
 
-    def test_json_output_options(self) -> None:
-        t = helper_table()
-        result = t.get_json_string(header=False, indent=None, separators=(",", ":"))
+    def test_json_output_options(self, helper_table) -> None:
+        result = helper_table.get_json_string(
+            header=False, indent=None, separators=(",", ":")
+        )
         assert (
             result
             == """[{"":1,"Field 1":"value 1","Field 2":"value2","Field 3":"value3"},"""

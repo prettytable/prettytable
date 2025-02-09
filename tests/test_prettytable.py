@@ -25,16 +25,6 @@ def test_version() -> None:
     assert prettytable.__version__[-1].isdigit()
 
 
-def helper_table(*, rows: int = 3) -> PrettyTable:
-    table = PrettyTable(["", "Field 1", "Field 2", "Field 3"])
-    v = 1
-    for row in range(rows):
-        # Some have spaces, some not, to help test padding columns of different widths
-        table.add_row([v, f"value {v}", f"value{v+1}", f"value{v+2}"])
-        v += 3
-    return table
-
-
 # Australian capital city data example table
 CITY_DATA_HEADER = ["City name", "Area", "Population", "Annual Rainfall"]
 CITY_DATA = [
@@ -381,13 +371,12 @@ class TestOptionAttribute:
         table = PrettyTable(preserve_internal_border=True)
         assert table.preserve_internal_border is True
 
-    def test_internal_border_preserved(self) -> None:
-        pt = helper_table()
-        pt.border = False
-        pt.preserve_internal_border = True
+    def test_internal_border_preserved(self, helper_table) -> None:
+        helper_table.border = False
+        helper_table.preserve_internal_border = True
 
         assert (
-            pt.get_string().strip()
+            helper_table.get_string().strip()
             == """
    | Field 1 | Field 2 | Field 3  
 ---+---------+---------+---------
@@ -785,21 +774,20 @@ class TestFromDB:
 
 
 class TestCsvOutput:
-    def test_csv_output(self) -> None:
-        t = helper_table()
-        assert t.get_csv_string(delimiter="\t", header=False) == (
+    def test_csv_output(self, helper_table) -> None:
+        assert helper_table.get_csv_string(delimiter="\t", header=False) == (
             "1\tvalue 1\tvalue2\tvalue3\r\n"
             "4\tvalue 4\tvalue5\tvalue6\r\n"
             "7\tvalue 7\tvalue8\tvalue9\r\n"
         )
-        assert t.get_csv_string() == (
+        assert helper_table.get_csv_string() == (
             ",Field 1,Field 2,Field 3\r\n"
             "1,value 1,value2,value3\r\n"
             "4,value 4,value5,value6\r\n"
             "7,value 7,value8,value9\r\n"
         )
         options = {"fields": ["Field 1", "Field 3"]}
-        assert t.get_csv_string(**options) == (
+        assert helper_table.get_csv_string(**options) == (
             "Field 1,Field 3\r\n"
             "value 1,value3\r\n"
             "value 4,value6\r\n"
@@ -807,35 +795,31 @@ class TestCsvOutput:
         )
 
 
-def test_paginate() -> None:
-    t = helper_table(rows=7)
+def test_paginate(city_data: PrettyTable) -> None:
     expected_page_1 = """
-+----+----------+---------+---------+
-|    | Field 1  | Field 2 | Field 3 |
-+----+----------+---------+---------+
-| 1  | value 1  |  value2 |  value3 |
-| 4  | value 4  |  value5 |  value6 |
-| 7  | value 7  |  value8 |  value9 |
-| 10 | value 10 | value11 | value12 |
-+----+----------+---------+---------+
-    """.strip()
++-----------+------+------------+-----------------+
+| City name | Area | Population | Annual Rainfall |
++-----------+------+------------+-----------------+
+|  Adelaide | 1295 |  1158259   |      600.5      |
+|  Brisbane | 5905 |  1857594   |      1146.4     |
+|   Darwin  | 112  |   120900   |      1714.7     |
+|   Hobart  | 1357 |   205556   |      619.5      |
++-----------+------+------------+-----------------+""".strip()
     expected_page_2 = """
-+----+----------+---------+---------+
-|    | Field 1  | Field 2 | Field 3 |
-+----+----------+---------+---------+
-| 13 | value 13 | value14 | value15 |
-| 16 | value 16 | value17 | value18 |
-| 19 | value 19 | value20 | value21 |
-+----+----------+---------+---------+
-""".strip()
++-----------+------+------------+-----------------+
+| City name | Area | Population | Annual Rainfall |
++-----------+------+------------+-----------------+
+|   Sydney  | 2058 |  4336374   |      1214.8     |
+| Melbourne | 1566 |  3806092   |      646.9      |
+|   Perth   | 5386 |  1554769   |      869.4      |
++-----------+------+------------+-----------------+""".strip()
 
-    paginated = t.paginate(page_length=4)
-    paginated = paginated.strip()
+    paginated = city_data.paginate(page_length=4).strip()
     assert paginated.startswith(expected_page_1)
     assert "\f" in paginated
     assert paginated.endswith(expected_page_2)
 
-    paginated = t.paginate(page_length=4, line_break="\n")
+    paginated = city_data.paginate(page_length=4, line_break="\n")
     assert "\f" not in paginated
     assert "\n" in paginated
 
@@ -1467,55 +1451,57 @@ class TestFields:
 
 
 class TestGeneralOutput:
-    def test_copy(self) -> None:
-        t = helper_table()
-        t_copy = t.copy()
-        assert t.get_string() == t_copy.get_string()
+    def test_copy(self, helper_table: PrettyTable) -> None:
+        t_copy = helper_table.copy()
+        assert helper_table.get_string() == t_copy.get_string()
 
-    def test_text(self) -> None:
-        t = helper_table()
-        assert t.get_formatted_string("text") == t.get_string()
+    def test_text(self, helper_table: prettytable) -> None:
+        assert helper_table.get_formatted_string("text") == helper_table.get_string()
         # test with default arg, too
-        assert t.get_formatted_string() == t.get_string()
+        assert helper_table.get_formatted_string() == helper_table.get_string()
         # args passed through
-        assert t.get_formatted_string(border=False) == t.get_string(border=False)
-
-    def test_csv(self) -> None:
-        t = helper_table()
-        assert t.get_formatted_string("csv") == t.get_csv_string()
-        # args passed through
-        assert t.get_formatted_string("csv", border=False) == t.get_csv_string(
+        assert helper_table.get_formatted_string(
             border=False
-        )
+        ) == helper_table.get_string(border=False)
 
-    def test_json(self) -> None:
-        t = helper_table()
-        assert t.get_formatted_string("json") == t.get_json_string()
+    def test_csv(self, helper_table: PrettyTable) -> None:
+        assert helper_table.get_formatted_string("csv") == helper_table.get_csv_string()
         # args passed through
-        assert t.get_formatted_string("json", border=False) == t.get_json_string(
-            border=False
-        )
+        assert helper_table.get_formatted_string(
+            "csv", border=False
+        ) == helper_table.get_csv_string(border=False)
 
-    def test_html(self) -> None:
-        t = helper_table()
-        assert t.get_formatted_string("html") == t.get_html_string()
+    def test_json(self, helper_table: PrettyTable) -> None:
+        assert (
+            helper_table.get_formatted_string("json") == helper_table.get_json_string()
+        )
         # args passed through
-        assert t.get_formatted_string("html", border=False) == t.get_html_string(
-            border=False
-        )
+        assert helper_table.get_formatted_string(
+            "json", border=False
+        ) == helper_table.get_json_string(border=False)
 
-    def test_latex(self) -> None:
-        t = helper_table()
-        assert t.get_formatted_string("latex") == t.get_latex_string()
+    def test_html(self, helper_table: PrettyTable) -> None:
+        assert (
+            helper_table.get_formatted_string("html") == helper_table.get_html_string()
+        )
         # args passed through
-        assert t.get_formatted_string("latex", border=False) == t.get_latex_string(
-            border=False
-        )
+        assert helper_table.get_formatted_string(
+            "html", border=False
+        ) == helper_table.get_html_string(border=False)
 
-    def test_invalid(self) -> None:
-        t = helper_table()
+    def test_latex(self, helper_table: PrettyTable) -> None:
+        assert (
+            helper_table.get_formatted_string("latex")
+            == helper_table.get_latex_string()
+        )
+        # args passed through
+        assert helper_table.get_formatted_string(
+            "latex", border=False
+        ) == helper_table.get_latex_string(border=False)
+
+    def test_invalid(self, helper_table: PrettyTable) -> None:
         with pytest.raises(ValueError):
-            t.get_formatted_string("pdf")
+            helper_table.get_formatted_string("pdf")
 
 
 class TestDeprecations:

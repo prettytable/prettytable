@@ -4,7 +4,6 @@ import random
 
 import pytest
 from pytest_lazy_fixtures import lf
-from test_prettytable import helper_table
 
 from prettytable import HRuleStyle, PrettyTable, TableStyle, VRuleStyle
 
@@ -258,17 +257,15 @@ class TestStyle:
             ),
         ],
     )
-    def test_style(self, style, expected) -> None:
-        t = helper_table()
+    def test_style(self, helper_table, style, expected) -> None:
         random.seed(1234)
-        t.set_style(style)
-        assert t.get_string().strip() == expected.strip()
+        helper_table.set_style(style)
+        assert helper_table.get_string().strip() == expected.strip()
 
-    def test_style_invalid(self) -> None:
-        t = helper_table()
+    def test_style_invalid(self, helper_table) -> None:
         # This is an hrule style, not a table style
         with pytest.raises(ValueError):
-            t.set_style(HRuleStyle.ALL)  # type: ignore[arg-type]
+            helper_table.set_style(HRuleStyle.ALL)  # type: ignore[arg-type]
 
     @pytest.mark.parametrize(
         "original_style,style, expected",
@@ -377,7 +374,7 @@ class TestStyle:
             ),
         ],
     )
-    def test_style_reset(self, original_style, style, expected) -> None:
+    def test_style_reset(self, helper_table, original_style, style, expected) -> None:
         """
             Testing to ensure that default styling is reset between changes
             of styles on a PrettyTable
@@ -386,11 +383,10 @@ class TestStyle:
             style (str): Style to be used (Default, markdown, etc)
             expected (str): The expected format of style as a string representation
         """
-        t = helper_table()
         random.seed(1234)
-        t.set_style(original_style)
-        t.set_style(style)
-        assert t.get_string().strip() == expected.strip()
+        helper_table.set_style(original_style)
+        helper_table.set_style(style)
+        assert helper_table.get_string().strip() == expected.strip()
 
     @pytest.mark.parametrize(
         "style, expected",

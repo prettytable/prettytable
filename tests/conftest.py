@@ -60,3 +60,18 @@ def row_prettytable(field_name_less_table) -> PrettyTable:
     # Row by row...
     field_name_less_table.field_names = CITY_DATA_HEADER
     return field_name_less_table
+
+
+@pytest.fixture(scope="function")
+def empty_helper_table() -> PrettyTable:
+    return PrettyTable(["", "Field 1", "Field 2", "Field 3"])
+
+
+@pytest.fixture(scope="function")
+def helper_table(empty_helper_table: PrettyTable) -> PrettyTable:
+    v = 1
+    for row in range(3):
+        # Some have spaces, some not, to help test padding columns of different widths
+        empty_helper_table.add_row([v, f"value {v}", f"value{v+1}", f"value{v+2}"])
+        v += 3
+    return empty_helper_table

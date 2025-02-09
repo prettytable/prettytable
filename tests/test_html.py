@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import pytest
-from test_prettytable import helper_table
 
 from prettytable import PrettyTable, from_html, from_html_one
 
@@ -25,9 +24,8 @@ class TestHtmlConstructor:
 
 
 class TestHtmlOutput:
-    def test_html_output(self) -> None:
-        t = helper_table()
-        result = t.get_html_string()
+    def test_html_output(self, helper_table: PrettyTable) -> None:
+        result = helper_table.get_html_string()
         assert (
             result.strip()
             == """
@@ -64,9 +62,8 @@ class TestHtmlOutput:
 """.strip()
         )
 
-    def test_html_output_formatted(self) -> None:
-        t = helper_table()
-        result = t.get_html_string(format=True)
+    def test_html_output_formatted(self, helper_table: PrettyTable) -> None:
+        result = helper_table.get_html_string(format=True)
         assert (
             result.strip()
             == """
@@ -103,10 +100,11 @@ class TestHtmlOutput:
 """.strip()  # noqa: E501
         )
 
-    def test_html_output_with_title(self) -> None:
-        t = helper_table()
-        t.title = "Title & Title"
-        result = t.get_html_string(attributes={"bgcolor": "red", "a<b": "1<2"})
+    def test_html_output_with_title(self, helper_table: PrettyTable) -> None:
+        helper_table.title = "Title & Title"
+        result = helper_table.get_html_string(
+            attributes={"bgcolor": "red", "a<b": "1<2"}
+        )
         assert (
             result.strip()
             == """
@@ -144,10 +142,9 @@ class TestHtmlOutput:
 """.strip()
         )
 
-    def test_html_output_formatted_with_title(self) -> None:
-        t = helper_table()
-        t.title = "Title & Title"
-        result = t.get_html_string(
+    def test_html_output_formatted_with_title(self, helper_table: PrettyTable) -> None:
+        helper_table.title = "Title & Title"
+        result = helper_table.get_html_string(
             attributes={"bgcolor": "red", "a<b": "1<2"}, format=True
         )
         assert (
@@ -187,10 +184,16 @@ class TestHtmlOutput:
 """.strip()  # noqa: E501
         )
 
-    def test_html_output_without_escaped_header(self) -> None:
-        t = helper_table(rows=0)
-        t.field_names = ["", "Field 1", "<em>Field 2</em>", "<a href='#'>Field 3</a>"]
-        result = t.get_html_string(escape_header=False)
+    def test_html_output_without_escaped_header(
+        self, empty_helper_table: PrettyTable
+    ) -> None:
+        empty_helper_table.field_names = [
+            "",
+            "Field 1",
+            "<em>Field 2</em>",
+            "<a href='#'>Field 3</a>",
+        ]
+        result = empty_helper_table.get_html_string(escape_header=False)
         assert (
             result.strip()
             == """
@@ -209,9 +212,10 @@ class TestHtmlOutput:
 """.strip()
         )
 
-    def test_html_output_without_escaped_data(self) -> None:
-        t = helper_table(rows=0)
-        t.add_row(
+    def test_html_output_without_escaped_data(
+        self, empty_helper_table: PrettyTable
+    ) -> None:
+        empty_helper_table.add_row(
             [
                 1,
                 "<b>value 1</b>",
@@ -219,7 +223,7 @@ class TestHtmlOutput:
                 "<a href='#'>value3</a>",
             ]
         )
-        result = t.get_html_string(escape_data=False)
+        result = empty_helper_table.get_html_string(escape_data=False)
         assert (
             result.strip()
             == """
@@ -244,10 +248,16 @@ class TestHtmlOutput:
 """.strip()
         )
 
-    def test_html_output_with_escaped_header(self) -> None:
-        t = helper_table(rows=0)
-        t.field_names = ["", "Field 1", "<em>Field 2</em>", "<a href='#'>Field 3</a>"]
-        result = t.get_html_string(escape_header=True)
+    def test_html_output_with_escaped_header(
+        self, empty_helper_table: PrettyTable
+    ) -> None:
+        empty_helper_table.field_names = [
+            "",
+            "Field 1",
+            "<em>Field 2</em>",
+            "<a href='#'>Field 3</a>",
+        ]
+        result = empty_helper_table.get_html_string(escape_header=True)
         assert (
             result.strip()
             == """
@@ -266,9 +276,10 @@ class TestHtmlOutput:
 """.strip()
         )
 
-    def test_html_output_with_escaped_data(self) -> None:
-        t = helper_table(rows=0)
-        t.add_row(
+    def test_html_output_with_escaped_data(
+        self, empty_helper_table: PrettyTable
+    ) -> None:
+        empty_helper_table.add_row(
             [
                 1,
                 "<b>value 1</b>",
@@ -276,7 +287,7 @@ class TestHtmlOutput:
                 "<a href='#'>value3</a>",
             ]
         )
-        result = t.get_html_string(escape_data=True)
+        result = empty_helper_table.get_html_string(escape_data=True)
         assert (
             result.strip()
             == """
@@ -301,10 +312,16 @@ class TestHtmlOutput:
 """.strip()  # noqa: E501
         )
 
-    def test_html_output_formatted_without_escaped_header(self) -> None:
-        t = helper_table(rows=0)
-        t.field_names = ["", "Field 1", "<em>Field 2</em>", "<a href='#'>Field 3</a>"]
-        result = t.get_html_string(escape_header=False, format=True)
+    def test_html_output_formatted_without_escaped_header(
+        self, empty_helper_table: PrettyTable
+    ) -> None:
+        empty_helper_table.field_names = [
+            "",
+            "Field 1",
+            "<em>Field 2</em>",
+            "<a href='#'>Field 3</a>",
+        ]
+        result = empty_helper_table.get_html_string(escape_header=False, format=True)
         assert (
             result.strip()
             == """
@@ -323,9 +340,10 @@ class TestHtmlOutput:
 """.strip()  # noqa: E501
         )
 
-    def test_html_output_formatted_without_escaped_data(self) -> None:
-        t = helper_table(rows=0)
-        t.add_row(
+    def test_html_output_formatted_without_escaped_data(
+        self, empty_helper_table: PrettyTable
+    ) -> None:
+        empty_helper_table.add_row(
             [
                 1,
                 "<b>value 1</b>",
@@ -333,7 +351,7 @@ class TestHtmlOutput:
                 "<a href='#'>value3</a>",
             ]
         )
-        result = t.get_html_string(escape_data=False, format=True)
+        result = empty_helper_table.get_html_string(escape_data=False, format=True)
         assert (
             result.strip()
             == """
@@ -358,10 +376,16 @@ class TestHtmlOutput:
 """.strip()  # noqa: E501
         )
 
-    def test_html_output_formatted_with_escaped_header(self) -> None:
-        t = helper_table(rows=0)
-        t.field_names = ["", "Field 1", "<em>Field 2</em>", "<a href='#'>Field 3</a>"]
-        result = t.get_html_string(escape_header=True, format=True)
+    def test_html_output_formatted_with_escaped_header(
+        self, empty_helper_table: PrettyTable
+    ) -> None:
+        empty_helper_table.field_names = [
+            "",
+            "Field 1",
+            "<em>Field 2</em>",
+            "<a href='#'>Field 3</a>",
+        ]
+        result = empty_helper_table.get_html_string(escape_header=True, format=True)
         assert (
             result.strip()
             == """
@@ -380,9 +404,10 @@ class TestHtmlOutput:
 """.strip()  # noqa: E501
         )
 
-    def test_html_output_formatted_with_escaped_data(self) -> None:
-        t = helper_table(rows=0)
-        t.add_row(
+    def test_html_output_formatted_with_escaped_data(
+        self, empty_helper_table: PrettyTable
+    ) -> None:
+        empty_helper_table.add_row(
             [
                 1,
                 "<b>value 1</b>",
@@ -390,7 +415,7 @@ class TestHtmlOutput:
                 "<a href='#'>value3</a>",
             ]
         )
-        result = t.get_html_string(escape_data=True, format=True)
+        result = empty_helper_table.get_html_string(escape_data=True, format=True)
         assert (
             result.strip()
             == """
@@ -460,14 +485,13 @@ class TestHtmlOutput:
 </table>""".strip()  # noqa: E501
         )
 
-    def test_internal_border_preserved_html(self) -> None:
-        pt = helper_table()
-        pt.format = True
-        pt.border = False
-        pt.preserve_internal_border = True
+    def test_internal_border_preserved_html(self, helper_table: PrettyTable) -> None:
+        helper_table.format = True
+        helper_table.border = False
+        helper_table.preserve_internal_border = True
 
         assert (
-            pt.get_html_string().strip()
+            helper_table.get_html_string().strip()
             == """
 <table rules="cols">
     <thead>
