@@ -1,0 +1,62 @@
+from __future__ import annotations
+
+import io
+
+import pytest
+from test_prettytable import CITY_DATA, CITY_DATA_HEADER
+
+from prettytable import PrettyTable, from_csv
+
+
+@pytest.fixture(scope="function")
+def col_prettytable() -> PrettyTable:
+    # Column by column...
+    table = PrettyTable()
+    for idx, colname in enumerate(CITY_DATA_HEADER):
+        table.add_column(colname, [row[idx] for row in CITY_DATA])
+    return table
+
+
+@pytest.fixture(scope="function")
+def city_data() -> PrettyTable:
+    """Just build the Australian capital city data example table."""
+    table = PrettyTable(CITY_DATA_HEADER)
+    for row in CITY_DATA:
+        table.add_row(row)
+    return table
+
+
+@pytest.fixture(scope="function")
+def city_data_from_csv() -> PrettyTable:
+    csv_string = ", ".join(CITY_DATA_HEADER)
+    for row in CITY_DATA:
+        csv_string += "\n" + ",".join(str(fld) for fld in row)
+    csv_fp = io.StringIO(csv_string)
+    return from_csv(csv_fp)
+
+
+@pytest.fixture
+def mix_prettytable() -> PrettyTable:
+    # A mix of both!
+    table = PrettyTable()
+    table.field_names = [CITY_DATA_HEADER[0], CITY_DATA_HEADER[1]]
+    for row in CITY_DATA:
+        table.add_row([row[0], row[1]])
+    for idx, colname in enumerate(CITY_DATA_HEADER[2:]):
+        table.add_column(colname, [row[idx + 2] for row in CITY_DATA])
+    return table
+
+
+@pytest.fixture(scope="function")
+def field_name_less_table() -> PrettyTable:
+    table = PrettyTable()
+    for row in CITY_DATA:
+        table.add_row(row)
+    return table
+
+
+@pytest.fixture(scope="function")
+def row_prettytable(field_name_less_table) -> PrettyTable:
+    # Row by row...
+    field_name_less_table.field_names = CITY_DATA_HEADER
+    return field_name_less_table
