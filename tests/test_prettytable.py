@@ -558,6 +558,26 @@ class TestBasic:
         """All lines in a table should be of the same length."""
         self._test_all_length_equal(city_data_from_csv)
 
+    def test_rowcount(self, city_data: PrettyTable) -> None:
+        assert city_data.rowcount == 7
+
+    def test_colcount(self, city_data: PrettyTable) -> None:
+        assert city_data.colcount == 4
+
+    def test_getitem(self, city_data: PrettyTable) -> None:
+        assert (
+            city_data[1].get_string()
+            == """+-----------+------+------------+-----------------+
+| City name | Area | Population | Annual Rainfall |
++-----------+------+------------+-----------------+
+|  Brisbane | 5905 |  1857594   |      1146.4     |
++-----------+------+------------+-----------------+"""
+        )
+
+    def test_invalid_getitem(self, city_data: PrettyTable) -> None:
+        with pytest.raises(IndexError):
+            assert city_data[10]
+
     @pytest.mark.usefixtures("init_db")
     def test_no_blank_lines_from_db(self, db_cursor) -> None:
         """No table should ever have blank lines in it."""
