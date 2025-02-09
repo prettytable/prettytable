@@ -12,6 +12,7 @@ import prettytable
 from prettytable import (
     HRuleStyle,
     PrettyTable,
+    RowType,
     TableStyle,
     VRuleStyle,
     from_db_cursor,
@@ -453,15 +454,14 @@ class TestBasic:
     def _test_all_length_equal(self, table: PrettyTable) -> None:
         string = table.get_string()
         lines = string.split("\n")
-        lengths = [len(line) for line in lines]
-        lengths = set(lengths)
+        lengths = {len(line) for line in lines}
         assert len(lengths) == 1
 
-    def test_no_blank_lines(self, city_data) -> None:
+    def test_no_blank_lines(self, city_data: PrettyTable) -> None:
         """No table should ever have blank lines in it."""
         self._test_no_blank_lines(city_data)
 
-    def test_all_lengths_equal(self, city_data) -> None:
+    def test_all_lengths_equal(self, city_data: PrettyTable) -> None:
         """All lines in a table should be of the same length."""
         self._test_all_length_equal(city_data)
 
@@ -656,7 +656,7 @@ class TestRowFilter:
 |   Perth   | 5386 |  1554769   |      869.4      |
 +-----------+------+------------+-----------------+"""
 
-    def filter_function(self, vals: list[str]) -> bool:
+    def filter_function(self, vals: RowType) -> bool:
         return vals[2] > 999999
 
     def test_row_filter(self, city_data: PrettyTable) -> None:
@@ -687,7 +687,6 @@ def float_pt() -> PrettyTable:
 class TestFloatFormat:
     def test_no_decimals(self, float_pt: PrettyTable) -> None:
         float_pt.float_format = ".0f"
-        float_pt.caching = False
         assert "." not in float_pt.get_string()
 
     def test_round_to_5dp(self, float_pt: PrettyTable) -> None:
@@ -1467,7 +1466,7 @@ class TestGeneralOutput:
         t_copy = helper_table.copy()
         assert helper_table.get_string() == t_copy.get_string()
 
-    def test_text(self, helper_table: prettytable) -> None:
+    def test_text(self, helper_table: PrettyTable) -> None:
         assert helper_table.get_formatted_string("text") == helper_table.get_string()
         # test with default arg, too
         assert helper_table.get_formatted_string() == helper_table.get_string()
