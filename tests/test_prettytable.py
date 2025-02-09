@@ -41,18 +41,25 @@ def helper_table(*, rows: int = 3) -> PrettyTable:
     return table
 
 
+TEST_TABLE_HEADER = ["City name", "Area", "Population", "Annual Rainfall"]
+TEST_TABLE = [
+    ["Adelaide", 1295, 1158259, 600.5],
+    ["Brisbane", 5905, 1857594, 1146.4],
+    ["Darwin", 112, 120900, 1714.7],
+    ["Hobart", 1357, 205556, 619.5],
+    ["Sydney", 2058, 4336374, 1214.8],
+    ["Melbourne", 1566, 3806092, 646.9],
+    ["Perth", 5386, 1554769, 869.4],
+]
+
+
 @pytest.fixture
 def row_prettytable() -> PrettyTable:
     # Row by row...
     table = PrettyTable()
-    table.field_names = ["City name", "Area", "Population", "Annual Rainfall"]
-    table.add_row(["Adelaide", 1295, 1158259, 600.5])
-    table.add_row(["Brisbane", 5905, 1857594, 1146.4])
-    table.add_row(["Darwin", 112, 120900, 1714.7])
-    table.add_row(["Hobart", 1357, 205556, 619.5])
-    table.add_row(["Sydney", 2058, 4336374, 1214.8])
-    table.add_row(["Melbourne", 1566, 3806092, 646.9])
-    table.add_row(["Perth", 5386, 1554769, 869.4])
+    table.field_names = TEST_TABLE_HEADER
+    for row in TEST_TABLE:
+        table.add_row(row)
     return table
 
 
@@ -60,17 +67,8 @@ def row_prettytable() -> PrettyTable:
 def col_prettytable() -> PrettyTable:
     # Column by column...
     table = PrettyTable()
-    table.add_column(
-        "City name",
-        ["Adelaide", "Brisbane", "Darwin", "Hobart", "Sydney", "Melbourne", "Perth"],
-    )
-    table.add_column("Area", [1295, 5905, 112, 1357, 2058, 1566, 5386])
-    table.add_column(
-        "Population", [1158259, 1857594, 120900, 205556, 4336374, 3806092, 1554769]
-    )
-    table.add_column(
-        "Annual Rainfall", [600.5, 1146.4, 1714.7, 619.5, 1214.8, 646.9, 869.4]
-    )
+    for idx, colname in enumerate(TEST_TABLE_HEADER):
+        table.add_column(colname, [row[idx] for row in TEST_TABLE])
     return table
 
 
@@ -78,20 +76,11 @@ def col_prettytable() -> PrettyTable:
 def mix_prettytable() -> PrettyTable:
     # A mix of both!
     table = PrettyTable()
-    table.field_names = ["City name", "Area"]
-    table.add_row(["Adelaide", 1295])
-    table.add_row(["Brisbane", 5905])
-    table.add_row(["Darwin", 112])
-    table.add_row(["Hobart", 1357])
-    table.add_row(["Sydney", 2058])
-    table.add_row(["Melbourne", 1566])
-    table.add_row(["Perth", 5386])
-    table.add_column(
-        "Population", [1158259, 1857594, 120900, 205556, 4336374, 3806092, 1554769]
-    )
-    table.add_column(
-        "Annual Rainfall", [600.5, 1146.4, 1714.7, 619.5, 1214.8, 646.9, 869.4]
-    )
+    table.field_names = [TEST_TABLE_HEADER[0], TEST_TABLE_HEADER[1]]
+    for row in TEST_TABLE:
+        table.add_row([row[0], row[1]])
+    for idx, colname in enumerate(TEST_TABLE_HEADER[2:]):
+        table.add_column(colname, [row[idx + 2] for row in TEST_TABLE])
     return table
 
 
@@ -268,18 +257,27 @@ class TestBuildEquivalence:
 
 
 class TestDeleteColumn:
-    def test_delete_column(self) -> None:
-        table = PrettyTable()
-        table.add_column("City name", ["Adelaide", "Brisbane", "Darwin"])
-        table.add_column("Area", [1295, 5905, 112])
-        table.add_column("Population", [1158259, 1857594, 120900])
-        table.del_column("Area")
+    def test_delete_column(self, col_prettytable: PrettyTable) -> None:
+        # table = PrettyTable()
+        # table.add_column("City name", ["Adelaide", "Brisbane", "Darwin"])
+        # table.add_column("Area", [1295, 5905, 112])
+        # table.add_column("Population", [1158259, 1857594, 120900])
+        col_prettytable.del_column("Area")
 
-        without_row = PrettyTable()
-        without_row.add_column("City name", ["Adelaide", "Brisbane", "Darwin"])
-        without_row.add_column("Population", [1158259, 1857594, 120900])
-
-        assert table.get_string() == without_row.get_string()
+        assert (
+            col_prettytable.get_string()
+            == """+-----------+------------+-----------------+
+| City name | Population | Annual Rainfall |
++-----------+------------+-----------------+
+|  Adelaide |  1158259   |      600.5      |
+|  Brisbane |  1857594   |      1146.4     |
+|   Darwin  |   120900   |      1714.7     |
+|   Hobart  |   205556   |      619.5      |
+|   Sydney  |  4336374   |      1214.8     |
+| Melbourne |  3806092   |      646.9      |
+|   Perth   |  1554769   |      869.4      |
++-----------+------------+-----------------+"""
+        )
 
     def test_delete_illegal_column_raises_error(self) -> None:
         table = PrettyTable()
@@ -292,13 +290,8 @@ class TestDeleteColumn:
 @pytest.fixture(scope="function")
 def field_name_less_table() -> PrettyTable:
     table = PrettyTable()
-    table.add_row(["Adelaide", 1295, 1158259, 600.5])
-    table.add_row(["Brisbane", 5905, 1857594, 1146.4])
-    table.add_row(["Darwin", 112, 120900, 1714.7])
-    table.add_row(["Hobart", 1357, 205556, 619.5])
-    table.add_row(["Sydney", 2058, 4336374, 1214.8])
-    table.add_row(["Melbourne", 1566, 3806092, 646.9])
-    table.add_row(["Perth", 5386, 1554769, 869.4])
+    for row in TEST_TABLE:
+        table.add_row(row)
     return table
 
 
@@ -321,12 +314,7 @@ class TestFieldNameLessTable:
         assert "Adelaide & 1295 & 1158259 & 600.5 \\\\" in output
 
     def test_add_field_names_later(self, field_name_less_table: PrettyTable) -> None:
-        field_name_less_table.field_names = [
-            "City name",
-            "Area",
-            "Population",
-            "Annual Rainfall",
-        ]
+        field_name_less_table.field_names = TEST_TABLE_HEADER
         assert (
             "City name | Area | Population | Annual Rainfall"
             in field_name_less_table.get_string()
@@ -337,28 +325,18 @@ class TestFieldNameLessTable:
 def aligned_before_table() -> PrettyTable:
     table = PrettyTable()
     table.align = "r"
-    table.field_names = ["City name", "Area", "Population", "Annual Rainfall"]
-    table.add_row(["Adelaide", 1295, 1158259, 600.5])
-    table.add_row(["Brisbane", 5905, 1857594, 1146.4])
-    table.add_row(["Darwin", 112, 120900, 1714.7])
-    table.add_row(["Hobart", 1357, 205556, 619.5])
-    table.add_row(["Sydney", 2058, 4336374, 1214.8])
-    table.add_row(["Melbourne", 1566, 3806092, 646.9])
-    table.add_row(["Perth", 5386, 1554769, 869.4])
+    table.field_names = TEST_TABLE_HEADER
+    for row in TEST_TABLE:
+        table.add_row(row)
     return table
 
 
 @pytest.fixture(scope="function")
 def aligned_after_table() -> PrettyTable:
     table = PrettyTable()
-    table.field_names = ["City name", "Area", "Population", "Annual Rainfall"]
-    table.add_row(["Adelaide", 1295, 1158259, 600.5])
-    table.add_row(["Brisbane", 5905, 1857594, 1146.4])
-    table.add_row(["Darwin", 112, 120900, 1714.7])
-    table.add_row(["Hobart", 1357, 205556, 619.5])
-    table.add_row(["Sydney", 2058, 4336374, 1214.8])
-    table.add_row(["Melbourne", 1566, 3806092, 646.9])
-    table.add_row(["Perth", 5386, 1554769, 869.4])
+    table.field_names = TEST_TABLE_HEADER
+    for row in TEST_TABLE:
+        table.add_row(row)
     table.align = "r"
     return table
 
@@ -391,14 +369,9 @@ class TestAlignment:
 @pytest.fixture(scope="function")
 def city_data_prettytable() -> PrettyTable:
     """Just build the Australian capital city data example table."""
-    table = PrettyTable(["City name", "Area", "Population", "Annual Rainfall"])
-    table.add_row(["Adelaide", 1295, 1158259, 600.5])
-    table.add_row(["Brisbane", 5905, 1857594, 1146.4])
-    table.add_row(["Darwin", 112, 120900, 1714.7])
-    table.add_row(["Hobart", 1357, 205556, 619.5])
-    table.add_row(["Sydney", 2058, 4336374, 1214.8])
-    table.add_row(["Melbourne", 1566, 3806092, 646.9])
-    table.add_row(["Perth", 5386, 1554769, 869.4])
+    table = PrettyTable(TEST_TABLE_HEADER)
+    for row in TEST_TABLE:
+        table.add_row(row)
     return table
 
 
@@ -507,13 +480,8 @@ def init_db(db_cursor):
         "CREATE TABLE cities "
         "(name TEXT, area INTEGER, population INTEGER, rainfall REAL)"
     )
-    db_cursor.execute('INSERT INTO cities VALUES ("Adelaide", 1295, 1158259, 600.5)')
-    db_cursor.execute('INSERT INTO cities VALUES ("Brisbane", 5905, 1857594, 1146.4)')
-    db_cursor.execute('INSERT INTO cities VALUES ("Darwin", 112, 120900, 1714.7)')
-    db_cursor.execute('INSERT INTO cities VALUES ("Hobart", 1357, 205556, 619.5)')
-    db_cursor.execute('INSERT INTO cities VALUES ("Sydney", 2058, 4336374, 1214.8)')
-    db_cursor.execute('INSERT INTO cities VALUES ("Melbourne", 1566, 3806092, 646.9)')
-    db_cursor.execute('INSERT INTO cities VALUES ("Perth", 5386, 1554769, 869.4)')
+    for row in TEST_TABLE:
+        db_cursor.execute(f"INSERT INTO cities VALUES {tuple(row)}")
     yield
     db_cursor.execute("DROP TABLE cities")
 
@@ -524,7 +492,7 @@ class TestBasic:
     def test_table_rows(self, city_data_prettytable: PrettyTable) -> None:
         rows = city_data_prettytable.rows
         assert len(rows) == 7
-        assert rows[0] == ["Adelaide", 1295, 1158259, 600.5]
+        assert rows[0] == TEST_TABLE[0]
 
     def _test_no_blank_lines(self, table: PrettyTable) -> None:
         string = table.get_string()
@@ -693,7 +661,7 @@ class TestEmptyTable:
 
     def test_print_empty_true(self, city_data_prettytable: PrettyTable) -> None:
         table = PrettyTable()
-        table.field_names = ["City name", "Area", "Population", "Annual Rainfall"]
+        table.field_names = TEST_TABLE_HEADER
 
         assert table.get_string(print_empty=True) != ""
         assert table.get_string(print_empty=True) != city_data_prettytable.get_string(
@@ -702,7 +670,7 @@ class TestEmptyTable:
 
     def test_print_empty_false(self, city_data_prettytable: PrettyTable) -> None:
         table = PrettyTable()
-        table.field_names = ["City name", "Area", "Population", "Annual Rainfall"]
+        table.field_names = TEST_TABLE_HEADER
 
         assert table.get_string(print_empty=False) == ""
         assert table.get_string(print_empty=False) != city_data_prettytable.get_string(
@@ -711,7 +679,7 @@ class TestEmptyTable:
 
     def test_interaction_with_border(self) -> None:
         table = PrettyTable()
-        table.field_names = ["City name", "Area", "Population", "Annual Rainfall"]
+        table.field_names = TEST_TABLE_HEADER
 
         assert table.get_string(border=False, print_empty=True) == ""
 
@@ -725,19 +693,19 @@ class TestSlicing:
         table = city_data_prettytable[0:2]
         string = table.get_string()
         assert len(string.split("\n")) == 6
-        assert "Adelaide" in string
-        assert "Brisbane" in string
-        assert "Melbourne" not in string
-        assert "Perth" not in string
+        for rowidx in (0, 1):
+            assert TEST_TABLE[rowidx][0] in string
+        for rowidx in (2, 3, 4, 5, 6):
+            assert TEST_TABLE[rowidx][0] not in string
 
     def test_slice_last_two_rows(self, city_data_prettytable: PrettyTable) -> None:
         table = city_data_prettytable[-2:]
         string = table.get_string()
         assert len(string.split("\n")) == 6
-        assert "Adelaide" not in string
-        assert "Brisbane" not in string
-        assert "Melbourne" in string
-        assert "Perth" in string
+        for rowidx in (0, 1, 2, 3, 4):
+            assert TEST_TABLE[rowidx][0] not in string
+        for rowidx in (5, 6):
+            assert TEST_TABLE[rowidx][0] in string
 
 
 class TestSorting:
@@ -843,13 +811,8 @@ class TestSorting:
             sortby="Area",
         )
         assert table.sortby == "Area"
-        table.add_row(["Adelaide", 1295, 1158259, 600.5])
-        table.add_row(["Brisbane", 5905, 1857594, 1146.4])
-        table.add_row(["Darwin", 112, 120900, 1714.7])
-        table.add_row(["Hobart", 1357, 205556, 619.5])
-        table.add_row(["Sydney", 2058, 4336374, 1214.8])
-        table.add_row(["Melbourne", 1566, 3806092, 646.9])
-        table.add_row(["Perth", 5386, 1554769, 869.4])
+        for row in TEST_TABLE:
+            table.add_row(row)
         assert (
             """+-----------+------+------------+-----------------+
 | City name | Area | Population | Annual Rainfall |
@@ -890,13 +853,8 @@ class TestRowFilter:
             field_names=["City name", "Area", "Population", "Annual Rainfall"],
             row_filter=self.filter_function,
         )
-        table.add_row(["Adelaide", 1295, 1158259, 600.5])
-        table.add_row(["Brisbane", 5905, 1857594, 1146.4])
-        table.add_row(["Darwin", 112, 120900, 1714.7])
-        table.add_row(["Hobart", 1357, 205556, 619.5])
-        table.add_row(["Sydney", 2058, 4336374, 1214.8])
-        table.add_row(["Melbourne", 1566, 3806092, 646.9])
-        table.add_row(["Perth", 5386, 1554769, 869.4])
+        for row in TEST_TABLE:
+            table.add_row(row)
         assert table.row_filter == self.filter_function
         assert self.EXPECTED_RESULT == table.get_string().strip()
 
@@ -2276,33 +2234,20 @@ def test_add_rows() -> None:
     assert str(table1) == str(table2)
 
 
-def test_autoindex() -> None:
+def test_autoindex(city_data_prettytable: PrettyTable) -> None:
     """Testing that a table with a custom index row is
     equal to the one produced by the function
     .add_autoindex()
     """
-    table1 = PrettyTable()
-    table1.field_names = ["City name", "Area", "Population", "Annual Rainfall"]
-    table1.add_row(["Adelaide", 1295, 1158259, 600.5])
-    table1.add_row(["Brisbane", 5905, 1857594, 1146.4])
-    table1.add_row(["Darwin", 112, 120900, 1714.7])
-    table1.add_row(["Hobart", 1357, 205556, 619.5])
-    table1.add_row(["Sydney", 2058, 4336374, 1214.8])
-    table1.add_row(["Melbourne", 1566, 3806092, 646.9])
-    table1.add_row(["Perth", 5386, 1554769, 869.4])
-    table1.add_autoindex(fieldname="Test")
+    city_data_prettytable.field_names = TEST_TABLE_HEADER
+    city_data_prettytable.add_autoindex(fieldname="Test")
 
     table2 = PrettyTable()
-    table2.field_names = ["Test", "City name", "Area", "Population", "Annual Rainfall"]
-    table2.add_row([1, "Adelaide", 1295, 1158259, 600.5])
-    table2.add_row([2, "Brisbane", 5905, 1857594, 1146.4])
-    table2.add_row([3, "Darwin", 112, 120900, 1714.7])
-    table2.add_row([4, "Hobart", 1357, 205556, 619.5])
-    table2.add_row([5, "Sydney", 2058, 4336374, 1214.8])
-    table2.add_row([6, "Melbourne", 1566, 3806092, 646.9])
-    table2.add_row([7, "Perth", 5386, 1554769, 869.4])
+    table2.field_names = ["Test"] + TEST_TABLE_HEADER
+    for idx, row in enumerate(TEST_TABLE):
+        table2.add_row([idx + 1] + row)
 
-    assert str(table1) == str(table2)
+    assert str(city_data_prettytable) == str(table2)
 
 
 @pytest.fixture(scope="function")
@@ -2889,16 +2834,11 @@ class TestMaxTableWidth:
 class TestFields:
     def test_fields_at_class_declaration(self) -> None:
         table = PrettyTable(
-            field_names=["City name", "Area", "Population", "Annual Rainfall"],
+            field_names=TEST_TABLE_HEADER,
             fields=["City name", "Annual Rainfall"],
         )
-        table.add_row(["Adelaide", 1295, 1158259, 600.5])
-        table.add_row(["Brisbane", 5905, 1857594, 1146.4])
-        table.add_row(["Darwin", 112, 120900, 1714.7])
-        table.add_row(["Hobart", 1357, 205556, 619.5])
-        table.add_row(["Sydney", 2058, 4336374, 1214.8])
-        table.add_row(["Melbourne", 1566, 3806092, 646.9])
-        table.add_row(["Perth", 5386, 1554769, 869.4])
+        for row in TEST_TABLE:
+            table.add_row(row)
         assert (
             """+-----------+-----------------+
 | City name | Annual Rainfall |
@@ -2916,15 +2856,10 @@ class TestFields:
 
     def test_fields(self) -> None:
         table = PrettyTable()
-        table.field_names = ["City name", "Area", "Population", "Annual Rainfall"]
+        table.field_names = TEST_TABLE_HEADER
         table.fields = ["City name", "Annual Rainfall"]
-        table.add_row(["Adelaide", 1295, 1158259, 600.5])
-        table.add_row(["Brisbane", 5905, 1857594, 1146.4])
-        table.add_row(["Darwin", 112, 120900, 1714.7])
-        table.add_row(["Hobart", 1357, 205556, 619.5])
-        table.add_row(["Sydney", 2058, 4336374, 1214.8])
-        table.add_row(["Melbourne", 1566, 3806092, 646.9])
-        table.add_row(["Perth", 5386, 1554769, 869.4])
+        for row in TEST_TABLE:
+            table.add_row(row)
         assert (
             """+-----------+-----------------+
 | City name | Annual Rainfall |
