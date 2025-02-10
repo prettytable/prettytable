@@ -38,6 +38,7 @@ import re
 import warnings
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from enum import IntEnum
+from functools import lru_cache
 from html.parser import HTMLParser
 from typing import TYPE_CHECKING, Any, Final, Literal, TypedDict, cast
 
@@ -101,11 +102,13 @@ class OptionsType(TypedDict):
     end: int | None
     fields: Sequence[str | None] | None
     header: bool
+    use_header_width: bool
     border: bool
     preserve_internal_border: bool
     sortby: str | None
     reversesort: bool
     sort_key: Callable[[RowType], SupportsRichComparison]
+    row_filter: Callable[[RowType], bool]
     attributes: dict[str, str]
     format: bool
     hrules: HRuleStyle
@@ -143,11 +146,13 @@ class OptionsType(TypedDict):
     none_format: str | dict[str, str | None] | None
     escape_header: bool
     escape_data: bool
+    break_on_hyphens: bool
 
 
 _re = re.compile(r"\033\[[0-9;]*m|\033\(B")
 
 
+@lru_cache
 def _get_size(text: str) -> tuple[int, int]:
     lines = text.split("\n")
     height = len(lines)
@@ -170,7 +175,9 @@ class PrettyTable:
     _sortby: str | None
     _reversesort: bool
     _sort_key: Callable[[RowType], SupportsRichComparison]
+    _row_filter: Callable[[RowType], bool]
     _header: bool
+    _use_header_width: bool
     _header_style: HeaderStyleType
     _border: bool
     _preserve_internal_border: bool
@@ -204,6 +211,7 @@ class PrettyTable:
     orgmode: bool
     _widths: list[int]
     _hrule: str
+    _break_on_hyphens: bool
 
     def __init__(self, field_names: Sequence[str] | None = None, **kwargs) -> None:
         """Return a new PrettyTable instance
@@ -217,6 +225,7 @@ class PrettyTable:
         start - index of first data row to include in output
         end - index of last data row to include in output PLUS ONE (list slice style)
         header - print a header showing field names (True or False)
+        use_header_width - reflect width of header (True or False)
         header_style - stylisation to apply to field names in header
             ("cap", "title", "upper", "lower" or None)
         border - print a border around the table (True or False)
@@ -256,11 +265,13 @@ class PrettyTable:
             single character string used to draw bottom-left line junctions
         sortby - name of field to sort rows by
         sort_key - sorting key function, applied to data points before sorting
+        row_filter - filter function applied on rows
         align - default align for each column (None, "l", "c" or "r")
         valign - default valign for each row (None, "t", "m" or "b")
         reversesort - True or False to sort in descending or ascending order
-        oldsortslice - Slice rows before sorting in the "old style" """
-
+        oldsortslice - Slice rows before sorting in the "old style"
+        break_on_hyphens - Whether long lines are broken on hypens or not, default: True
+        """
         self.encoding = kwargs.get("encoding", "UTF-8")
 
         # Data
@@ -283,11 +294,13 @@ class PrettyTable:
             "end",
             "fields",
             "header",
+            "use_header_width",
             "border",
             "preserve_internal_border",
             "sortby",
             "reversesort",
             "sort_key",
+            "row_filter",
             "attributes",
             "format",
             "hrules",
@@ -323,6 +336,7 @@ class PrettyTable:
             "none_format",
             "escape_header",
             "escape_data",
+            "break_on_hyphens",
         ]
 
         self._none_format: dict[str, str | None] = {}
@@ -349,6 +363,10 @@ class PrettyTable:
             self._header = kwargs["header"]
         else:
             self._header = True
+        if kwargs["use_header_width"] in (True, False):
+            self._use_header_width = kwargs["use_header_width"]
+        else:
+            self._use_header_width = True
         self._header_style = kwargs["header_style"] or None
         if kwargs["border"] in (True, False):
             self._border = kwargs["border"]
@@ -367,6 +385,7 @@ class PrettyTable:
         else:
             self._reversesort = False
         self._sort_key = kwargs["sort_key"] or (lambda x: x)
+        self._row_filter = kwargs["row_filter"] or (lambda x: True)
 
         if kwargs["escape_data"] in (True, False):
             self._escape_data = kwargs["escape_data"]
@@ -412,6 +431,10 @@ class PrettyTable:
         self._format = kwargs["format"] or False
         self._xhtml = kwargs["xhtml"] or False
         self._attributes = kwargs["attributes"] or {}
+        if kwargs["break_on_hyphens"] in (True, False):
+            self._break_on_hyphens = kwargs["break_on_hyphens"]
+        else:
+            self._break_on_hyphens = True
 
     def _column_specific_args(self):
         # Column specific arguments, use property.setters
@@ -524,7 +547,7 @@ class PrettyTable:
             self._validate_nonnegative_int(option, val)
         elif option == "sortby":
             self._validate_field_name(option, val)
-        elif option == "sort_key":
+        elif option in ("sort_key", "row_filter"):
             self._validate_function(option, val)
         elif option == "hrules":
             self._validate_hrules(option, val)
@@ -534,6 +557,7 @@ class PrettyTable:
             self._validate_all_field_names(option, val)
         elif option in (
             "header",
+            "use_header_width",
             "border",
             "preserve_internal_border",
             "reversesort",
@@ -543,6 +567,7 @@ class PrettyTable:
             "oldsortslice",
             "escape_header",
             "escape_data",
+            "break_on_hyphens",
         ):
             self._validate_true_or_false(option, val)
         elif option == "header_style":
@@ -989,6 +1014,20 @@ class PrettyTable:
         self._sort_key = val
 
     @property
+    def row_filter(self) -> Callable[[RowType], bool]:
+        """Filter function, applied to data points
+
+        Arguments:
+
+        row_filter - a function which takes one argument and returns a Boolean"""
+        return self._row_filter
+
+    @row_filter.setter
+    def row_filter(self, val: Callable[[RowType], bool]) -> None:
+        self._validate_option("row_filter", val)
+        self._row_filter = val
+
+    @property
     def header(self) -> bool:
         """Controls printing of table header with field names
 
@@ -1001,6 +1040,22 @@ class PrettyTable:
     def header(self, val: bool) -> None:
         self._validate_option("header", val)
         self._header = val
+
+    @property
+    def use_header_width(self) -> bool:
+        """Controls whether header is included in computing width
+
+        Arguments:
+
+        use_header_width - respect width of fieldname in header to calculate column
+            width (True or False)
+        """
+        return self._use_header_width
+
+    @use_header_width.setter
+    def use_header_width(self, val: bool) -> None:
+        self._validate_option("use_header_width", val)
+        self._use_header_width = val
 
     @property
     def header_style(self) -> HeaderStyleType:
@@ -1438,6 +1493,16 @@ class PrettyTable:
         self._validate_option("escape_data", val)
         self._escape_data = val
 
+    @property
+    def break_on_hyphens(self) -> bool:
+        """Break longlines on hyphens (True or False)"""
+        return self._break_on_hyphens
+
+    @break_on_hyphens.setter
+    def break_on_hyphens(self, val: bool) -> None:
+        self._validate_option("break_on_hyphens", val)
+        self._break_on_hyphens = val
+
     ##############################
     # OPTION MIXER               #
     ##############################
@@ -1770,7 +1835,7 @@ class PrettyTable:
         return table_width
 
     def _compute_widths(self, rows: list[list[str]], options: OptionsType) -> None:
-        if options["header"]:
+        if options["header"] and options["use_header_width"]:
             widths = [_get_size(field)[0] for field in self._field_names]
         else:
             widths = len(self.field_names) * [0]
@@ -1863,12 +1928,13 @@ class PrettyTable:
         Arguments:
 
         options - dictionary of option settings."""
-        import copy
 
         if options["oldsortslice"]:
-            rows = copy.deepcopy(self._rows[options["start"] : options["end"]])
+            rows = self._rows[options["start"] : options["end"]]
         else:
-            rows = copy.deepcopy(self._rows)
+            rows = self._rows
+
+        rows = [row for row in rows if options["row_filter"](row)]
 
         # Sort
         if options["sortby"]:
@@ -1892,12 +1958,10 @@ class PrettyTable:
         Arguments:
 
         options - dictionary of option settings."""
-        import copy
-
         if options["oldsortslice"]:
-            dividers = copy.deepcopy(self._dividers[options["start"] : options["end"]])
+            dividers = self._dividers[options["start"] : options["end"]]
         else:
-            dividers = copy.deepcopy(self._dividers)
+            dividers = self._dividers
 
         if options["sortby"]:
             dividers = [False for divider in dividers]
@@ -1927,6 +1991,7 @@ class PrettyTable:
         end - index of last data row to include in output PLUS ONE (list slice style)
         fields - names of fields (columns) to include
         header - print a header showing field names (True or False)
+        use_header_width - reflect width of header (True or False)
         border - print a border around the table (True or False)
         preserve_internal_border - print a border inside the table even if
             border is disabled (True or False)
@@ -1962,6 +2027,7 @@ class PrettyTable:
         sortby - name of field to sort rows by
         sort_key - sorting key function, applied to data points before sorting
         reversesort - True or False to sort in descending or ascending order
+        row_filter - filter function applied on rows
         print empty - if True, stringify just the header for an empty table,
             if False return an empty string"""
 
@@ -2191,7 +2257,9 @@ class PrettyTable:
                 ):
                     line = none_val
                 if _str_block_width(line) > width:
-                    line = textwrap.fill(line, width)
+                    line = textwrap.fill(
+                        line, width, break_on_hyphens=options["break_on_hyphens"]
+                    )
                 new_lines.append(line)
             lines = new_lines
             value = "\n".join(lines)
@@ -2394,12 +2462,15 @@ class PrettyTable:
         right_padding_width - number of spaces on right hand side of column data
         sortby - name of field to sort rows by
         sort_key - sorting key function, applied to data points before sorting
+        row_filter - filter function applied on rows
         attributes - dictionary of name/value pairs to include as HTML attributes in the
             <table> tag
         format - Controls whether or not HTML tables are formatted to match
             styling options (True or False)
         escape_data - escapes the text within a data field (True or False)
-        xhtml - print <br/> tags if True, <br> tags if False"""
+        xhtml - print <br/> tags if True, <br> tags if False
+        break_on_hyphens - Whether long lines are broken on hypens or not, default: True
+        """
 
         options = self._get_options(kwargs)
 
@@ -2599,6 +2670,7 @@ class PrettyTable:
         float_format - controls formatting of floating point data
         sortby - name of field to sort rows by
         sort_key - sorting key function, applied to data points before sorting
+        row_filter - filter function applied on rows
         format - Controls whether or not HTML tables are formatted to match
             styling options (True or False)
         """
@@ -2773,6 +2845,7 @@ class PrettyTable:
 ##############################
 
 
+@lru_cache
 def _str_block_width(val: str) -> int:
     import wcwidth  # type: ignore[import-untyped]
 
