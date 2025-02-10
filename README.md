@@ -212,9 +212,9 @@ This string is guaranteed to look exactly the same as what would be printed by d
 your table to a file or insert it into a GUI.
 
 The table can be displayed in several different formats using `get_formatted_string` by
-changing the `out_format=<text|html|json|csv|latex|mediawiki>`. This function passes through
-arguments to the functions that render the table, so additional arguments can be given.
-This provides a way to let a user choose the output formatting.
+changing the `out_format=<text|html|json|csv|latex|mediawiki>`. This function passes
+through arguments to the functions that render the table, so additional arguments can be
+given. This provides a way to let a user choose the output formatting.
 
 ```python
 def my_cli_function(table_format: str = 'text'):
@@ -638,7 +638,9 @@ rows. Just like in ASCII form, you can actually get a string representation - ju
 
 ### Displaying your table in MediaWiki Markup
 
-PrettyTable can also print your tables in MediaWiki table markup, making it easy to format tables for wikis. Similar to the ASCII format, you can get a string representation using get_mediawiki_string().
+PrettyTable can also print your tables in MediaWiki table markup, making it easy to
+format tables for wikis. Similar to the ASCII format, you can get a string
+representation using get_mediawiki_string().
 
 ### Displaying your table in HTML form
 
