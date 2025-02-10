@@ -77,16 +77,18 @@ class TestNoneOption:
         )
 
     def test_replace_none_all(self) -> None:
-        table = PrettyTable(["Field 1", "Field 2", "Field 3"], none_format="N/A")
-        table.add_row(["value 1", None, "None"])
+        table = PrettyTable(
+            ["Field 1", "Field 2", "Field 3", "Field 4"], none_format="N/A"
+        )
+        table.add_row(["value 1", None, "None", ""])
         assert (
             table.get_string().strip()
             == """
-+---------+---------+---------+
-| Field 1 | Field 2 | Field 3 |
-+---------+---------+---------+
-| value 1 |   N/A   |   N/A   |
-+---------+---------+---------+
++---------+---------+---------+---------+
+| Field 1 | Field 2 | Field 3 | Field 4 |
++---------+---------+---------+---------+
+| value 1 |   N/A   |   N/A   |         |
++---------+---------+---------+---------+
 """.strip()
         )
 
@@ -295,9 +297,8 @@ def aligned_before_table() -> PrettyTable:
 
 
 @pytest.fixture(scope="function")
-def aligned_after_table(field_name_less_table) -> PrettyTable:
+def aligned_after_table() -> PrettyTable:
     table = PrettyTable()
-    table.align = "r"
     table.field_names = CITY_DATA_HEADER
     for row in CITY_DATA:
         table.add_row(row)
@@ -336,13 +337,13 @@ class TestOptionOverride:
     def test_border(self, city_data: PrettyTable) -> None:
         assert city_data.get_string() != city_data.get_string(border=False)
 
-    def test_header(self, city_data) -> None:
+    def test_header(self, city_data: PrettyTable) -> None:
         assert city_data.get_string() != city_data.get_string(header=False)
 
-    def test_hrules_all(self, city_data) -> None:
+    def test_hrules_all(self, city_data: PrettyTable) -> None:
         assert city_data.get_string() != city_data.get_string(hrules=HRuleStyle.ALL)
 
-    def test_hrules_none(self, city_data) -> None:
+    def test_hrules_none(self, city_data: PrettyTable) -> None:
         assert city_data.get_string() != city_data.get_string(hrules=HRuleStyle.NONE)
 
 
@@ -351,7 +352,7 @@ class TestOptionAttribute:
     Also make sure option settings are copied correctly when a table is cloned by
     slicing."""
 
-    def test_set_for_all_columns(self, city_data) -> None:
+    def test_set_for_all_columns(self, city_data: PrettyTable) -> None:
         city_data.field_names = sorted(city_data.field_names)
         city_data.align = "l"
         city_data.max_width = 10

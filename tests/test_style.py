@@ -453,8 +453,8 @@ def emoji_pretty_table() -> PrettyTable:
         "\033[38;5;21;1m  ‚ʻ‚ʻ\033[38;5;228;5m⚡\033[38;5;21;25mʻ‚ʻ   \033[0m",
     ]
     table = PrettyTable(["Thunderbolt", "Lightning"])
-    for i in range(len(thunder1)):
-        table.add_row([thunder1[i], thunder2[i]])
+    for i, t1 in enumerate(thunder1):
+        table.add_row([t1, thunder2[i]])
     return table
 
 
@@ -518,7 +518,6 @@ class TestMultiPattern:
     def test_multi_pattern_outputs(
         self, pt: PrettyTable, expected_output: str, test_type: str
     ) -> None:
-        printed_table = pt.get_string()
         assert (
-            printed_table.strip() == expected_output.strip()
+            pt.get_string().strip() == expected_output.strip()
         ), f"Error output for test output of type {test_type}"
