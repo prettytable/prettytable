@@ -212,7 +212,7 @@ This string is guaranteed to look exactly the same as what would be printed by d
 your table to a file or insert it into a GUI.
 
 The table can be displayed in several different formats using `get_formatted_string` by
-changing the `out_format=<text|html|json|csv|latex>`. This function passes through
+changing the `out_format=<text|html|json|csv|latex|mediawiki>`. This function passes through
 arguments to the functions that render the table, so additional arguments can be given.
 This provides a way to let a user choose the output formatting.
 
@@ -599,6 +599,10 @@ table.
 PrettyTable will also print your tables in JSON, as a list of fields and an array of
 rows. Just like in ASCII form, you can actually get a string representation - just use
 `get_json_string()`.
+
+### Displaying your table in MediaWiki Markup
+
+PrettyTable can also print your tables in MediaWiki table markup, making it easy to format tables for wikis. Similar to the ASCII format, you can get a string representation using get_mediawiki_string().
 
 ### Displaying your table in HTML form
 
