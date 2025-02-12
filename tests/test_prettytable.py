@@ -1203,7 +1203,7 @@ class TestWidth:
         )
 
     @pytest.mark.parametrize("set_width_parameter", [True, False])
-    def test_table_max_width_wo_header_width(self, set_width_parameter) -> None:
+    def test_table_max_width_wo_header_width(self, set_width_parameter: bool) -> None:
         headers = [
             "A Field Name",
             "B Field Name",
