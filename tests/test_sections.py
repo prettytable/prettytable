@@ -43,7 +43,7 @@ class TestClearing:
         assert helper_table.dividers == []
         assert helper_table.field_names == ["", "Field 1", "Field 2", "Field 3"]
 
-    def test_clear(self, helper_table) -> None:
+    def test_clear(self, helper_table: PrettyTable) -> None:
         helper_table.add_row([0, "a", "b", "c"], divider=True)
         helper_table.clear()
         assert helper_table.rows == []
