@@ -4,7 +4,7 @@ from prettytable import PrettyTable, from_json
 
 
 class TestJSONOutput:
-    def test_json_output(self, helper_table) -> None:
+    def test_json_output(self, helper_table: PrettyTable) -> None:
         result = helper_table.get_json_string()
         assert (
             result.strip()
