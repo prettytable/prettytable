@@ -376,7 +376,13 @@ class TestStyle:
             ),
         ],
     )
-    def test_style_reset(self, helper_table: PrettyTable, original_style: TableStyle, style: TableStyle, expected: str) -> None:
+    def test_style_reset(
+        self,
+        helper_table: PrettyTable,
+        original_style: TableStyle,
+        style: TableStyle,
+        expected: str,
+    ) -> None:
         """
             Testing to ensure that default styling is reset between changes
             of styles on a PrettyTable
