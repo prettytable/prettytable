@@ -257,7 +257,7 @@ class TestStyle:
             ),
         ],
     )
-    def test_style(self, helper_table, style, expected) -> None:
+    def test_style(self, helper_table: PrettyTable, style: TableStyle, expected: str) -> None:
         random.seed(1234)
         helper_table.set_style(style)
         assert helper_table.get_string().strip() == expected.strip()
