@@ -262,7 +262,7 @@ class TestStyle:
         helper_table.set_style(style)
         assert helper_table.get_string().strip() == expected.strip()
 
-    def test_style_invalid(self, helper_table) -> None:
+    def test_style_invalid(self, helper_table: PrettyTable) -> None:
         # This is an hrule style, not a table style
         with pytest.raises(ValueError):
             helper_table.set_style(HRuleStyle.ALL)  # type: ignore[arg-type]
