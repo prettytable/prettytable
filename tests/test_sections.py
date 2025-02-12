@@ -36,7 +36,7 @@ class TestRowEndSection:
 
 
 class TestClearing:
-    def test_clear_rows(self, helper_table) -> None:
+    def test_clear_rows(self, helper_table: PrettyTable) -> None:
         helper_table.add_row([0, "a", "b", "c"], divider=True)
         helper_table.clear_rows()
         assert helper_table.rows == []
