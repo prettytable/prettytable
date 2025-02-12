@@ -786,7 +786,7 @@ class TestFromDB:
 
 
 class TestCsvOutput:
-    def test_csv_output(self, helper_table) -> None:
+    def test_csv_output(self, helper_table: PrettyTable) -> None:
         assert helper_table.get_csv_string(delimiter="\t", header=False) == (
             "1\tvalue 1\tvalue2\tvalue3\r\n"
             "4\tvalue 4\tvalue5\tvalue6\r\n"
