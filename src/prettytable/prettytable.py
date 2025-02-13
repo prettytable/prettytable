@@ -1797,10 +1797,12 @@ class PrettyTable:
             return self.get_csv_string(**kwargs)
         if out_format == "latex":
             return self.get_latex_string(**kwargs)
+        if out_format == "mediawiki":
+            return self.get_mediawiki_string(**kwargs)
 
         msg = (
             f"Invalid format {out_format}. "
-            "Must be one of: text, html, json, csv, or latex"
+            "Must be one of: text, html, json, csv, latex or mediawiki"
         )
         raise ValueError(msg)
 
@@ -2773,6 +2775,70 @@ class PrettyTable:
 
         return "\r\n".join(lines)
 
+    ##############################
+    # MEDIAWIKI STRING METHODS   #
+    ##############################
+
+    def get_mediawiki_string(self, **kwargs) -> str:
+        """
+        Return string representation of the table in MediaWiki table markup.
+        The generated markup follows simple MediaWiki syntax. For example:
+            {| class="wikitable"
+            |+ Optional caption
+            |-
+            ! Header1 !! Header2 !! Header3
+            |-
+            | Data1 || Data2 || Data3
+            |-
+            | Data4 || Data5 || Data6
+            |}
+        """
+
+        options = self._get_options(kwargs)
+        lines: list[str] = []
+
+        if (
+            options.get("attributes")
+            and isinstance(options["attributes"], dict)
+            and options["attributes"]
+        ):
+            attr_str = " ".join(f'{k}="{v}"' for k, v in options["attributes"].items())
+            lines.append("{| " + attr_str)
+        else:
+            lines.append('{| class="wikitable"')
+
+        caption = options.get("title", self._title)
+        if caption:
+            lines.append("|+ " + caption)
+
+        if options.get("header"):
+            lines.append("|-")
+            headers = []
+            fields_option = options.get("fields")
+            for field in self._field_names:
+                if fields_option is not None and field not in fields_option:
+                    continue
+                headers.append(field)
+            if headers:
+                header_line = " !! ".join(headers)
+                lines.append("! " + header_line)
+
+        rows = self._get_rows(options)
+        formatted_rows = self._format_rows(rows)
+        for row in formatted_rows:
+            lines.append("|-")
+            cells = []
+            fields_option = options.get("fields")
+            for field, cell in zip(self._field_names, row):
+                if fields_option is not None and field not in fields_option:
+                    continue
+                cells.append(cell)
+            if cells:
+                lines.append("| " + " || ".join(cells))
+
+        lines.append("|}")
+        return "\n".join(lines)
+
 
 ##############################
 # UNICODE WIDTH FUNCTION     #
@@ -2945,6 +3011,53 @@ def from_html_one(html_code: str, **kwargs) -> PrettyTable:
         msg = "More than one <table> in provided HTML code. Use from_html instead."
         raise ValueError(msg)
     return tables[0]
+
+
+def from_mediawiki(wiki_text: str, **kwargs) -> PrettyTable:
+    """
+    Returns a PrettyTable instance from simple MediaWiki table markup.
+    Note that the table should have a header row.
+    Arguments:
+    wiki_text -- Multiline string containing MediaWiki table markup
+    (Enter within '''   ''')
+    """
+    lines = wiki_text.strip().split("\n")
+    table = PrettyTable(**kwargs)
+    header = None
+    rows = []
+    inside_table = False
+    for line in lines:
+        line = line.strip()
+        if line.startswith("{|"):
+            inside_table = True
+            continue
+        if line.startswith("|}"):
+            break
+        if not inside_table:
+            continue
+        if line.startswith("|-"):
+            continue
+        if line.startswith("|+"):
+            continue
+        if line.startswith("!"):
+            header = [cell.strip() for cell in re.split(r"\s*!!\s*", line[1:])]
+            table.field_names = header
+            continue
+        if line.startswith("|"):
+            row_data = [cell.strip() for cell in re.split(r"\s*\|\|\s*", line[1:])]
+            rows.append(row_data)
+            continue
+
+    if header:
+        for row in rows:
+            if len(row) != len(header):
+                error_message = "Row length mismatch between header and body."
+                raise ValueError(error_message)
+            table.add_row(row)
+    else:
+        msg = "No valid header found in the MediaWiki table."
+        raise ValueError(msg)
+    return table
 
 
 def _warn_deprecation(name: str, module_globals: dict[str, Any]) -> Any:
