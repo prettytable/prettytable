@@ -636,7 +636,7 @@ PrettyTable will also print your tables in JSON, as a list of fields and an arra
 rows. Just like in ASCII form, you can actually get a string representation - just use
 `get_json_string()`.
 
-### Displaying your table in MediaWiki Markup
+### Displaying your table in MediaWiki markup
 
 PrettyTable can also print your tables in MediaWiki table markup, making it easy to
 format tables for wikis. Similar to the ASCII format, you can get a string
