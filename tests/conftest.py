@@ -5,7 +5,7 @@ import io
 import pytest
 from test_prettytable import CITY_DATA, CITY_DATA_HEADER
 
-from prettytable import PrettyTable, from_csv
+from prettytable import PrettyTable, from_csv, from_mediawiki
 
 
 @pytest.fixture(scope="function")
@@ -33,6 +33,18 @@ def city_data_from_csv() -> PrettyTable:
         csv_string += "\n" + ",".join(str(fld) for fld in row)
     csv_fp = io.StringIO(csv_string)
     return from_csv(csv_fp)
+
+
+@pytest.fixture(scope="function")
+def city_data_from_mediawiki() -> PrettyTable:
+    wiki_text = '{| class="wikitable"\n'
+    wiki_text += "|-\n"
+    wiki_text += "! " + " !! ".join(CITY_DATA_HEADER) + "\n"
+    for row in CITY_DATA:
+        wiki_text += "|-\n"
+        wiki_text += "| " + " || ".join(str(item) for item in row) + "\n"
+    wiki_text += "|}"
+    return from_mediawiki(wiki_text)
 
 
 @pytest.fixture
