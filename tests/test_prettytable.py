@@ -212,6 +212,24 @@ class TestBuildEquivalence:
     ) -> None:
         assert left_hand.get_latex_string() == right_hand.get_latex_string()
 
+    @pytest.mark.parametrize(
+        ["left_hand", "right_hand"],
+        [
+            (
+                lf("row_prettytable"),
+                lf("col_prettytable"),
+            ),
+            (
+                lf("row_prettytable"),
+                lf("mix_prettytable"),
+            ),
+        ],
+    )
+    def test_equivalence_mediawiki(
+        self, left_hand: PrettyTable, right_hand: PrettyTable
+    ) -> None:
+        assert left_hand.get_mediawiki_string() == right_hand.get_mediawiki_string()
+
 
 class TestDelete:
     def test_delete_column(self, col_prettytable: PrettyTable) -> None:
@@ -278,6 +296,11 @@ class TestFieldNameLessTable:
         assert "Field 1 & Field 2 & Field 3 & Field 4 \\\\" in output
         assert "Adelaide & 1295 & 1158259 & 600.5 \\\\" in output
 
+    def test_can_string_mediawiki(self, field_name_less_table: PrettyTable) -> None:
+        output = field_name_less_table.get_mediawiki_string(header=True)
+        assert "! Field 1 !! Field 2 !! Field 3 !! Field 4" in output
+        assert "| Adelaide || 1295 || 1158259 || 600.5" in output
+
     def test_add_field_names_later(self, field_name_less_table: PrettyTable) -> None:
         field_name_less_table.field_names = CITY_DATA_HEADER
         assert (
@@ -329,6 +352,13 @@ class TestAlignment:
             aligned_before_table.get_latex_string()
             == aligned_after_table.get_latex_string()
         )
+
+    def test_aligned_mediawiki(
+        self, aligned_before_table: PrettyTable, aligned_after_table: PrettyTable
+    ) -> None:
+        assert aligned_before_table.get_mediawiki_string(
+            header=True
+        ) == aligned_after_table.get_mediawiki_string(header=True)
 
 
 class TestOptionOverride:
@@ -558,6 +588,18 @@ class TestBasic:
     def test_all_lengths_equal_from_csv(self, city_data_from_csv: PrettyTable) -> None:
         """All lines in a table should be of the same length."""
         self._test_all_length_equal(city_data_from_csv)
+
+    def test_no_blank_lines_from_mediawiki(
+        self, city_data_from_mediawiki: PrettyTable
+    ) -> None:
+        """No table should ever have blank lines in it."""
+        self._test_no_blank_lines(city_data_from_mediawiki)
+
+    def test_all_lengths_equal_from_mediawiki(
+        self, city_data_from_mediawiki: PrettyTable
+    ) -> None:
+        """All lines in a table should be of the same length."""
+        self._test_all_length_equal(city_data_from_mediawiki)
 
     def test_rowcount(self, city_data: PrettyTable) -> None:
         assert city_data.rowcount == 7
@@ -1510,6 +1552,11 @@ class TestGeneralOutput:
         assert helper_table.get_formatted_string(
             "latex", border=False
         ) == helper_table.get_latex_string(border=False)
+
+    def test_mediawiki(self, helper_table: PrettyTable) -> None:
+        assert helper_table.get_formatted_string(
+            "mediawiki", border=False
+        ) == helper_table.get_mediawiki_string(border=False)
 
     def test_invalid(self, helper_table: PrettyTable) -> None:
         with pytest.raises(ValueError):
