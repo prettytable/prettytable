@@ -1883,7 +1883,7 @@ class PrettyTable:
         # Are we under min_table_width or title width?
         if self._min_table_width or options["title"]:
             if options["title"]:
-                title_width = len(options["title"]) + per_col_padding
+                title_width = _str_block_width(options["title"]) + per_col_padding
                 if options["vrules"] in (VRuleStyle.FRAME, VRuleStyle.ALL):
                     title_width += 2
             else:
