@@ -1648,7 +1648,7 @@ class PrettyTable:
 
         divider - add row divider after the row block
         """
-        # FIXME: Ignore types, because mapy thinks:
+        # FIXME: Ignore types, because mypy thinks:
         # On rows[:-1]: Value of type "Iterable[list[Any]]" is not indexable
         for row in rows[:-1]:  # type: ignore[index]
             self.add_row(row)
