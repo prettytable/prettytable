@@ -103,6 +103,5 @@ follow_imports = "silent"
 warn_unused_ignores = true
 exclude = [
   "^tests/test_colortable.py$",
-  "^tests/test_latex.py$",
   "^tests/test_prettytable.py$",
 ]
