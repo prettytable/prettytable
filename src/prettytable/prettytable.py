@@ -1663,7 +1663,7 @@ class PrettyTable:
             )
             raise ValueError(msg)
         if not self._field_names:
-            self.field_names = [f"Field {n + 1}" for n in range(0, len(row))]
+            self.field_names = [f"Field {n + 1}" for n in range(len(row))]
         self._rows.append(list(row))
         self._dividers.append(divider)
 
@@ -1713,7 +1713,7 @@ class PrettyTable:
             self._field_names.append(fieldname)
             self._align[fieldname] = align
             self._valign[fieldname] = valign
-            for i in range(0, len(column)):
+            for i in range(len(column)):
                 if len(self._rows) < i + 1:
                     self._rows.append([])
                     self._dividers.append(False)
@@ -2245,7 +2245,7 @@ class PrettyTable:
         import textwrap
 
         for index, field, value, width in zip(
-            range(0, len(row)), self._field_names, row, self._widths
+            range(len(row)), self._field_names, row, self._widths
         ):
             # Enforce max widths
             lines = value.split("\n")
@@ -2273,7 +2273,7 @@ class PrettyTable:
 
         bits: list[list[str]] = []
         lpad, rpad = self._get_padding_widths(options)
-        for y in range(0, row_height):
+        for y in range(row_height):
             bits.append([])
             if options["border"]:
                 if options["vrules"] in (VRuleStyle.ALL, VRuleStyle.FRAME):
@@ -2320,7 +2320,7 @@ class PrettyTable:
 
         # If vrules is FRAME, then we just appended a space at the end
         # of the last field, when we really want a vertical character
-        for y in range(0, row_height):
+        for y in range(row_height):
             if options["border"] and options["vrules"] == VRuleStyle.FRAME:
                 bits[y].pop()
                 bits[y].append(options["vertical_char"])
@@ -2981,7 +2981,7 @@ class TableHandler(HTMLParser):
         """
         iterates over the row and make each field unique
         """
-        for i in range(0, len(fields)):
+        for i in range(len(fields)):
             for j in range(i + 1, len(fields)):
                 if fields[i] == fields[j]:
                     fields[j] += "'"
