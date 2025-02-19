@@ -35,15 +35,16 @@ from __future__ import annotations
 
 import io
 import re
-import warnings
-from collections.abc import Callable, Iterable, Mapping, Sequence
 from enum import IntEnum
 from functools import lru_cache
 from html.parser import HTMLParser
-from typing import TYPE_CHECKING, Any, Final, Literal, TypedDict, cast
+from typing import Any, Literal, TypedDict, cast
 
+TYPE_CHECKING = False
 if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable, Mapping, Sequence
     from sqlite3 import Cursor
+    from typing import Final
 
     from _typeshed import SupportsRichComparison
     from typing_extensions import Self, TypeAlias
@@ -3078,6 +3079,9 @@ def _warn_deprecation(name: str, module_globals: dict[str, Any]) -> Any:
         )
     else:
         msg = f"the '{name}' constant is deprecated, use the 'TableStyle' enum instead"
+
+    import warnings
+
     warnings.warn(msg, DeprecationWarning, stacklevel=3)
     return val
 
