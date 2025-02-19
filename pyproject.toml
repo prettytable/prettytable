@@ -94,3 +94,15 @@ filterwarnings = [
   "ignore:sys.monitoring isn't available, using default core:coverage.exceptions.CoverageWarning",
 ]
 testpaths = [ "tests" ]
+
+[tool.mypy]
+python_version = "3.9"
+pretty = true
+enable_error_code = "ignore-without-code"
+follow_imports = "silent"
+warn_unused_ignores = true
+exclude = [
+  "^tests/test_colortable.py$",
+  "^tests/test_latex.py$",
+  "^tests/test_prettytable.py$",
+]
