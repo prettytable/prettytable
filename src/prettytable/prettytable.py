@@ -1638,7 +1638,7 @@ class PrettyTable:
     # DATA INPUT METHODS         #
     ##############################
 
-    def add_rows(self, rows: Iterable[RowType], divider: bool = False) -> None:
+    def add_rows(self, rows: Iterable[RowType], *, divider: bool = False) -> None:
         """Add rows to the table
 
         Arguments:
