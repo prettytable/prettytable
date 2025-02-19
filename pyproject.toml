@@ -98,6 +98,9 @@ testpaths = [ "tests" ]
 [tool.mypy]
 python_version = "3.9"
 pretty = true
+disallow_any_generics = true
 enable_error_code = "ignore-without-code"
+extra_checks = true
 follow_imports = "silent"
+warn_redundant_casts = true
 warn_unused_ignores = true
