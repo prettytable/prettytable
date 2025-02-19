@@ -2725,7 +2725,6 @@ class PrettyTable:
     def _get_formatted_latex_string(self, options: OptionsType) -> str:
         lines: list[str] = []
 
-        wanted_fields: list[str] = []
         if options["fields"]:
             wanted_fields = [
                 field for field in self._field_names if field in options["fields"]

@@ -47,8 +47,8 @@ class TestLatexOutput:
             "\\end{tabular}"
         )
 
-        options = {"vrules": VRuleStyle.FRAME}
-        assert helper_table.get_latex_string(format=True, **options) == (
+        vrule_options: dict[str, VRuleStyle] = {"vrules": VRuleStyle.FRAME}
+        assert helper_table.get_latex_string(format=True, **vrule_options) == (
             "\\begin{tabular}{|cccc|}\r\n"
             "\\hline\r\n"
             " & Field 1 & Field 2 & Field 3 \\\\\r\n"
@@ -59,8 +59,8 @@ class TestLatexOutput:
             "\\end{tabular}"
         )
 
-        options = {"hrules": HRuleStyle.ALL}
-        assert helper_table.get_latex_string(format=True, **options) == (
+        hrule_options: dict[str, HRuleStyle] = {"hrules": HRuleStyle.ALL}
+        assert helper_table.get_latex_string(format=True, **hrule_options) == (
             "\\begin{tabular}{|c|c|c|c|}\r\n"
             "\\hline\r\n"
             " & Field 1 & Field 2 & Field 3 \\\\\r\n"
