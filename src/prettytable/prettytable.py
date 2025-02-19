@@ -1638,15 +1638,21 @@ class PrettyTable:
     # DATA INPUT METHODS         #
     ##############################
 
-    def add_rows(self, rows: Iterable[RowType]) -> None:
+    def add_rows(self, rows: Iterable[RowType], *, divider: bool = False) -> None:
         """Add rows to the table
 
         Arguments:
 
         rows - rows of data, should be an iterable of lists, each list with as many
-        elements as the table has fields"""
-        for row in rows:
+        elements as the table has fields
+
+        divider - add row divider after the row block
+        """
+        # FIXME: Ignore types, because mypy thinks:
+        # On rows[:-1]: Value of type "Iterable[list[Any]]" is not indexable
+        for row in rows[:-1]:  # type: ignore[index]
             self.add_row(row)
+        self.add_row(rows[-1], divider=divider)  # type: ignore[index]
 
     def add_row(self, row: RowType, *, divider: bool = False) -> None:
         """Add a row to the table
