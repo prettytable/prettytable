@@ -529,3 +529,18 @@ class TestMultiPattern:
         assert (
             pt.get_string().strip() == expected_output.strip()
         ), f"Error output for test output of type {test_type}"
+
+
+class TestColoredTitle:
+    def test_colored_table(self):
+        table = PrettyTable(field_names=["Namespace", "Count"])
+        table.title = "\x1b[34mHere be Table caption\x1b[39m"
+        assert (
+            table.get_string()
+            == """+-----------------------+
+| \x1b[34mHere be Table caption\x1b[39m |
++-------------+---------+
+|  Namespace  |  Count  |
++-------------+---------+
++-------------+---------+"""
+        )
