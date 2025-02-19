@@ -3,8 +3,11 @@ from __future__ import annotations
 import pytest
 from test_prettytable import CITY_DATA, CITY_DATA_HEADER
 
-from prettytable import PrettyTable
 from prettytable.colortable import RESET_CODE, ColorTable, Theme, Themes
+
+TYPE_CHECKING = False
+if TYPE_CHECKING:
+    from prettytable import PrettyTable
 
 
 @pytest.fixture
