@@ -112,6 +112,10 @@ class TestColorTableRendering:
         minus = chars.get("-")
         pipe = chars.get("|")
         space = chars.get(" ")
+        assert isinstance(plus, str)
+        assert isinstance(minus, str)
+        assert isinstance(pipe, str)
+        assert isinstance(space, str)
 
         # +-----------------------+
         # |        Efforts        |

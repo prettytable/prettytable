@@ -101,6 +101,3 @@ pretty = true
 enable_error_code = "ignore-without-code"
 follow_imports = "silent"
 warn_unused_ignores = true
-exclude = [
-  "^tests/test_colortable.py$",
-]
