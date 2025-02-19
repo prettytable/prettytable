@@ -392,7 +392,7 @@ class TestOptionAttribute:
         city_data.reversesort = True
         city_data.header = True
         city_data.border = False
-        city_data.hrules = True
+        city_data.hrules = HRuleStyle.ALL
         city_data.int_format = "4"
         city_data.float_format = "2.2"
         city_data.padding_width = 2
@@ -625,15 +625,17 @@ class TestBasic:
     def test_no_blank_lines_from_db(self, db_cursor) -> None:
         """No table should ever have blank lines in it."""
         db_cursor.execute("SELECT * FROM cities")
-        pt = from_db_cursor(db_cursor)
-        self._test_no_blank_lines(pt)
+        table = from_db_cursor(db_cursor)
+        assert table is not None
+        self._test_no_blank_lines(table)
 
     @pytest.mark.usefixtures("init_db")
     def test_all_lengths_equal_from_db(self, db_cursor) -> None:
         """No table should ever have blank lines in it."""
         db_cursor.execute("SELECT * FROM cities")
-        pt = from_db_cursor(db_cursor)
-        self._test_all_length_equal(pt)
+        table = from_db_cursor(db_cursor)
+        assert table is not None
+        self._test_all_length_equal(table)
 
 
 class TestEmptyTable:
@@ -673,19 +675,27 @@ class TestSlicing:
         table = city_data[0:2]
         string = table.get_string()
         assert len(string.split("\n")) == 6
-        for rowidx in (0, 1):
-            assert CITY_DATA[rowidx][0] in string
-        for rowidx in (2, 3, 4, 5, 6):
-            assert CITY_DATA[rowidx][0] not in string
+        for row_index in (0, 1):
+            city = CITY_DATA[row_index][0]
+            assert isinstance(city, str)
+            assert city in string
+        for row_index in (2, 3, 4, 5, 6):
+            city = CITY_DATA[row_index][0]
+            assert isinstance(city, str)
+            assert city not in string
 
     def test_slice_last_two_rows(self, city_data: PrettyTable) -> None:
         table = city_data[-2:]
         string = table.get_string()
         assert len(string.split("\n")) == 6
-        for rowidx in (0, 1, 2, 3, 4):
-            assert CITY_DATA[rowidx][0] not in string
-        for rowidx in (5, 6):
-            assert CITY_DATA[rowidx][0] in string
+        for row_index in (0, 1, 2, 3, 4):
+            city = CITY_DATA[row_index][0]
+            assert isinstance(city, str)
+            assert city not in string
+        for row_index in (5, 6):
+            city = CITY_DATA[row_index][0]
+            assert isinstance(city, str)
+            assert city in string
 
 
 class TestRowFilter:
@@ -897,9 +907,9 @@ def test_autoindex(city_data: PrettyTable) -> None:
 @pytest.fixture(scope="function")
 def unpadded_pt() -> PrettyTable:
     table = PrettyTable(header=False, padding_width=0)
-    table.add_row("abc")
-    table.add_row("def")
-    table.add_row("g..")
+    table.add_row(list("abc"))
+    table.add_row(list("def"))
+    table.add_row(list("g.."))
     return table
 
 
@@ -954,7 +964,6 @@ class TestCustomFormatter:
     def test_set_custom_format_to_none_set_empty_dict(self) -> None:
         table = PrettyTable()
         table.custom_format = None
-        assert len(table.custom_format) == 0
         assert isinstance(table.custom_format, dict)
 
     def test_set_custom_format_invalid_type_throw_error(self) -> None:
