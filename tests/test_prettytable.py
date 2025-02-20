@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime as dt
 import sqlite3
+from collections.abc import Generator
 from math import e, pi, sqrt
 from typing import Any
 
@@ -441,7 +442,7 @@ class TestOptionAttribute:
 
 
 @pytest.fixture(scope="module")
-def db_cursor():
+def db_cursor() -> Generator[sqlite3.Cursor]:
     conn = sqlite3.connect(":memory:")
     cur = conn.cursor()
     yield cur
@@ -450,7 +451,7 @@ def db_cursor():
 
 
 @pytest.fixture(scope="module")
-def init_db(db_cursor):
+def init_db(db_cursor: sqlite3.Cursor) -> Generator[Any]:
     db_cursor.execute(
         "CREATE TABLE cities "
         "(name TEXT, area INTEGER, population INTEGER, rainfall REAL)"
@@ -622,7 +623,7 @@ class TestBasic:
             assert city_data[10]
 
     @pytest.mark.usefixtures("init_db")
-    def test_no_blank_lines_from_db(self, db_cursor) -> None:
+    def test_no_blank_lines_from_db(self, db_cursor: sqlite3.Cursor) -> None:
         """No table should ever have blank lines in it."""
         db_cursor.execute("SELECT * FROM cities")
         table = from_db_cursor(db_cursor)
@@ -630,7 +631,7 @@ class TestBasic:
         self._test_no_blank_lines(table)
 
     @pytest.mark.usefixtures("init_db")
-    def test_all_lengths_equal_from_db(self, db_cursor) -> None:
+    def test_all_lengths_equal_from_db(self, db_cursor: sqlite3.Cursor) -> None:
         """No table should ever have blank lines in it."""
         db_cursor.execute("SELECT * FROM cities")
         table = from_db_cursor(db_cursor)
@@ -832,7 +833,7 @@ class TestBreakLine:
 
 class TestFromDB:
     @pytest.mark.usefixtures("init_db")
-    def test_non_select_cursor(self, db_cursor) -> None:
+    def test_non_select_cursor(self, db_cursor: sqlite3.Cursor) -> None:
         db_cursor.execute(f"INSERT INTO cities VALUES {tuple(CITY_DATA[0])}")
         assert from_db_cursor(db_cursor) is None
 
@@ -1150,7 +1151,12 @@ class TestWidth:
         ],
     )
     def test_min_table_width(
-        self, loops, fields, desired_width, border, internal_border
+        self,
+        loops: int,
+        fields: list[str],
+        desired_width: int,
+        border: bool,
+        internal_border: bool,
     ) -> None:
         for col_width in range(loops):
             x = prettytable.PrettyTable()
