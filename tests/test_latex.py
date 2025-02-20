@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from prettytable import HRuleStyle, VRuleStyle
+from prettytable import HRuleStyle, PrettyTable, VRuleStyle
 
 
 class TestLatexOutput:
-    def test_latex_output(self, helper_table) -> None:
+    def test_latex_output(self, helper_table: PrettyTable) -> None:
         assert helper_table.get_latex_string() == (
             "\\begin{tabular}{cccc}\r\n"
             " & Field 1 & Field 2 & Field 3 \\\\\r\n"
@@ -23,7 +23,7 @@ class TestLatexOutput:
             "\\end{tabular}"
         )
 
-    def test_latex_output_formatted(self, helper_table) -> None:
+    def test_latex_output_formatted(self, helper_table: PrettyTable) -> None:
         assert helper_table.get_latex_string(format=True) == (
             "\\begin{tabular}{|c|c|c|c|}\r\n"
             "\\hline\r\n"
@@ -74,7 +74,7 @@ class TestLatexOutput:
             "\\end{tabular}"
         )
 
-    def test_latex_output_header(self, helper_table) -> None:
+    def test_latex_output_header(self, helper_table: PrettyTable) -> None:
         assert helper_table.get_latex_string(format=True, hrules=HRuleStyle.HEADER) == (
             "\\begin{tabular}{|c|c|c|c|}\r\n"
             " & Field 1 & Field 2 & Field 3 \\\\\r\n"
@@ -85,7 +85,7 @@ class TestLatexOutput:
             "\\end{tabular}"
         )
 
-    def test_internal_border_preserved_latex(self, helper_table) -> None:
+    def test_internal_border_preserved_latex(self, helper_table: PrettyTable) -> None:
         helper_table.border = False
         helper_table.format = True
         helper_table.preserve_internal_border = True

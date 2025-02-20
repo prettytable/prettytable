@@ -413,7 +413,7 @@ class TestOptionAttribute:
         city_data.attributes = {"class": "prettytable"}
         assert city_data.get_string() == city_data[:].get_string()
 
-    def test_set_for_one_column(self, city_data) -> None:
+    def test_set_for_one_column(self, city_data: PrettyTable) -> None:
         city_data.align["Rainfall"] = "l"
         city_data.max_width["Name"] = 10
         city_data.int_format["Population"] = "4"
@@ -424,7 +424,7 @@ class TestOptionAttribute:
         table = PrettyTable(preserve_internal_border=True)
         assert table.preserve_internal_border is True
 
-    def test_internal_border_preserved(self, helper_table) -> None:
+    def test_internal_border_preserved(self, helper_table: PrettyTable) -> None:
         helper_table.border = False
         helper_table.preserve_internal_border = True
 

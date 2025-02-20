@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture
-def row_colortable():
+def row_colortable() -> PrettyTable:
     table = ColorTable()
     table.field_names = CITY_DATA_HEADER
     for row in CITY_DATA:

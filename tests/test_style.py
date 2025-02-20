@@ -412,7 +412,7 @@ class TestStyle:
             ),
         ],
     )
-    def test_style_align(self, style, expected) -> None:
+    def test_style_align(self, style: TableStyle, expected: str) -> None:
         t = PrettyTable(["l", "c", "r", "Align left", "Align centre", "Align right"])
         v = 1
         for row in range(3):
@@ -532,7 +532,7 @@ class TestMultiPattern:
 
 
 class TestColoredTitle:
-    def test_colored_table(self):
+    def test_colored_table(self) -> None:
         table = PrettyTable(field_names=["Namespace", "Count"])
         table.title = "\x1b[34mHere be Table caption\x1b[39m"
         assert (
