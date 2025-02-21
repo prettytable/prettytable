@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from test_prettytable import CITY_DATA, CITY_DATA_HEADER
 
-from prettytable import PrettyTable
+from prettytable import PrettyTable, RowType
 
 
 class TestSorting:
@@ -28,7 +28,7 @@ class TestSorting:
 
     def test_sort_key(self, city_data: PrettyTable) -> None:
         # Test sorting by length of city name
-        def key(vals):
+        def key(vals: RowType) -> list[int]:
             vals[0] = len(vals[0])
             return vals
 
@@ -53,7 +53,7 @@ class TestSorting:
 
     def test_sort_key_at_class_declaration(self) -> None:
         # Test sorting by length of city name
-        def key(vals):
+        def key(vals: RowType) -> list[int]:
             vals[0] = len(vals[0])
             return vals
 

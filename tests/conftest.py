@@ -68,7 +68,7 @@ def field_name_less_table() -> PrettyTable:
 
 
 @pytest.fixture(scope="function")
-def row_prettytable(field_name_less_table) -> PrettyTable:
+def row_prettytable(field_name_less_table: PrettyTable) -> PrettyTable:
     # Row by row...
     field_name_less_table.field_names = CITY_DATA_HEADER
     return field_name_less_table

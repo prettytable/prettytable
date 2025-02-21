@@ -61,7 +61,7 @@ class TestJSONOutput:
 ]""".strip()
         )
 
-    def test_json_output_options(self, helper_table) -> None:
+    def test_json_output_options(self, helper_table: PrettyTable) -> None:
         result = helper_table.get_json_string(
             header=False, indent=None, separators=(",", ":")
         )
