@@ -42,7 +42,7 @@ from typing import Any, Literal, TypedDict, cast
 
 TYPE_CHECKING = False
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable, Mapping, Sequence
+    from collections.abc import Callable, Mapping, Sequence
     from sqlite3 import Cursor
     from typing import Final
 
@@ -1639,7 +1639,7 @@ class PrettyTable:
     # DATA INPUT METHODS         #
     ##############################
 
-    def add_rows(self, rows: Iterable[RowType], *, divider: bool = False) -> None:
+    def add_rows(self, rows: Sequence[RowType], *, divider: bool = False) -> None:
         """Add rows to the table
 
         Arguments:
@@ -1649,13 +1649,11 @@ class PrettyTable:
 
         divider - add row divider after the row block
         """
-        # FIXME: Ignore types, because mypy thinks:
-        # On rows[:-1]: Value of type "Iterable[list[Any]]" is not indexable
-        for row in rows[:-1]:  # type: ignore[index]
+        for row in rows[:-1]:
             self.add_row(row)
 
         if rows:
-            self.add_row(rows[-1], divider=divider)  # type: ignore[index]
+            self.add_row(rows[-1], divider=divider)
 
     def add_row(self, row: RowType, *, divider: bool = False) -> None:
         """Add a row to the table
