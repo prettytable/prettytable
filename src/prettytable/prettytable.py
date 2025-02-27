@@ -1653,7 +1653,9 @@ class PrettyTable:
         # On rows[:-1]: Value of type "Iterable[list[Any]]" is not indexable
         for row in rows[:-1]:  # type: ignore[index]
             self.add_row(row)
-        self.add_row(rows[-1], divider=divider)  # type: ignore[index]
+
+        if rows:
+            self.add_row(rows[-1], divider=divider)  # type: ignore[index]
 
     def add_row(self, row: RowType, *, divider: bool = False) -> None:
         """Add a row to the table

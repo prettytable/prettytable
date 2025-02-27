@@ -478,6 +478,9 @@ class TestBasic:
         table.add_rows(CITY_DATA)
         assert str(city_data) == str(table)
 
+        table.add_rows([])
+        assert str(city_data) == str(table)
+
     def _test_no_blank_lines(self, table: PrettyTable) -> None:
         string = table.get_string()
         lines = string.split("\n")
