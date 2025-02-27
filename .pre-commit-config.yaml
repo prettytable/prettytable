@@ -21,6 +21,7 @@ repos:
       - id: debug-statements
       - id: end-of-file-fixer
       - id: forbid-submodules
+      - id: requirements-txt-fixer
       - id: trailing-whitespace
         exclude: .github/ISSUE_TEMPLATE/bug_report.md|tests/test_style.py|tests/test_prettytable.py
 
