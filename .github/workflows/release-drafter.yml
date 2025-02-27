@@ -16,7 +16,7 @@ on:
 
 jobs:
   update_release_draft:
-    if: github.repository_owner == 'prettytable'
+    if: github.event.repository.fork == false
     permissions:
       # write permission is required to create a GitHub Release
       contents: write
