@@ -414,19 +414,23 @@ class TestStyle:
         ],
     )
     def test_style_align(self, style: TableStyle, expected: str) -> None:
-        t = PrettyTable(["l", "c", "r", "Align left", "Align centre", "Align right"])
+        table = PrettyTable(
+            ["l", "c", "r", "Align left", "Align centre", "Align right"]
+        )
         v = 1
         for row in range(3):
             # Some have spaces, some not, to help test padding columns of
             # different widths
-            t.add_row([v, v + 1, v + 2, f"value {v}", f"value{v + 1}", f"value{v + 2}"])
+            table.add_row(
+                [v, v + 1, v + 2, f"value {v}", f"value{v + 1}", f"value{v + 2}"]
+            )
             v += 3
 
-        t.set_style(style)
-        t.align["l"] = t.align["Align left"] = "l"
-        t.align["c"] = t.align["Align centre"] = "c"
-        t.align["r"] = t.align["Align right"] = "r"
-        assert t.get_string().strip() == expected.strip()
+        table.set_style(style)
+        table.align["l"] = table.align["Align left"] = "l"
+        table.align["c"] = table.align["Align centre"] = "c"
+        table.align["r"] = table.align["Align right"] = "r"
+        assert table.get_string().strip() == expected.strip()
 
 
 @pytest.fixture
