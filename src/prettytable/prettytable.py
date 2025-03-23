@@ -150,7 +150,10 @@ class OptionsType(TypedDict):
     break_on_hyphens: bool
 
 
+# ANSI colour codes
 _re = re.compile(r"\033\[[0-9;]*m|\033\(B")
+# OSC 8 hyperlinks
+_osc8_re = re.compile(r"\033\]8;;.*?\033\\(.*?)\033\]8;;\033\\")
 
 
 @lru_cache
@@ -2855,6 +2858,7 @@ class PrettyTable:
 def _str_block_width(val: str) -> int:
     import wcwidth  # type: ignore[import-untyped]
 
+    val = _osc8_re.sub(r"\1", val)
     return wcwidth.wcswidth(_re.sub("", val))
 
 

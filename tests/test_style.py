@@ -6,6 +6,7 @@ import pytest
 from pytest_lazy_fixtures import lf
 
 from prettytable import HRuleStyle, PrettyTable, TableStyle, VRuleStyle
+from prettytable.prettytable import _str_block_width
 
 
 class TestPositionalJunctions:
@@ -531,16 +532,56 @@ class TestMultiPattern:
         ), f"Error output for test output of type {test_type}"
 
 
-class TestColoredTitle:
-    def test_colored_table(self) -> None:
-        table = PrettyTable(field_names=["Namespace", "Count"])
-        table.title = "\x1b[34mHere be Table caption\x1b[39m"
-        assert (
-            table.get_string()
-            == """+-----------------------+
+def test_colored_table() -> None:
+    table = PrettyTable(field_names=["Namespace", "Count"])
+    table.title = "\x1b[34mHere be Table caption\x1b[39m"
+    assert (
+        table.get_string()
+        == """+-----------------------+
 | \x1b[34mHere be Table caption\x1b[39m |
 +-------------+---------+
 |  Namespace  |  Count  |
 +-------------+---------+
 +-------------+---------+"""
-        )
+    )
+
+
+def test_link_and_color() -> None:
+    table = PrettyTable(["Link", "Count"])
+    # Add link
+    text = "Click here"
+    table.add_row([f"\033]8;;https://example.com\033\\{text}\033]8;;\033\\", "1"])
+    table.add_row(["No link", "2"])
+    # Add link with colour
+    text = "Click \x1b[34mhere\x1b[39m"
+    table.add_row([f"\033]8;;https://example.com\033\\{text}\033]8;;\033\\", "3"])
+
+    assert (
+        table.get_string()
+        == """\
++------------+-------+
+|    Link    | Count |
++------------+-------+
+| \033]8;;https://example.com\033\\Click here\033]8;;\033\\ |   1   |
+|  No link   |   2   |
+| \033]8;;https://example.com\033\\Click \x1b[34mhere\x1b[39m\033]8;;\033\\ |   3   |
++------------+-------+"""
+    )
+
+
+@pytest.mark.parametrize(
+    ["test_input", "expected"],
+    [
+        ("a", 1),
+        ("abc", 3),
+        ("abc def", 7),
+        ("\x1b[34mblue\x1b[39m", 4),
+        ("\033]8;;https://example.com\033\\link\033]8;;\033\\", 4),
+        # colour inside link
+        ("\033]8;;https://example.com\033\\\x1b[34mblue link\x1b[39m\033]8;;\033\\", 9),
+        # link inside colour
+        ("\x1b[34m\033]8;;https://example.com\033\\blue link\033]8;;\033\\\x1b[39m", 9),
+    ],
+)
+def test__str_block_width(test_input: str, expected: int) -> None:
+    assert _str_block_width(test_input) == expected
