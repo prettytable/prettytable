@@ -56,7 +56,7 @@ fix = true
 
 lint.select = [
   "C4",     # flake8-comprehensions
-  "E",      # pycodestyle
+  "E",      # pycodestyle errors
   "EM",     # flake8-errmsg
   "F",      # pyflakes
   "I",      # isort
@@ -69,7 +69,7 @@ lint.select = [
   "RUF022", # unsorted-dunder-all
   "RUF100", # unused noqa (yesqa)
   "UP",     # pyupgrade
-  "W",      # pycodestyle
+  "W",      # pycodestyle warnings
   "YTT",    # flake8-2020
 ]
 lint.ignore = [
@@ -77,7 +77,7 @@ lint.ignore = [
   "E221",   # Multiple spaces before operator
   "E226",   # Missing whitespace around arithmetic operator
   "E241",   # Multiple spaces after ','
-  "PIE790", # Unnecessary pass statement
+  "PIE790", # flake8-pie: unnecessary-placeholder
   "UP038",  # Makes code slower and more verbose
 ]
 lint.flake8-import-conventions.aliases.datetime = "dt"
@@ -90,8 +90,7 @@ max_supported_python = "3.14"
 
 [tool.pytest.ini_options]
 filterwarnings = [
-  # Python <= 3.11
-  "ignore:sys.monitoring isn't available, using default core:coverage.exceptions.CoverageWarning",
+  "error",
 ]
 testpaths = [ "tests" ]
 
