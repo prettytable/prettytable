@@ -278,11 +278,11 @@ keyword argument, which must be a function with one argument `row` returning a B
 value. The `row` is the list of fields in a row.
 
 For example, to print the example table we built earlier of Australian capital city
-data, so that cities with a population with more than 1,000,000, we can do this:
+data, so that cities with a population of at least 1,000,000, we can do this:
 
 ```python
-def filter_function(self, vals: list[str]) -> bool:
-    return vals[2] > 999999
+def filter_function(row: list[str]) -> bool:
+    return row[2] > 999999
 
 print(table.get_string(row_filter=filter_function))
 ```
