@@ -2856,7 +2856,7 @@ class PrettyTable:
 
 @lru_cache
 def _str_block_width(val: str) -> int:
-    import wcwidth  # type: ignore[import-untyped]
+    import wcwidth
 
     val = _osc8_re.sub(r"\1", val)
     return wcwidth.wcswidth(_re.sub("", val))
