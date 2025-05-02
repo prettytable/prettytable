@@ -29,37 +29,8 @@ class TestHtmlOutput:
         assert (
             result.strip()
             == """
-<table>
-    <thead>
-        <tr>
-            <th></th>
-            <th>Field 1</th>
-            <th>Field 2</th>
-            <th>Field 3</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>1</td>
-            <td>value 1</td>
-            <td>value2</td>
-            <td>value3</td>
-        </tr>
-        <tr>
-            <td>4</td>
-            <td>value 4</td>
-            <td>value5</td>
-            <td>value6</td>
-        </tr>
-        <tr>
-            <td>7</td>
-            <td>value 7</td>
-            <td>value8</td>
-            <td>value9</td>
-        </tr>
-    </tbody>
-</table>
-""".strip()
+<table><thead><tr><th></th><th>Field 1</th><th>Field 2</th><th>Field 3</th></tr></thead><tbody><tr><td>1</td><td>value 1</td><td>value2</td><td>value3</td></tr><tr><td>4</td><td>value 4</td><td>value5</td><td>value6</td></tr><tr><td>7</td><td>value 7</td><td>value8</td><td>value9</td></tr></tbody></table>
+""".strip()  # noqa: E501
         )
 
     def test_html_output_formatted(self, helper_table: PrettyTable) -> None:
@@ -67,36 +38,7 @@ class TestHtmlOutput:
         assert (
             result.strip()
             == """
-<table frame="box" rules="cols">
-    <thead>
-        <tr>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center"></th>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 1</th>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 2</th>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 3</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 1</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value2</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value3</td>
-        </tr>
-        <tr>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 4</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value5</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value6</td>
-        </tr>
-        <tr>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 7</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value8</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value9</td>
-        </tr>
-    </tbody>
-</table>
+<table frame="box" rules="cols"><thead><tr><th style="padding-left: 1em; padding-right: 1em; text-align: center"></th><th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 1</th><th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 2</th><th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 3</th></tr></thead><tbody><tr><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 1</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value2</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value3</td></tr><tr><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 4</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value5</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value6</td></tr><tr><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 7</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value8</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value9</td></tr></tbody></table>
 """.strip()  # noqa: E501
         )
 
@@ -108,38 +50,8 @@ class TestHtmlOutput:
         assert (
             result.strip()
             == """
-<table bgcolor="red" a&lt;b="1&lt;2">
-    <caption>Title &amp; Title</caption>
-    <thead>
-        <tr>
-            <th></th>
-            <th>Field 1</th>
-            <th>Field 2</th>
-            <th>Field 3</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>1</td>
-            <td>value 1</td>
-            <td>value2</td>
-            <td>value3</td>
-        </tr>
-        <tr>
-            <td>4</td>
-            <td>value 4</td>
-            <td>value5</td>
-            <td>value6</td>
-        </tr>
-        <tr>
-            <td>7</td>
-            <td>value 7</td>
-            <td>value8</td>
-            <td>value9</td>
-        </tr>
-    </tbody>
-</table>
-""".strip()
+<table bgcolor="red" a&lt;b="1&lt;2"><caption>Title &amp; Title</caption><thead><tr><th></th><th>Field 1</th><th>Field 2</th><th>Field 3</th></tr></thead><tbody><tr><td>1</td><td>value 1</td><td>value2</td><td>value3</td></tr><tr><td>4</td><td>value 4</td><td>value5</td><td>value6</td></tr><tr><td>7</td><td>value 7</td><td>value8</td><td>value9</td></tr></tbody></table>
+""".strip()  # noqa: E501
         )
 
     def test_html_output_formatted_with_title(self, helper_table: PrettyTable) -> None:
@@ -150,37 +62,7 @@ class TestHtmlOutput:
         assert (
             result.strip()
             == """
-<table frame="box" rules="cols" bgcolor="red" a&lt;b="1&lt;2">
-    <caption>Title &amp; Title</caption>
-    <thead>
-        <tr>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center"></th>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 1</th>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 2</th>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 3</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 1</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value2</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value3</td>
-        </tr>
-        <tr>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 4</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value5</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value6</td>
-        </tr>
-        <tr>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 7</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value8</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value9</td>
-        </tr>
-    </tbody>
-</table>
+<table frame="box" rules="cols" bgcolor="red" a&lt;b="1&lt;2"><caption>Title &amp; Title</caption><thead><tr><th style="padding-left: 1em; padding-right: 1em; text-align: center"></th><th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 1</th><th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 2</th><th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 3</th></tr></thead><tbody><tr><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 1</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value2</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value3</td></tr><tr><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 4</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value5</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value6</td></tr><tr><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 7</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value8</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value9</td></tr></tbody></table>
 """.strip()  # noqa: E501
         )
 
@@ -197,19 +79,8 @@ class TestHtmlOutput:
         assert (
             result.strip()
             == """
-<table>
-    <thead>
-        <tr>
-            <th></th>
-            <th>Field 1</th>
-            <th><em>Field 2</em></th>
-            <th><a href='#'>Field 3</a></th>
-        </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
-""".strip()
+<table><thead><tr><th></th><th>Field 1</th><th><em>Field 2</em></th><th><a href='#'>Field 3</a></th></tr></thead><tbody></tbody></table>
+""".strip()  # noqa: E501
         )
 
     def test_html_output_without_escaped_data(
@@ -227,25 +98,8 @@ class TestHtmlOutput:
         assert (
             result.strip()
             == """
-<table>
-    <thead>
-        <tr>
-            <th></th>
-            <th>Field 1</th>
-            <th>Field 2</th>
-            <th>Field 3</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>1</td>
-            <td><b>value 1</b></td>
-            <td><span style='text-decoration: underline;'>value2</span></td>
-            <td><a href='#'>value3</a></td>
-        </tr>
-    </tbody>
-</table>
-""".strip()
+<table><thead><tr><th></th><th>Field 1</th><th>Field 2</th><th>Field 3</th></tr></thead><tbody><tr><td>1</td><td><b>value 1</b></td><td><span style='text-decoration: underline;'>value2</span></td><td><a href='#'>value3</a></td></tr></tbody></table>
+""".strip()  # noqa: E501
         )
 
     def test_html_output_with_escaped_header(
@@ -261,19 +115,8 @@ class TestHtmlOutput:
         assert (
             result.strip()
             == """
-<table>
-    <thead>
-        <tr>
-            <th></th>
-            <th>Field 1</th>
-            <th>&lt;em&gt;Field 2&lt;/em&gt;</th>
-            <th>&lt;a href=&#x27;#&#x27;&gt;Field 3&lt;/a&gt;</th>
-        </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
-""".strip()
+<table><thead><tr><th></th><th>Field 1</th><th>&lt;em&gt;Field 2&lt;/em&gt;</th><th>&lt;a href=&#x27;#&#x27;&gt;Field 3&lt;/a&gt;</th></tr></thead><tbody></tbody></table>
+""".strip()  # noqa: E501
         )
 
     def test_html_output_with_escaped_data(
@@ -291,24 +134,7 @@ class TestHtmlOutput:
         assert (
             result.strip()
             == """
-<table>
-    <thead>
-        <tr>
-            <th></th>
-            <th>Field 1</th>
-            <th>Field 2</th>
-            <th>Field 3</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>1</td>
-            <td>&lt;b&gt;value 1&lt;/b&gt;</td>
-            <td>&lt;span style=&#x27;text-decoration: underline;&#x27;&gt;value2&lt;/span&gt;</td>
-            <td>&lt;a href=&#x27;#&#x27;&gt;value3&lt;/a&gt;</td>
-        </tr>
-    </tbody>
-</table>
+<table><thead><tr><th></th><th>Field 1</th><th>Field 2</th><th>Field 3</th></tr></thead><tbody><tr><td>1</td><td>&lt;b&gt;value 1&lt;/b&gt;</td><td>&lt;span style=&#x27;text-decoration: underline;&#x27;&gt;value2&lt;/span&gt;</td><td>&lt;a href=&#x27;#&#x27;&gt;value3&lt;/a&gt;</td></tr></tbody></table>
 """.strip()  # noqa: E501
         )
 
@@ -325,18 +151,7 @@ class TestHtmlOutput:
         assert (
             result.strip()
             == """
-<table frame="box" rules="cols">
-    <thead>
-        <tr>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center"></th>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 1</th>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center"><em>Field 2</em></th>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center"><a href='#'>Field 3</a></th>
-        </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
+<table frame="box" rules="cols"><thead><tr><th style="padding-left: 1em; padding-right: 1em; text-align: center"></th><th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 1</th><th style="padding-left: 1em; padding-right: 1em; text-align: center"><em>Field 2</em></th><th style="padding-left: 1em; padding-right: 1em; text-align: center"><a href='#'>Field 3</a></th></tr></thead><tbody></tbody></table>
 """.strip()  # noqa: E501
         )
 
@@ -355,24 +170,7 @@ class TestHtmlOutput:
         assert (
             result.strip()
             == """
-<table frame="box" rules="cols">
-    <thead>
-        <tr>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center"></th>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 1</th>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 2</th>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 3</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top"><b>value 1</b></td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top"><span style='text-decoration: underline;'>value2</span></td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top"><a href='#'>value3</a></td>
-        </tr>
-    </tbody>
-</table>
+<table frame="box" rules="cols"><thead><tr><th style="padding-left: 1em; padding-right: 1em; text-align: center"></th><th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 1</th><th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 2</th><th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 3</th></tr></thead><tbody><tr><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top"><b>value 1</b></td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top"><span style='text-decoration: underline;'>value2</span></td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top"><a href='#'>value3</a></td></tr></tbody></table>
 """.strip()  # noqa: E501
         )
 
@@ -389,18 +187,7 @@ class TestHtmlOutput:
         assert (
             result.strip()
             == """
-<table frame="box" rules="cols">
-    <thead>
-        <tr>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center"></th>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 1</th>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center">&lt;em&gt;Field 2&lt;/em&gt;</th>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center">&lt;a href=&#x27;#&#x27;&gt;Field 3&lt;/a&gt;</th>
-        </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
+<table frame="box" rules="cols"><thead><tr><th style="padding-left: 1em; padding-right: 1em; text-align: center"></th><th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 1</th><th style="padding-left: 1em; padding-right: 1em; text-align: center">&lt;em&gt;Field 2&lt;/em&gt;</th><th style="padding-left: 1em; padding-right: 1em; text-align: center">&lt;a href=&#x27;#&#x27;&gt;Field 3&lt;/a&gt;</th></tr></thead><tbody></tbody></table>
 """.strip()  # noqa: E501
         )
 
@@ -419,24 +206,7 @@ class TestHtmlOutput:
         assert (
             result.strip()
             == """
-<table frame="box" rules="cols">
-    <thead>
-        <tr>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center"></th>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 1</th>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 2</th>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 3</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">&lt;b&gt;value 1&lt;/b&gt;</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">&lt;span style=&#x27;text-decoration: underline;&#x27;&gt;value2&lt;/span&gt;</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">&lt;a href=&#x27;#&#x27;&gt;value3&lt;/a&gt;</td>
-        </tr>
-    </tbody>
-</table>
+<table frame="box" rules="cols"><thead><tr><th style="padding-left: 1em; padding-right: 1em; text-align: center"></th><th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 1</th><th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 2</th><th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 3</th></tr></thead><tbody><tr><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">&lt;b&gt;value 1&lt;/b&gt;</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">&lt;span style=&#x27;text-decoration: underline;&#x27;&gt;value2&lt;/span&gt;</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">&lt;a href=&#x27;#&#x27;&gt;value3&lt;/a&gt;</td></tr></tbody></table>
 """.strip()  # noqa: E501
         )
 
@@ -453,36 +223,7 @@ class TestHtmlOutput:
         assert (
             table.get_html_string().strip()
             == """
-<table frame="box" rules="cols">
-    <thead>
-        <tr>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center">I</th>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 1</th>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 2</th>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 3</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 100</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 101</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 201</td>
-        </tr>
-        <tr>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 400</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 104</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 204</td>
-        </tr>
-        <tr>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 700</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 107</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 207</td>
-        </tr>
-    </tbody>
-</table>""".strip()  # noqa: E501
+<table frame="box" rules="cols"><thead><tr><th style="padding-left: 1em; padding-right: 1em; text-align: center">I</th><th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 1</th><th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 2</th><th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 3</th></tr></thead><tbody><tr><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 100</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 101</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 201</td></tr><tr><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 400</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 104</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 204</td></tr><tr><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 700</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 107</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 207</td></tr></tbody></table>""".strip()  # noqa: E501
         )
 
     def test_internal_border_preserved_html(self, helper_table: PrettyTable) -> None:
@@ -493,36 +234,7 @@ class TestHtmlOutput:
         assert (
             helper_table.get_html_string().strip()
             == """
-<table rules="cols">
-    <thead>
-        <tr>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center"></th>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 1</th>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 2</th>
-            <th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 3</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 1</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value2</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value3</td>
-        </tr>
-        <tr>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 4</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value5</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value6</td>
-        </tr>
-        <tr>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 7</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value8</td>
-            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value9</td>
-        </tr>
-    </tbody>
-</table>
+<table rules="cols"><thead><tr><th style="padding-left: 1em; padding-right: 1em; text-align: center"></th><th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 1</th><th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 2</th><th style="padding-left: 1em; padding-right: 1em; text-align: center">Field 3</th></tr></thead><tbody><tr><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 1</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value2</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value3</td></tr><tr><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 4</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value5</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value6</td></tr><tr><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 7</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value8</td><td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value9</td></tr></tbody></table>
 """.strip()  # noqa: E501
         )
 
@@ -534,25 +246,8 @@ class TestHtmlOutput:
         assert (
             result.strip()
             == """
-<table>
-    <thead>
-        <tr>
-            <th>Field 1</th>
-            <th>Field 2</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>value 1</td>
-            <td>value2<br>second line</td>
-        </tr>
-        <tr>
-            <td>value 3</td>
-            <td>value4</td>
-        </tr>
-    </tbody>
-</table>
-""".strip()
+<table><thead><tr><th>Field 1</th><th>Field 2</th></tr></thead><tbody><tr><td>value 1</td><td>value2<br>second line</td></tr><tr><td>value 3</td><td>value4</td></tr></tbody></table>
+""".strip()  # noqa: E501
         )
 
     def test_break_line_xhtml(self) -> None:
@@ -563,23 +258,21 @@ class TestHtmlOutput:
         assert (
             result.strip()
             == """
-<table>
-    <thead>
-        <tr>
-            <th>Field 1</th>
-            <th>Field 2</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>value 1</td>
-            <td>value2<br/>second line</td>
-        </tr>
-        <tr>
-            <td>value 3</td>
-            <td>value4</td>
-        </tr>
-    </tbody>
-</table>
-""".strip()
+<table><thead><tr><th>Field 1</th><th>Field 2</th></tr></thead><tbody><tr><td>value 1</td><td>value2<br/>second line</td></tr><tr><td>value 3</td><td>value4</td></tr></tbody></table>
+""".strip()  # noqa: E501
+        )
+
+    def test_nested_table_html(self) -> None:
+        sub_table = PrettyTable()
+        sub_table.title = "First set of data"
+        sub_table.field_names = ["item", "A", "B"]
+        sub_table.add_rows([["a", "foo", "bar"], ["b", "foo bar", "bar foo"]])
+
+        table = PrettyTable()
+        table.title = "Full set of data"
+        table.field_names = ["1", "2"]
+        table.add_row([sub_table.get_html_string(), sub_table.get_html_string()])
+        assert (
+            table.get_html_string(escape_header=False, escape_data=False)
+            == """<table><caption>Full set of data</caption><thead><tr><th>1</th><th>2</th></tr></thead><tbody><tr><td><table><caption>First set of data</caption><thead><tr><th>item</th><th>A</th><th>B</th></tr></thead><tbody><tr><td>a</td><td>foo</td><td>bar</td></tr><tr><td>b</td><td>foo bar</td><td>bar foo</td></tr></tbody></table></td><td><table><caption>First set of data</caption><thead><tr><th>item</th><th>A</th><th>B</th></tr></thead><tbody><tr><td>a</td><td>foo</td><td>bar</td></tr><tr><td>b</td><td>foo bar</td><td>bar foo</td></tr></tbody></table></td></tr></tbody></table>"""  # noqa: E501
         )
