@@ -412,7 +412,7 @@ table.sortby = None
 ```
 
 If you want to specify a custom sorting function, you can use the `sort_key` keyword
-argument as Pythons `sorted()` key parameter. The value of the `sort_key` parameter
+argument as Pythons `sorted()` `key` parameter. The value of the `sort_key` parameter
 should be a function (or other callable) that takes a single argument and returns a key
 to use for sorting purposes.
 
