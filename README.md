@@ -412,13 +412,15 @@ table.sortby = None
 ```
 
 If you want to specify a custom sorting function, you can use the `sort_key` keyword
-argument. Pass this a function which accepts two lists of values and returns a negative
-or positive value depending on whether the first list should appear before or after the
-second one. If your table has n columns, each list will have n+1 elements. Each list
-corresponds to one row of the table. The first element will be whatever data is in the
-relevant row, in the column specified by the `sort_by` argument. The remaining n
-elements are the data in each of the table's columns, in order, including a repeated
-instance of the data in the `sort_by` column.
+argument as Pythons `sorted()` key parameter. The value of the `sort_key` parameter
+should be a function (or other callable) that takes a single argument and returns a key
+to use for sorting purposes.
+
+If your table has n columns, each list will have n+1 elements. Each list corresponds to
+one row of the table. The first element will be whatever data is in the relevant row, in
+the column specified by the `sort_by` argument. The remaining n elements are the data in
+each of the table's columns, in order, including a repeated instance of the data in the
+`sort_by` column.
 
 #### Adding sections to a table
 
