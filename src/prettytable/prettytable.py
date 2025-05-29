@@ -2510,45 +2510,41 @@ class PrettyTable:
         # Title
         title = options["title"] or self._title
         if title:
-            lines.append(f"    <caption>{escape(title)}</caption>")
+            lines.append(f"<caption>{escape(title)}</caption>")
 
         # Headers
         if options["header"]:
-            lines.append("    <thead>")
-            lines.append("        <tr>")
+            lines.append("<thead>")
+            lines.append("<tr>")
             for field in self._field_names:
                 if options["fields"] and field not in options["fields"]:
                     continue
                 if options["escape_header"]:
                     field = escape(field)
 
-                lines.append(
-                    "            <th>{}</th>".format(field.replace("\n", linebreak))
-                )
+                lines.append("<th>{}</th>".format(field.replace("\n", linebreak)))
 
-            lines.append("        </tr>")
-            lines.append("    </thead>")
+            lines.append("</tr>")
+            lines.append("</thead>")
 
         # Data
-        lines.append("    <tbody>")
+        lines.append("<tbody>")
         rows = self._get_rows(options)
         formatted_rows = self._format_rows(rows)
         for row in formatted_rows:
-            lines.append("        <tr>")
+            lines.append("<tr>")
             for field, datum in zip(self._field_names, row):
                 if options["fields"] and field not in options["fields"]:
                     continue
                 if options["escape_data"]:
                     datum = escape(datum)
 
-                lines.append(
-                    "            <td>{}</td>".format(datum.replace("\n", linebreak))
-                )
-            lines.append("        </tr>")
-        lines.append("    </tbody>")
+                lines.append("<td>{}</td>".format(datum.replace("\n", linebreak)))
+            lines.append("</tr>")
+        lines.append("</tbody>")
         lines.append("</table>")
 
-        return "\n".join(lines)
+        return "".join(lines)
 
     def _get_formatted_html_string(self, options: OptionsType) -> str:
         from html import escape
@@ -2596,12 +2592,12 @@ class PrettyTable:
         # Title
         title = options["title"] or self._title
         if title:
-            lines.append(f"    <caption>{escape(title)}</caption>")
+            lines.append(f"<caption>{escape(title)}</caption>")
 
         # Headers
         if options["header"]:
-            lines.append("    <thead>")
-            lines.append("        <tr>")
+            lines.append("<thead>")
+            lines.append("<tr>")
             for field in self._field_names:
                 if options["fields"] and field not in options["fields"]:
                     continue
@@ -2610,16 +2606,16 @@ class PrettyTable:
 
                 content = field.replace("\n", linebreak)
                 lines.append(
-                    f'            <th style="'
+                    f'<th style="'
                     f"padding-left: {lpad}em; "
                     f"padding-right: {rpad}em; "
                     f'text-align: center">{content}</th>'
                 )
-            lines.append("        </tr>")
-            lines.append("    </thead>")
+            lines.append("</tr>")
+            lines.append("</thead>")
 
         # Data
-        lines.append("    <tbody>")
+        lines.append("<tbody>")
         rows = self._get_rows(options)
         formatted_rows = self._format_rows(rows)
         aligns: list[str] = []
@@ -2632,7 +2628,7 @@ class PrettyTable:
                 {"t": "top", "m": "middle", "b": "bottom"}[self._valign[field]]
             )
         for row in formatted_rows:
-            lines.append("        <tr>")
+            lines.append("<tr>")
             for field, datum, align, valign in zip(
                 self._field_names, row, aligns, valigns
             ):
@@ -2643,17 +2639,17 @@ class PrettyTable:
 
                 content = datum.replace("\n", linebreak)
                 lines.append(
-                    f'            <td style="'
+                    f'<td style="'
                     f"padding-left: {lpad}em; "
                     f"padding-right: {rpad}em; "
                     f"text-align: {align}; "
                     f'vertical-align: {valign}">{content}</td>'
                 )
-            lines.append("        </tr>")
-        lines.append("    </tbody>")
+            lines.append("</tr>")
+        lines.append("</tbody>")
         lines.append("</table>")
 
-        return "\n".join(lines)
+        return "".join(lines)
 
     ##############################
     # LATEX STRING METHODS       #
