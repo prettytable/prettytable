@@ -973,7 +973,7 @@ class TestCustomFormatter:
     def test_set_custom_format_invalid_type_throw_error(self) -> None:
         table = PrettyTable()
         with pytest.raises(TypeError) as e:
-            table.custom_format = "Some String"
+            table.custom_format = "Some String"  # type: ignore[assignment]
         assert "The custom_format property need to be a dictionary or callable" in str(
             e.value
         )
