@@ -778,14 +778,16 @@ class PrettyTable:
     def none_format(self, val: str | dict[str, str | None] | None):
         if not self._field_names:
             self._none_format = {}
-        elif val is None or (isinstance(val, dict) and len(val) == 0):
+        elif val:
             for field in self._field_names:
                 self._none_format[field] = None
-        else:
             self._validate_none_format(val)
             val = cast(str, val)
             for field in self._field_names:
                 self._none_format[field] = val
+        else:
+            for field in self._field_names:
+                self._none_format[field] = None
 
     @property
     def field_names(self) -> list[str]:
@@ -837,13 +839,7 @@ class PrettyTable:
 
     @align.setter
     def align(self, val: AlignType | dict[str, AlignType] | None) -> None:
-        if val is None or (isinstance(val, dict) and len(val) == 0):
-            if not self._field_names:
-                self._align = {BASE_ALIGN_VALUE: "c"}
-            else:
-                for field in self._field_names:
-                    self._align[field] = "c"
-        else:
+        if val:
             self._validate_align(val)
             val = cast(AlignType, val)
             if not self._field_names:
@@ -851,6 +847,12 @@ class PrettyTable:
             else:
                 for field in self._field_names:
                     self._align[field] = val
+        else:
+            if not self._field_names:
+                self._align = {BASE_ALIGN_VALUE: "c"}
+            else:
+                for field in self._field_names:
+                    self._align[field] = "c"
 
     @property
     def valign(self) -> dict[str, VAlignType]:
@@ -864,14 +866,14 @@ class PrettyTable:
     def valign(self, val: VAlignType | dict[str, VAlignType] | None) -> None:
         if not self._field_names:
             self._valign = {}
-        elif val is None or (isinstance(val, dict) and len(val) == 0):
-            for field in self._field_names:
-                self._valign[field] = "t"
-        else:
+        elif val:
             self._validate_valign(val)
             val = cast(VAlignType, val)
             for field in self._field_names:
                 self._valign[field] = val
+        else:
+            for field in self._field_names:
+                self._valign[field] = "t"
 
     @property
     def max_width(self) -> dict[str, int]:
@@ -883,13 +885,13 @@ class PrettyTable:
 
     @max_width.setter
     def max_width(self, val: int | dict[str, int] | None) -> None:
-        if val is None or (isinstance(val, dict) and len(val) == 0):
-            self._max_width = {}
-        else:
+        if val:
             self._validate_option("max_width", val)
             val = cast(int, val)
             for field in self._field_names:
                 self._max_width[field] = val
+        else:
+            self._max_width = {}
 
     @property
     def min_width(self) -> dict[str, int]:
@@ -901,13 +903,13 @@ class PrettyTable:
 
     @min_width.setter
     def min_width(self, val: int | dict[str, int] | None) -> None:
-        if val is None or (isinstance(val, dict) and len(val) == 0):
-            self._min_width = {}
-        else:
+        if val:
             self._validate_option("min_width", val)
             val = cast(int, val)
             for field in self._field_names:
                 self._min_width[field] = val
+        else:
+            self._min_width = {}
 
     @property
     def min_table_width(self) -> int | None:
@@ -1148,13 +1150,13 @@ class PrettyTable:
 
     @int_format.setter
     def int_format(self, val: str | dict[str, str] | None) -> None:
-        if val is None or (isinstance(val, dict) and len(val) == 0):
-            self._int_format = {}
-        else:
+        if val:
             self._validate_option("int_format", val)
             val = cast(str, val)
             for field in self._field_names:
                 self._int_format[field] = val
+        else:
+            self._int_format = {}
 
     @property
     def float_format(self) -> dict[str, str]:
@@ -1166,13 +1168,13 @@ class PrettyTable:
 
     @float_format.setter
     def float_format(self, val: str | dict[str, str] | None) -> None:
-        if val is None or (isinstance(val, dict) and len(val) == 0):
-            self._float_format = {}
-        else:
+        if val:
             self._validate_option("float_format", val)
             val = cast(str, val)
             for field in self._field_names:
                 self._float_format[field] = val
+        else:
+            self._float_format = {}
 
     @property
     def custom_format(self) -> dict[str, Callable[[str, Any], str]]:
