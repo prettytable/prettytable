@@ -1039,7 +1039,7 @@ class PrettyTable:
         Arguments:
 
         value - the original value
-        representation - the formatted string representaion of the value"""
+        representation - the preformatted string representation of the value"""
         return self._custom_value_format
 
     @custom_value_format.setter
@@ -1861,8 +1861,7 @@ class PrettyTable:
             result = (f"%{self._int_format[field]}d") % value
         elif isinstance(value, float) and field in self._float_format:
             result = (f"%{self._float_format[field]}f") % value
-
-        if result is None:
+        else:
             formatter = self._custom_format.get(field, (lambda f, v: str(v)))
             result = formatter(field, value)
         return (

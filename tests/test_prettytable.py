@@ -1078,7 +1078,7 @@ class TestCustomValueFormatter:
     def test_colorize(self, city_data: PrettyTable) -> None:
         city_data.custom_value_format = self._value_colorizer
         assert (
-            city_data.get_string().strip()
+            city_data.get_string()
             == """+-----------+------+------------+-----------------+
 | City name | Area | Population | Annual Rainfall |
 +-----------+------+------------+-----------------+
@@ -1095,7 +1095,7 @@ class TestCustomValueFormatter:
     def test_change_len(self, city_data: PrettyTable) -> None:
         city_data.custom_value_format = self._value_changer
         assert (
-            city_data.get_string().strip()
+            city_data.get_string()
             == """+-----------+------------+---------------+-----------------+
 | City name |    Area    |   Population  | Annual Rainfall |
 +-----------+------------+---------------+-----------------+
@@ -1107,6 +1107,24 @@ class TestCustomValueFormatter:
 | Melbourne | ## 1566 ## | ## 3806092 ## |  !!! 646.9 !!!  |
 |   Perth   | ## 5386 ## | ## 1554769 ## |  !!! 869.4 !!!  |
 +-----------+------------+---------------+-----------------+"""
+        )
+
+    def test_colorize_and_float_formatting(self, city_data: PrettyTable) -> None:
+        city_data.custom_value_format = self._value_colorizer
+        city_data.float_format = "10.2"
+        assert (
+            city_data.get_string()
+            == """+-----------+------+------------+-----------------+
+| City name | Area | Population | Annual Rainfall |
++-----------+------+------------+-----------------+
+|  \x1b[34mAdelaide\x1b[39m | \x1b[32m1295\x1b[39m |  \x1b[32m1158259\x1b[39m   |    \x1b[33m    600.50\x1b[39m   |
+|  \x1b[34mBrisbane\x1b[39m | \x1b[32m5905\x1b[39m |  \x1b[32m1857594\x1b[39m   |    \x1b[33m   1146.40\x1b[39m   |
+|   \x1b[34mDarwin\x1b[39m  | \x1b[32m112\x1b[39m  |   \x1b[32m120900\x1b[39m   |    \x1b[33m   1714.70\x1b[39m   |
+|   \x1b[34mHobart\x1b[39m  | \x1b[32m1357\x1b[39m |   \x1b[32m205556\x1b[39m   |    \x1b[33m    619.50\x1b[39m   |
+|   \x1b[34mSydney\x1b[39m  | \x1b[32m2058\x1b[39m |  \x1b[32m4336374\x1b[39m   |    \x1b[33m   1214.80\x1b[39m   |
+| \x1b[34mMelbourne\x1b[39m | \x1b[32m1566\x1b[39m |  \x1b[32m3806092\x1b[39m   |    \x1b[33m    646.90\x1b[39m   |
+|   \x1b[34mPerth\x1b[39m   | \x1b[32m5386\x1b[39m |  \x1b[32m1554769\x1b[39m   |    \x1b[33m    869.40\x1b[39m   |
++-----------+------+------------+-----------------+"""  # noqa: E501
         )
 
 
