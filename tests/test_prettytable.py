@@ -1044,6 +1044,72 @@ class TestCustomFormatter:
         )
 
 
+class TestCustomValueFormatter:
+    @staticmethod
+    def _value_colorizer(value, representation):
+        if isinstance(value, int):
+            return f"\x1b[32m{representation}\x1b[39m"
+        elif isinstance(value, float):
+            return f"\x1b[33m{representation}\x1b[39m"
+        return f"\x1b[34m{representation}\x1b[39m"
+
+    @staticmethod
+    def _value_changer(value, representation):
+        if isinstance(value, int):
+            return f"## {representation} ##"
+        elif isinstance(value, float):
+            return f"!!! {representation} !!!"
+        return representation
+
+    def test_init_is_empty(self) -> None:
+        table = PrettyTable()
+        assert table.custom_value_format is None
+
+    def test_can_set(self) -> None:
+        table = PrettyTable()
+        table.custom_value_format = self._value_colorizer
+        assert table.custom_value_format == self._value_colorizer
+
+    def test_set_to_none(self) -> None:
+        table = PrettyTable()
+        table.custom_value_format = None
+        assert table.custom_value_format is None
+
+    def test_colorize(self, city_data: PrettyTable) -> None:
+        city_data.custom_value_format = self._value_colorizer
+        assert (
+            city_data.get_string().strip()
+            == """+-----------+------+------------+-----------------+
+| City name | Area | Population | Annual Rainfall |
++-----------+------+------------+-----------------+
+|  \x1b[34mAdelaide\x1b[39m | \x1b[32m1295\x1b[39m |  \x1b[32m1158259\x1b[39m   |      \x1b[33m600.5\x1b[39m      |
+|  \x1b[34mBrisbane\x1b[39m | \x1b[32m5905\x1b[39m |  \x1b[32m1857594\x1b[39m   |      \x1b[33m1146.4\x1b[39m     |
+|   \x1b[34mDarwin\x1b[39m  | \x1b[32m112\x1b[39m  |   \x1b[32m120900\x1b[39m   |      \x1b[33m1714.7\x1b[39m     |
+|   \x1b[34mHobart\x1b[39m  | \x1b[32m1357\x1b[39m |   \x1b[32m205556\x1b[39m   |      \x1b[33m619.5\x1b[39m      |
+|   \x1b[34mSydney\x1b[39m  | \x1b[32m2058\x1b[39m |  \x1b[32m4336374\x1b[39m   |      \x1b[33m1214.8\x1b[39m     |
+| \x1b[34mMelbourne\x1b[39m | \x1b[32m1566\x1b[39m |  \x1b[32m3806092\x1b[39m   |      \x1b[33m646.9\x1b[39m      |
+|   \x1b[34mPerth\x1b[39m   | \x1b[32m5386\x1b[39m |  \x1b[32m1554769\x1b[39m   |      \x1b[33m869.4\x1b[39m      |
++-----------+------+------------+-----------------+"""  # noqa: E501
+        )
+
+    def test_change_len(self, city_data: PrettyTable) -> None:
+        city_data.custom_value_format = self._value_changer
+        assert (
+            city_data.get_string().strip()
+            == """+-----------+------------+---------------+-----------------+
+| City name |    Area    |   Population  | Annual Rainfall |
++-----------+------------+---------------+-----------------+
+|  Adelaide | ## 1295 ## | ## 1158259 ## |  !!! 600.5 !!!  |
+|  Brisbane | ## 5905 ## | ## 1857594 ## |  !!! 1146.4 !!! |
+|   Darwin  | ## 112 ##  |  ## 120900 ## |  !!! 1714.7 !!! |
+|   Hobart  | ## 1357 ## |  ## 205556 ## |  !!! 619.5 !!!  |
+|   Sydney  | ## 2058 ## | ## 4336374 ## |  !!! 1214.8 !!! |
+| Melbourne | ## 1566 ## | ## 3806092 ## |  !!! 646.9 !!!  |
+|   Perth   | ## 5386 ## | ## 1554769 ## |  !!! 869.4 !!!  |
++-----------+------------+---------------+-----------------+"""
+        )
+
+
 class TestRepr:
     def test_default_repr(self, row_prettytable: PrettyTable) -> None:
         assert row_prettytable.__str__() == row_prettytable.__repr__()

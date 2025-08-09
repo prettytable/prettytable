@@ -119,6 +119,7 @@ class OptionsType(TypedDict):
     custom_format: (
         Callable[[str, Any], str] | dict[str, Callable[[str, Any], str]] | None
     )
+    custom_value_format: Callable[[Any, str], str] | None
     min_table_width: int | None
     max_table_width: int | None
     padding_width: int
@@ -190,6 +191,7 @@ class PrettyTable:
     _int_format: dict[str, str]
     _float_format: dict[str, str]
     _custom_format: dict[str, Callable[[str, Any], str]]
+    _custom_value_format: Callable[[Any, str], str] | None
     _padding_width: int
     _left_padding_width: int | None
     _right_padding_width: int | None
@@ -242,6 +244,7 @@ class PrettyTable:
         int_format - controls formatting of integer data
         float_format - controls formatting of floating point data
         custom_format - controls formatting of any column using callable
+        custom_value_format - controls formatting of any value using callable
         min_table_width - minimum desired table width, in characters
         max_table_width - maximum desired table width, in characters
         min_width - minimum desired field width, in characters
@@ -312,6 +315,7 @@ class PrettyTable:
             "int_format",
             "float_format",
             "custom_format",
+            "custom_value_format",
             "min_table_width",
             "max_table_width",
             "padding_width",
@@ -439,6 +443,7 @@ class PrettyTable:
             self._break_on_hyphens = kwargs["break_on_hyphens"]
         else:
             self._break_on_hyphens = True
+        self._custom_value_format = kwargs["custom_value_format"] or None
 
     def _column_specific_args(self) -> None:
         # Column specific arguments, use property.setters
@@ -553,6 +558,9 @@ class PrettyTable:
             self._validate_field_name(option, val)
         elif option in ("sort_key", "row_filter"):
             self._validate_function(option, val)
+        elif option == "custom_value_format":
+            if val is not None:
+                self._validate_function(option, val)
         elif option == "hrules":
             self._validate_hrules(option, val)
         elif option == "vrules":
@@ -1023,6 +1031,21 @@ class PrettyTable:
     def sort_key(self, val: Callable[[RowType], SupportsRichComparison]) -> None:
         self._validate_option("sort_key", val)
         self._sort_key = val
+
+    @property
+    def custom_value_format(self) -> Callable[[Any, str], str] | None:
+        """controls formatting of any value using callable
+
+        Arguments:
+
+        value - the original value
+        representation - the formatted string representaion of the value"""
+        return self._custom_value_format
+
+    @custom_value_format.setter
+    def custom_value_format(self, val: Callable[[Any, str], str] | None) -> None:
+        self._validate_option("custom_value_format", val)
+        self._custom_value_format = val
 
     @property
     def row_filter(self) -> Callable[[RowType], bool]:
@@ -1833,13 +1856,20 @@ class PrettyTable:
     ##############################
 
     def _format_value(self, field: str, value: Any) -> str:
+        result = None
         if isinstance(value, int) and field in self._int_format:
-            return (f"%{self._int_format[field]}d") % value
+            result = (f"%{self._int_format[field]}d") % value
         elif isinstance(value, float) and field in self._float_format:
-            return (f"%{self._float_format[field]}f") % value
+            result = (f"%{self._float_format[field]}f") % value
 
-        formatter = self._custom_format.get(field, (lambda f, v: str(v)))
-        return formatter(field, value)
+        if result is None:
+            formatter = self._custom_format.get(field, (lambda f, v: str(v)))
+            result = formatter(field, value)
+        return (
+            self._custom_value_format(value, result)
+            if self._custom_value_format
+            else result
+        )
 
     def _compute_table_width(self, options) -> int:
         if options["vrules"] == VRuleStyle.FRAME:
@@ -2051,7 +2081,9 @@ class PrettyTable:
         reversesort - True or False to sort in descending or ascending order
         row_filter - filter function applied on rows
         print empty - if True, stringify just the header for an empty table,
-            if False return an empty string"""
+            if False return an empty string
+        custom_value_format - controls formatting of any value using callable
+        """
 
         options = self._get_options(kwargs)
 
@@ -2492,6 +2524,7 @@ class PrettyTable:
         escape_data - escapes the text within a data field (True or False)
         xhtml - print <br/> tags if True, <br> tags if False
         break_on_hyphens - Whether long lines are broken on hypens or not, default: True
+        custom_value_format - controls formatting of any value using callable
         """
 
         options = self._get_options(kwargs)
@@ -2695,6 +2728,7 @@ class PrettyTable:
         row_filter - filter function applied on rows
         format - Controls whether or not HTML tables are formatted to match
             styling options (True or False)
+        custom_value_format - controls formatting of any value using callable
         """
         options = self._get_options(kwargs)
 

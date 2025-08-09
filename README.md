@@ -597,6 +597,33 @@ print(table.get_string(border=False))
 print(table)
 ```
 
+### Changing the appearance of your values
+
+You can modify the appearance of your values by using colors. E.g. you want positive
+values green and negative values red. The standard formatting has been already processed
+before calling this function, e.g. float values are already formatted with given
+precision. Because of this the colorization function gets two parameters, the original
+value (with its type) and the preprocessed formatted value.
+
+```python
+import colorama
+
+def colorUpYourLife(value, representation):
+    if isinstance(value,  (int, float)):
+        if value >= 0:
+            return f"{colorama.Fore.GREEN}{representation}{colorama.Fore.RESET}"
+        else:
+            return f"{colorama.Fore.RED}{representation}{colorama.Fore.RESET}"
+    if value is not None:
+        return f"{colorama.Fore.BLUE}{representation}{colorama.Fore.RESET}"
+    return representation
+
+table = PrettyTable(custom_value_format = colorUpYourLife)
+table.title = "Here be Table caption"
+table.add_row(["bla", 24, None])
+table.add_row(["blu", -1, None])
+```
+
 ### Changing the appearance of your table - with _colors_!
 
 PrettyTable has the functionality of printing your table with ANSI color codes. This
