@@ -583,3 +583,74 @@ class TestHtmlOutput:
 </table>
 """.strip()
         )
+
+    @staticmethod
+    def _value_colorizer(value, representation):
+        import html
+
+        if isinstance(value, int):
+            return f'<span style="color: red">{html.escape(representation)}</span>'
+        elif isinstance(value, float):
+            return f'<span style="color: green">{html.escape(representation)}</span>'
+        return f'<span style="color: blue">{html.escape(representation)}</span>'
+
+    def test_html_output_value_formatted(self, city_data: PrettyTable) -> None:
+        city_data.custom_value_format = self._value_colorizer
+        city_data.escape_data = False
+        assert (
+            city_data.get_html_string()
+            == """<table>
+    <thead>
+        <tr>
+            <th>City name</th>
+            <th>Area</th>
+            <th>Population</th>
+            <th>Annual Rainfall</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><span style="color: blue">Adelaide</span></td>
+            <td><span style="color: red">1295</span></td>
+            <td><span style="color: red">1158259</span></td>
+            <td><span style="color: green">600.5</span></td>
+        </tr>
+        <tr>
+            <td><span style="color: blue">Brisbane</span></td>
+            <td><span style="color: red">5905</span></td>
+            <td><span style="color: red">1857594</span></td>
+            <td><span style="color: green">1146.4</span></td>
+        </tr>
+        <tr>
+            <td><span style="color: blue">Darwin</span></td>
+            <td><span style="color: red">112</span></td>
+            <td><span style="color: red">120900</span></td>
+            <td><span style="color: green">1714.7</span></td>
+        </tr>
+        <tr>
+            <td><span style="color: blue">Hobart</span></td>
+            <td><span style="color: red">1357</span></td>
+            <td><span style="color: red">205556</span></td>
+            <td><span style="color: green">619.5</span></td>
+        </tr>
+        <tr>
+            <td><span style="color: blue">Sydney</span></td>
+            <td><span style="color: red">2058</span></td>
+            <td><span style="color: red">4336374</span></td>
+            <td><span style="color: green">1214.8</span></td>
+        </tr>
+        <tr>
+            <td><span style="color: blue">Melbourne</span></td>
+            <td><span style="color: red">1566</span></td>
+            <td><span style="color: red">3806092</span></td>
+            <td><span style="color: green">646.9</span></td>
+        </tr>
+        <tr>
+            <td><span style="color: blue">Perth</span></td>
+            <td><span style="color: red">5386</span></td>
+            <td><span style="color: red">1554769</span></td>
+            <td><span style="color: green">869.4</span></td>
+        </tr>
+    </tbody>
+</table>"""
+        )
