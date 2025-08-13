@@ -585,7 +585,7 @@ class TestHtmlOutput:
         )
 
     @staticmethod
-    def _value_colorizer(value, representation):
+    def _value_colorizer(field, value, representation):
         import html
 
         if isinstance(value, int):

@@ -1046,7 +1046,7 @@ class TestCustomFormatter:
 
 class TestCustomValueFormatter:
     @staticmethod
-    def _value_colorizer(value, representation):
+    def _value_colorizer(field, value, representation):
         if isinstance(value, int):
             return f"\x1b[32m{representation}\x1b[39m"
         elif isinstance(value, float):
@@ -1054,7 +1054,7 @@ class TestCustomValueFormatter:
         return f"\x1b[34m{representation}\x1b[39m"
 
     @staticmethod
-    def _value_changer(value, representation):
+    def _value_changer(field, value, representation):
         if isinstance(value, int):
             return f"## {representation} ##"
         elif isinstance(value, float):

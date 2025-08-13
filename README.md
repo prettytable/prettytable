@@ -602,13 +602,14 @@ print(table)
 You can modify the appearance of your values by using colors. E.g. you want positive
 values green and negative values red. The standard formatting has been already processed
 before calling this function, e.g. float values are already formatted with given
-precision. Because of this the colorization function gets two parameters, the original
-value (with its type) and the preprocessed formatted value.
+precision. Because of this the colorization function gets three parameters, the field
+name, the original value (with its type) and the preprocessed formatted value and must
+return the new representation.
 
 ```python
 import colorama
 
-def colorUpYourLife(value, representation):
+def colorUpYourLife(field, value, representation):
     if isinstance(value,  (int, float)):
         if value >= 0:
             return f"{colorama.Fore.GREEN}{representation}{colorama.Fore.RESET}"

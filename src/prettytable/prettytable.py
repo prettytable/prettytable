@@ -119,7 +119,7 @@ class OptionsType(TypedDict):
     custom_format: (
         Callable[[str, Any], str] | dict[str, Callable[[str, Any], str]] | None
     )
-    custom_value_format: Callable[[Any, str], str] | None
+    custom_value_format: Callable[[str, Any, str], str] | None
     min_table_width: int | None
     max_table_width: int | None
     padding_width: int
@@ -191,7 +191,7 @@ class PrettyTable:
     _int_format: dict[str, str]
     _float_format: dict[str, str]
     _custom_format: dict[str, Callable[[str, Any], str]]
-    _custom_value_format: Callable[[Any, str], str] | None
+    _custom_value_format: Callable[[str, Any, str], str] | None
     _padding_width: int
     _left_padding_width: int | None
     _right_padding_width: int | None
@@ -1033,7 +1033,7 @@ class PrettyTable:
         self._sort_key = val
 
     @property
-    def custom_value_format(self) -> Callable[[Any, str], str] | None:
+    def custom_value_format(self) -> Callable[[str, Any, str], str] | None:
         """controls formatting of any value using callable
 
         Arguments:
@@ -1043,7 +1043,7 @@ class PrettyTable:
         return self._custom_value_format
 
     @custom_value_format.setter
-    def custom_value_format(self, val: Callable[[Any, str], str] | None) -> None:
+    def custom_value_format(self, val: Callable[[str, Any, str], str] | None) -> None:
         self._validate_option("custom_value_format", val)
         self._custom_value_format = val
 
@@ -1865,7 +1865,7 @@ class PrettyTable:
             formatter = self._custom_format.get(field, (lambda f, v: str(v)))
             result = formatter(field, value)
         return (
-            self._custom_value_format(value, result)
+            self._custom_value_format(field, value, result)
             if self._custom_value_format
             else result
         )
