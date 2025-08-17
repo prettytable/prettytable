@@ -885,11 +885,15 @@ class PrettyTable:
 
     @max_width.setter
     def max_width(self, val: int | dict[str, int] | None) -> None:
-        if val:
+        if isinstance(val, int):
             self._validate_option("max_width", val)
-            val = cast(int, val)
             for field in self._field_names:
                 self._max_width[field] = val
+        elif isinstance(val, dict) and val:
+            for field, fval in val.items():
+                self._validate_option("max_width", fval)
+                fval = cast(int, fval)
+                self._max_width[field] = fval
         else:
             self._max_width = {}
 
@@ -903,11 +907,15 @@ class PrettyTable:
 
     @min_width.setter
     def min_width(self, val: int | dict[str, int] | None) -> None:
-        if val:
+        if isinstance(val, int):
             self._validate_option("min_width", val)
-            val = cast(int, val)
             for field in self._field_names:
                 self._min_width[field] = val
+        elif isinstance(val, dict) and val:
+            for field, fval in val.items():
+                self._validate_option("min_width", fval)
+                fval = cast(int, fval)
+                self._min_width[field] = fval
         else:
             self._min_width = {}
 

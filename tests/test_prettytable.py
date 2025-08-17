@@ -1377,6 +1377,71 @@ class TestWidth:
 +----------------------+--------------------------------------------------------------------+"""  # noqa: E501
         )
 
+    def test_minwidth_dict(self, city_data: PrettyTable) -> None:
+        city_data.min_width = {
+            "City name": 20,
+            "Area": 20,
+            "Population": 20,
+            "Annual Rainfall": 20,
+        }
+        assert (
+            city_data.get_string()
+            == """+----------------------+----------------------+----------------------+----------------------+
+|      City name       |         Area         |      Population      |   Annual Rainfall    |
++----------------------+----------------------+----------------------+----------------------+
+|       Adelaide       |         1295         |       1158259        |        600.5         |
+|       Brisbane       |         5905         |       1857594        |        1146.4        |
+|        Darwin        |         112          |        120900        |        1714.7        |
+|        Hobart        |         1357         |        205556        |        619.5         |
+|        Sydney        |         2058         |       4336374        |        1214.8        |
+|      Melbourne       |         1566         |       3806092        |        646.9         |
+|        Perth         |         5386         |       1554769        |        869.4         |
++----------------------+----------------------+----------------------+----------------------+"""  # noqa: E501
+        )
+
+    def test_maxwidth_dict(
+        self,
+    ) -> None:
+        table = PrettyTable(
+            ["Field 1", "Field 2", "Field 3", "Field 4", "Field 5", "Field 6"],
+        )
+        table.max_width = {
+            "Field 1": 10,
+            "Field 2": 10,
+            "Field 3": 10,
+            "Field 4": 10,
+            "Field 5": 10,
+            "Field 6": 10,
+        }
+        print(table.max_width)
+        table.add_row(
+            [
+                "Lorem",
+                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam ",
+                "ipsum",
+                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam ",
+                "dolor",
+                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam ",
+            ]
+        )
+
+        assert (
+            table.get_string().strip()
+            == """
++---------+------------+---------+------------+---------+------------+
+| Field 1 |  Field 2   | Field 3 |  Field 4   | Field 5 |  Field 6   |
++---------+------------+---------+------------+---------+------------+
+|  Lorem  |   Lorem    |  ipsum  |   Lorem    |  dolor  |   Lorem    |
+|         |   ipsum    |         |   ipsum    |         |   ipsum    |
+|         | dolor sit  |         | dolor sit  |         | dolor sit  |
+|         |   amet,    |         |   amet,    |         |   amet,    |
+|         | consetetur |         | consetetur |         | consetetur |
+|         | sadipscing |         | sadipscing |         | sadipscing |
+|         | elitr, sed |         | elitr, sed |         | elitr, sed |
+|         |    diam    |         |    diam    |         |    diam    |
++---------+------------+---------+------------+---------+------------+""".strip()
+        )
+
     def test_table_min_max_width_on_init_with_columns(self) -> None:
         table = PrettyTable(["Field 1", "Field 2"], min_width=20, max_width=40)
         table.add_row(
