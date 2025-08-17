@@ -1407,7 +1407,7 @@ class TestWidth:
         )
         table.max_width = {
             "Field 1": 10,
-            "Field 2": 10,
+            "Field 2": 20,
             "Field 3": 10,
             "Field 4": 10,
             "Field 5": 10,
@@ -1427,19 +1427,18 @@ class TestWidth:
 
         assert (
             table.get_string().strip()
-            == """
-+---------+------------+---------+------------+---------+------------+
-| Field 1 |  Field 2   | Field 3 |  Field 4   | Field 5 |  Field 6   |
-+---------+------------+---------+------------+---------+------------+
-|  Lorem  |   Lorem    |  ipsum  |   Lorem    |  dolor  |   Lorem    |
-|         |   ipsum    |         |   ipsum    |         |   ipsum    |
-|         | dolor sit  |         | dolor sit  |         | dolor sit  |
-|         |   amet,    |         |   amet,    |         |   amet,    |
-|         | consetetur |         | consetetur |         | consetetur |
-|         | sadipscing |         | sadipscing |         | sadipscing |
-|         | elitr, sed |         | elitr, sed |         | elitr, sed |
-|         |    diam    |         |    diam    |         |    diam    |
-+---------+------------+---------+------------+---------+------------+""".strip()
+            == """+---------+----------------------+---------+------------+---------+------------+
+| Field 1 |       Field 2        | Field 3 |  Field 4   | Field 5 |  Field 6   |
++---------+----------------------+---------+------------+---------+------------+
+|  Lorem  |  Lorem ipsum dolor   |  ipsum  |   Lorem    |  dolor  |   Lorem    |
+|         | sit amet, consetetur |         |   ipsum    |         |   ipsum    |
+|         |  sadipscing elitr,   |         | dolor sit  |         | dolor sit  |
+|         |       sed diam       |         |   amet,    |         |   amet,    |
+|         |                      |         | consetetur |         | consetetur |
+|         |                      |         | sadipscing |         | sadipscing |
+|         |                      |         | elitr, sed |         | elitr, sed |
+|         |                      |         |    diam    |         |    diam    |
++---------+----------------------+---------+------------+---------+------------+"""  # noqa: E501
         )
 
     def test_table_min_max_width_on_init_with_columns(self) -> None:
