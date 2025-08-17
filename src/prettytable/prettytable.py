@@ -852,10 +852,7 @@ class PrettyTable:
         elif isinstance(val, dict) and val:
             for field, fval in val.items():
                 self._validate_align(fval)
-                if not self._field_names:
-                    self._align = {BASE_ALIGN_VALUE: fval}
-                else:
-                    self._align[field] = fval
+                self._align[field] = fval
         else:
             if not self._field_names:
                 self._align = {BASE_ALIGN_VALUE: "c"}
