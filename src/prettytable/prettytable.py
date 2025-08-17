@@ -778,13 +778,16 @@ class PrettyTable:
     def none_format(self, val: str | dict[str, str | None] | None):
         if not self._field_names:
             self._none_format = {}
-        elif val:
+        elif isinstance(val, str):
             for field in self._field_names:
                 self._none_format[field] = None
             self._validate_none_format(val)
-            val = cast(str, val)
             for field in self._field_names:
                 self._none_format[field] = val
+        elif isinstance(val, dict) and val:
+            for field, fval in val.items():
+                self._validate_none_format(fval)
+                self._none_format[field] = fval
         else:
             for field in self._field_names:
                 self._none_format[field] = None
@@ -839,7 +842,7 @@ class PrettyTable:
 
     @align.setter
     def align(self, val: AlignType | dict[str, AlignType] | None) -> None:
-        if val:
+        if isinstance(val, str):
             self._validate_align(val)
             val = cast(AlignType, val)
             if not self._field_names:
@@ -847,6 +850,13 @@ class PrettyTable:
             else:
                 for field in self._field_names:
                     self._align[field] = val
+        elif isinstance(val, dict) and val:
+            for field, fval in val.items():
+                self._validate_align(fval)
+                if not self._field_names:
+                    self._align = {BASE_ALIGN_VALUE: fval}
+                else:
+                    self._align[field] = fval
         else:
             if not self._field_names:
                 self._align = {BASE_ALIGN_VALUE: "c"}
@@ -866,10 +876,14 @@ class PrettyTable:
     def valign(self, val: VAlignType | dict[str, VAlignType] | None) -> None:
         if not self._field_names:
             self._valign = {}
-        elif val:
+        if isinstance(val, str):
             self._validate_valign(val)
             val = cast(VAlignType, val)
             for field in self._field_names:
+                self._valign[field] = val
+        elif isinstance(val, dict) and val:
+            for field, fval in val.items():
+                self._validate_valign(fval)
                 self._valign[field] = val
         else:
             for field in self._field_names:
@@ -1156,11 +1170,14 @@ class PrettyTable:
 
     @int_format.setter
     def int_format(self, val: str | dict[str, str] | None) -> None:
-        if val:
+        if isinstance(val, str):
             self._validate_option("int_format", val)
-            val = cast(str, val)
             for field in self._field_names:
                 self._int_format[field] = val
+        elif isinstance(val, dict) and val:
+            for field, fval in val.items():
+                self._validate_option("int_format", fval)
+                self._int_format[field] = fval
         else:
             self._int_format = {}
 
@@ -1174,11 +1191,14 @@ class PrettyTable:
 
     @float_format.setter
     def float_format(self, val: str | dict[str, str] | None) -> None:
-        if val:
+        if isinstance(val, str):
             self._validate_option("float_format", val)
-            val = cast(str, val)
             for field in self._field_names:
                 self._float_format[field] = val
+        elif isinstance(val, dict) and val:
+            for field, fval in val.items():
+                self._validate_option("float_format", fval)
+                self._float_format[field] = fval
         else:
             self._float_format = {}
 
