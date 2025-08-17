@@ -892,7 +892,6 @@ class PrettyTable:
         elif isinstance(val, dict) and val:
             for field, fval in val.items():
                 self._validate_option("max_width", fval)
-                fval = cast(int, fval)
                 self._max_width[field] = fval
         else:
             self._max_width = {}
@@ -914,7 +913,6 @@ class PrettyTable:
         elif isinstance(val, dict) and val:
             for field, fval in val.items():
                 self._validate_option("min_width", fval)
-                fval = cast(int, fval)
                 self._min_width[field] = fval
         else:
             self._min_width = {}
