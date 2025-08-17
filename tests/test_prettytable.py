@@ -805,10 +805,10 @@ class TestColumnFormatingfromDict:
             == """+---------+----------------------+---------+------------+---------+------------+
 | Field 1 |       Field 2        | Field 3 |  Field 4   | Field 5 |  Field 6   |
 +---------+----------------------+---------+------------+---------+------------+
-|  Lorem  |  Lorem ipsum dolor   |  ipsum  |   Lorem    |  dolor  |   Lorem    |
+|         |  Lorem ipsum dolor   |  ipsum  |   Lorem    |  dolor  |   Lorem    |
 |         | sit amet, consetetur |         |   ipsum    |         |   ipsum    |
 |         |  sadipscing elitr,   |         | dolor sit  |         | dolor sit  |
-|         |       sed diam       |         |   amet,    |         |   amet,    |
+|  Lorem  |       sed diam       |         |   amet,    |         |   amet,    |
 |         |                      |         | consetetur |         | consetetur |
 |         |                      |         | sadipscing |         | sadipscing |
 |         |                      |         | elitr, sed |         | elitr, sed |
@@ -925,7 +925,7 @@ class TestColumnFormatingfromDict:
 
     def test_set_none_format(self, city_data: PrettyTable) -> None:
         city_data.clear_rows()
-        city_data.add_row((None, None, None, None))
+        city_data.add_row([None, None, None, None])
         city_data.none_format = {"Annual Rainfall": "N/A"}
         assert (
             city_data.get_string()

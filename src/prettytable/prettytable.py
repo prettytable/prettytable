@@ -844,7 +844,6 @@ class PrettyTable:
     def align(self, val: AlignType | dict[str, AlignType] | None) -> None:
         if isinstance(val, str):
             self._validate_align(val)
-            val = cast(AlignType, val)
             if not self._field_names:
                 self._align = {BASE_ALIGN_VALUE: val}
             else:
@@ -878,13 +877,12 @@ class PrettyTable:
             self._valign = {}
         if isinstance(val, str):
             self._validate_valign(val)
-            val = cast(VAlignType, val)
             for field in self._field_names:
                 self._valign[field] = val
         elif isinstance(val, dict) and val:
             for field, fval in val.items():
                 self._validate_valign(fval)
-                self._valign[field] = val
+                self._valign[field] = fval
         else:
             for field in self._field_names:
                 self._valign[field] = "t"
