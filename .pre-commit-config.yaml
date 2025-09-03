@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.4
+    rev: v0.12.2
     hooks:
       - id: ruff
         args: [--exit-non-zero-on-fix]
@@ -26,7 +26,7 @@ repos:
         exclude: .github/ISSUE_TEMPLATE/bug_report.md|tests/test_style.py|tests/test_prettytable.py
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.32.1
+    rev: 0.33.2
     hooks:
       - id: check-dependabot
       - id: check-github-workflows
@@ -37,12 +37,12 @@ repos:
       - id: actionlint
 
   - repo: https://github.com/woodruffw/zizmor-pre-commit
-    rev: v1.5.2
+    rev: v1.11.0
     hooks:
       - id: zizmor
 
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: v2.5.1
+    rev: v2.6.0
     hooks:
       - id: pyproject-fmt
 
@@ -57,7 +57,7 @@ repos:
       - id: tox-ini-fmt
 
   - repo: https://github.com/rbubley/mirrors-prettier
-    rev: v3.5.3
+    rev: v3.6.2
     hooks:
       - id: prettier
         args: [--prose-wrap=always, --print-width=88]
