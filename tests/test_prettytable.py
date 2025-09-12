@@ -765,12 +765,13 @@ class TestFloatFormat:
         assert "001.41" in string
 
 
-class TestColumnFormatingfromDict:
+class TestColumnFormattingfromDict:
     def test_set_align_format(self, city_data: PrettyTable) -> None:
         city_data.align = {"Annual Rainfall": "r"}
         assert (
             city_data.get_string()
-            == """+-----------+------+------------+-----------------+
+            == """
++-----------+------+------------+-----------------+
 | City name | Area | Population | Annual Rainfall |
 +-----------+------+------------+-----------------+
 |  Adelaide | 1295 |  1158259   |           600.5 |
@@ -780,7 +781,8 @@ class TestColumnFormatingfromDict:
 |   Sydney  | 2058 |  4336374   |          1214.8 |
 | Melbourne | 1566 |  3806092   |           646.9 |
 |   Perth   | 5386 |  1554769   |           869.4 |
-+-----------+------+------------+-----------------+"""
++-----------+------+------------+-----------------+
+""".strip()
         )
 
     def test_set_valign_format(self, city_data: PrettyTable) -> None:
@@ -802,7 +804,8 @@ class TestColumnFormatingfromDict:
 
         assert (
             table.get_string()
-            == """+---------+----------------------+---------+------------+---------+------------+
+            == """
++---------+----------------------+---------+------------+---------+------------+
 | Field 1 |       Field 2        | Field 3 |  Field 4   | Field 5 |  Field 6   |
 +---------+----------------------+---------+------------+---------+------------+
 |         |  Lorem ipsum dolor   |  ipsum  |   Lorem    |  dolor  |   Lorem    |
@@ -813,7 +816,8 @@ class TestColumnFormatingfromDict:
 |         |                      |         | sadipscing |         | sadipscing |
 |         |                      |         | elitr, sed |         | elitr, sed |
 |         |                      |         |    diam    |         |    diam    |
-+---------+----------------------+---------+------------+---------+------------+"""  # noqa: E501
++---------+----------------------+---------+------------+---------+------------+
+""".strip()
         )
 
     def test_max_width(
@@ -836,7 +840,8 @@ class TestColumnFormatingfromDict:
 
         assert (
             table.get_string()
-            == """+---------+----------------------+---------+------------+---------+------------+
+            == """
++---------+----------------------+---------+------------+---------+------------+
 | Field 1 |       Field 2        | Field 3 |  Field 4   | Field 5 |  Field 6   |
 +---------+----------------------+---------+------------+---------+------------+
 |  Lorem  |  Lorem ipsum dolor   |  ipsum  |   Lorem    |  dolor  |   Lorem    |
@@ -847,7 +852,8 @@ class TestColumnFormatingfromDict:
 |         |                      |         | sadipscing |         | sadipscing |
 |         |                      |         | elitr, sed |         | elitr, sed |
 |         |                      |         |    diam    |         |    diam    |
-+---------+----------------------+---------+------------+---------+------------+"""  # noqa: E501
++---------+----------------------+---------+------------+---------+------------+
+""".strip()
         )
 
     def test_min_width(self, city_data: PrettyTable) -> None:
@@ -859,7 +865,8 @@ class TestColumnFormatingfromDict:
         }
         assert (
             city_data.get_string()
-            == """+----------------------+------------+----------------------+----------------------+
+            == """
++----------------------+------------+----------------------+----------------------+
 |      City name       |    Area    |      Population      |   Annual Rainfall    |
 +----------------------+------------+----------------------+----------------------+
 |       Adelaide       |    1295    |       1158259        |        600.5         |
@@ -869,14 +876,16 @@ class TestColumnFormatingfromDict:
 |        Sydney        |    2058    |       4336374        |        1214.8        |
 |      Melbourne       |    1566    |       3806092        |        646.9         |
 |        Perth         |    5386    |       1554769        |        869.4         |
-+----------------------+------------+----------------------+----------------------+"""  # noqa: E501
++----------------------+------------+----------------------+----------------------+
+""".strip()
         )
 
     def test_set_int_format(self, city_data: PrettyTable) -> None:
         city_data.int_format = {"Population": "20"}
         assert (
             city_data.get_string()
-            == """+-----------+------+----------------------+-----------------+
+            == """
++-----------+------+----------------------+-----------------+
 | City name | Area |      Population      | Annual Rainfall |
 +-----------+------+----------------------+-----------------+
 |  Adelaide | 1295 |              1158259 |      600.5      |
@@ -886,14 +895,16 @@ class TestColumnFormatingfromDict:
 |   Sydney  | 2058 |              4336374 |      1214.8     |
 | Melbourne | 1566 |              3806092 |      646.9      |
 |   Perth   | 5386 |              1554769 |      869.4      |
-+-----------+------+----------------------+-----------------+"""
++-----------+------+----------------------+-----------------+
+"""strip()
         )
 
     def test_set_float_format(self, city_data: PrettyTable) -> None:
         city_data.float_format = {"Annual Rainfall": "4.2"}
         assert (
             city_data.get_string()
-            == """+-----------+------+------------+-----------------+
+            == """
++-----------+------+------------+-----------------+
 | City name | Area | Population | Annual Rainfall |
 +-----------+------+------------+-----------------+
 |  Adelaide | 1295 |  1158259   |      600.50     |
@@ -903,14 +914,16 @@ class TestColumnFormatingfromDict:
 |   Sydney  | 2058 |  4336374   |     1214.80     |
 | Melbourne | 1566 |  3806092   |      646.90     |
 |   Perth   | 5386 |  1554769   |      869.40     |
-+-----------+------+------------+-----------------+"""
++-----------+------+------------+-----------------+
+""".strip()
         )
 
     def test_set_custom_format(self, city_data: PrettyTable) -> None:
         city_data.custom_format = {"Annual Rainfall": lambda f, v: f"{v:.2f}"}
         assert (
             city_data.get_string()
-            == """+-----------+------+------------+-----------------+
+            == """
++-----------+------+------------+-----------------+
 | City name | Area | Population | Annual Rainfall |
 +-----------+------+------------+-----------------+
 |  Adelaide | 1295 |  1158259   |      600.50     |
@@ -920,7 +933,8 @@ class TestColumnFormatingfromDict:
 |   Sydney  | 2058 |  4336374   |     1214.80     |
 | Melbourne | 1566 |  3806092   |      646.90     |
 |   Perth   | 5386 |  1554769   |      869.40     |
-+-----------+------+------------+-----------------+"""
++-----------+------+------------+-----------------+
+""".strip()
         )
 
     def test_set_none_format(self, city_data: PrettyTable) -> None:
@@ -929,11 +943,13 @@ class TestColumnFormatingfromDict:
         city_data.none_format = {"Annual Rainfall": "N/A"}
         assert (
             city_data.get_string()
-            == """+-----------+------+------------+-----------------+
+            == """
++-----------+------+------------+-----------------+
 | City name | Area | Population | Annual Rainfall |
 +-----------+------+------------+-----------------+
 |    None   | None |    None    |       N/A       |
-+-----------+------+------------+-----------------+"""
++-----------+------+------------+-----------------+
+""".strip()
         )
 
 
