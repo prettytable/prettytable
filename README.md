@@ -599,7 +599,7 @@ print(table)
 
 ### Changing the appearance of your values
 
-You can modify the appearance of your values by using colors. For example, you want 
+You can modify the appearance of your values by using colors. For example, you want
 positive values green and negative values red. The standard formatting has been already
 processed before calling this function, so for instance, float values are already
 formatted to the required precision. Because of this, the colorization function gets
