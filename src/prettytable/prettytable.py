@@ -776,6 +776,12 @@ class PrettyTable:
 
     @none_format.setter
     def none_format(self, val: str | dict[str, str | None] | None):
+        """Representation of None values:
+
+        Arguments:
+
+        val - The alternative representation to be used for None values
+        """
         if not self._field_names:
             self._none_format = {}
         elif isinstance(val, str):
