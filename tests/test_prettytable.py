@@ -896,7 +896,7 @@ class TestColumnFormattingfromDict:
 | Melbourne | 1566 |              3806092 |      646.9      |
 |   Perth   | 5386 |              1554769 |      869.4      |
 +-----------+------+----------------------+-----------------+
-"""strip()
+""".strip()
         )
 
     def test_set_float_format(self, city_data: PrettyTable) -> None:
