@@ -44,10 +44,10 @@ TYPE_CHECKING = False
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
     from sqlite3 import Cursor
-    from typing import Final
+    from typing import Final, TypeAlias
 
     from _typeshed import SupportsRichComparison
-    from typing_extensions import Self, TypeAlias
+    from typing_extensions import Self
 
 
 class HRuleStyle(IntEnum):
