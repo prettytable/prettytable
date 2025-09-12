@@ -542,22 +542,22 @@ Table specific options are:
 | `vrules`                     | Controls printing of vertical rules between columns. Allowed values: `FRAME`, `ALL`, `NONE`.                                                |
 
 For options that can be set individually for each column (`align`, `valign`,
-`max_width`, `min_width`, `int_format`, `float_format`, `none_format`) you can either
-set a value, that applies to all columns or set a dict with column names and individual
-values).
+`custom_format`, `max_width`, `min_width`, `int_format`, `float_format`, `none_format`)
+you can either set a value, that applies to all columns or set a dict with column names
+and individual values).
 
 Column specific options are:
 
-| Option          | Details                                                                                                                                                                                          |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `align`         | Controls alignment of fields, one of "l", "c", or "r" or a dictionary with column and value.                                                                                                     |
-| `custom_format` | A dictionary of field and callable. This allows you to set any format you want `pf.custom_format["my_col_int"] = lambda f, v: f"{v:,}"`. The type of the callable is `Callable[[str, Any], str]` |
-| `float_format`  | A string which controls the way floating point data is printed or a dictionary with column and value. This works like: `print("%<float_format>f" % data)`.                                       |
-| `int_format`    | A string which controls the way integer data is printed or a dictionary with column and value. This works like: `print("%<int_format>d" % data)`.                                                |
-| `max_width`     | Number of characters used for maximum width of a column or a dictionary with column and value.                                                                                                   |
-| `min_width`     | Number of characters used for minimum width of a column or a dictionary with column and value.                                                                                                   |
-| `none_format`   | Representation of None values or a dictionary with column and value.                                                                                                                             |
-| `valign`        | Controls vertical alignment of fields, one of "t", "m", or "b" or a dictionary with column and value.                                                                                            |
+| Option          | Details                                                                                                                                                                                                                                                                                                    |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `align`         | Controls alignment of fields, one of "l", "c", or "r" or a dictionary with column and value.                                                                                                                                                                                                               |
+| `custom_format` | Set any format, by setting a function that gets the original value,the formatted representation and returns the new string. E.g. `pf.custom_format["my_col_int"] = lambda f, v: f"{v:,}"`. The type of the callable is `Callable[[str, Any], str]`. This also takes a dictionary with column and function. |
+| `float_format`  | A string which controls the way floating point data is printed or a dictionary with column and value. This works like: `print("%<float_format>f" % data)`.                                                                                                                                                 |
+| `int_format`    | A string which controls the way integer data is printed or a dictionary with column and value. This works like: `print("%<int_format>d" % data)`.                                                                                                                                                          |
+| `max_width`     | Number of characters used for maximum width of a column or a dictionary with column and value.                                                                                                                                                                                                             |
+| `min_width`     | Number of characters used for minimum width of a column or a dictionary with column and value.                                                                                                                                                                                                             |
+| `none_format`   | Representation of None values or a dictionary with column and value.                                                                                                                                                                                                                                       |
+| `valign`        | Controls vertical alignment of fields, one of "t", "m", or "b" or a dictionary with column and value.                                                                                                                                                                                                      |
 
 You can set the style options to your own settings in two ways:
 
