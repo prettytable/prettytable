@@ -599,18 +599,19 @@ print(table)
 
 ### Changing the appearance of your values
 
-You can modify the appearance of your values by using colors. E.g. you want positive
-values green and negative values red. The standard formatting has been already processed
-before calling this function, e.g. float values are already formatted with given
-precision. Because of this the colorization function gets three parameters, the field
-name, the original value (with its type) and the preprocessed formatted value and must
-return the new representation.
+You can modify the appearance of your values by using colors. For example, you want 
+positive values green and negative values red. The standard formatting has been already
+processed before calling this function, so for instance, float values are already
+formatted to the required precision. Because of this, the colorization function gets
+three parameters, the field name, the original value (with its type) and the
+preprocessed formatted value, and must return the new representation.
 
 ```python
 import colorama
+from prettytable import PrettyTable
 
-def colorUpYourLife(field, value, representation):
-    if isinstance(value,  (int, float)):
+def color_up_your_life(field, value, representation):
+    if isinstance(value, (int, float)):
         if value >= 0:
             return f"{colorama.Fore.GREEN}{representation}{colorama.Fore.RESET}"
         else:
@@ -619,8 +620,7 @@ def colorUpYourLife(field, value, representation):
         return f"{colorama.Fore.BLUE}{representation}{colorama.Fore.RESET}"
     return representation
 
-table = PrettyTable(custom_value_format = colorUpYourLife)
-table.title = "Here be Table caption"
+table = PrettyTable(custom_value_format = color_up_your_life)
 table.add_row(["bla", 24, None])
 table.add_row(["blu", -1, None])
 ```
