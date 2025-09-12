@@ -765,6 +765,194 @@ class TestFloatFormat:
         assert "001.41" in string
 
 
+class TestColumnFormattingfromDict:
+    def test_set_align_format(self, city_data: PrettyTable) -> None:
+        city_data.align = {"Annual Rainfall": "r"}
+        assert (
+            city_data.get_string()
+            == """
++-----------+------+------------+-----------------+
+| City name | Area | Population | Annual Rainfall |
++-----------+------+------------+-----------------+
+|  Adelaide | 1295 |  1158259   |           600.5 |
+|  Brisbane | 5905 |  1857594   |          1146.4 |
+|   Darwin  | 112  |   120900   |          1714.7 |
+|   Hobart  | 1357 |   205556   |           619.5 |
+|   Sydney  | 2058 |  4336374   |          1214.8 |
+| Melbourne | 1566 |  3806092   |           646.9 |
+|   Perth   | 5386 |  1554769   |           869.4 |
++-----------+------+------------+-----------------+
+""".strip()
+        )
+
+    def test_set_valign_format(self, city_data: PrettyTable) -> None:
+        table = PrettyTable(
+            ["Field 1", "Field 2", "Field 3", "Field 4", "Field 5", "Field 6"],
+        )
+        table.valign = {"Field 1": "m"}
+        table.max_width = {"Field 2": 20, "Field 4": 10, "Field 6": 10}
+        table.add_row(
+            [
+                "Lorem",
+                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam ",
+                "ipsum",
+                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam ",
+                "dolor",
+                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam ",
+            ]
+        )
+
+        assert (
+            table.get_string()
+            == """
++---------+----------------------+---------+------------+---------+------------+
+| Field 1 |       Field 2        | Field 3 |  Field 4   | Field 5 |  Field 6   |
++---------+----------------------+---------+------------+---------+------------+
+|         |  Lorem ipsum dolor   |  ipsum  |   Lorem    |  dolor  |   Lorem    |
+|         | sit amet, consetetur |         |   ipsum    |         |   ipsum    |
+|         |  sadipscing elitr,   |         | dolor sit  |         | dolor sit  |
+|  Lorem  |       sed diam       |         |   amet,    |         |   amet,    |
+|         |                      |         | consetetur |         | consetetur |
+|         |                      |         | sadipscing |         | sadipscing |
+|         |                      |         | elitr, sed |         | elitr, sed |
+|         |                      |         |    diam    |         |    diam    |
++---------+----------------------+---------+------------+---------+------------+
+""".strip()
+        )
+
+    def test_max_width(
+        self,
+    ) -> None:
+        table = PrettyTable(
+            ["Field 1", "Field 2", "Field 3", "Field 4", "Field 5", "Field 6"],
+        )
+        table.max_width = {"Field 2": 20, "Field 4": 10, "Field 6": 10}
+        table.add_row(
+            [
+                "Lorem",
+                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam ",
+                "ipsum",
+                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam ",
+                "dolor",
+                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam ",
+            ]
+        )
+
+        assert (
+            table.get_string()
+            == """
++---------+----------------------+---------+------------+---------+------------+
+| Field 1 |       Field 2        | Field 3 |  Field 4   | Field 5 |  Field 6   |
++---------+----------------------+---------+------------+---------+------------+
+|  Lorem  |  Lorem ipsum dolor   |  ipsum  |   Lorem    |  dolor  |   Lorem    |
+|         | sit amet, consetetur |         |   ipsum    |         |   ipsum    |
+|         |  sadipscing elitr,   |         | dolor sit  |         | dolor sit  |
+|         |       sed diam       |         |   amet,    |         |   amet,    |
+|         |                      |         | consetetur |         | consetetur |
+|         |                      |         | sadipscing |         | sadipscing |
+|         |                      |         | elitr, sed |         | elitr, sed |
+|         |                      |         |    diam    |         |    diam    |
++---------+----------------------+---------+------------+---------+------------+
+""".strip()
+        )
+
+    def test_min_width(self, city_data: PrettyTable) -> None:
+        city_data.min_width = {
+            "City name": 20,
+            "Area": 10,
+            "Population": 20,
+            "Annual Rainfall": 20,
+        }
+        assert (
+            city_data.get_string()
+            == """
++----------------------+------------+----------------------+----------------------+
+|      City name       |    Area    |      Population      |   Annual Rainfall    |
++----------------------+------------+----------------------+----------------------+
+|       Adelaide       |    1295    |       1158259        |        600.5         |
+|       Brisbane       |    5905    |       1857594        |        1146.4        |
+|        Darwin        |    112     |        120900        |        1714.7        |
+|        Hobart        |    1357    |        205556        |        619.5         |
+|        Sydney        |    2058    |       4336374        |        1214.8        |
+|      Melbourne       |    1566    |       3806092        |        646.9         |
+|        Perth         |    5386    |       1554769        |        869.4         |
++----------------------+------------+----------------------+----------------------+
+""".strip()
+        )
+
+    def test_set_int_format(self, city_data: PrettyTable) -> None:
+        city_data.int_format = {"Population": "20"}
+        assert (
+            city_data.get_string()
+            == """
++-----------+------+----------------------+-----------------+
+| City name | Area |      Population      | Annual Rainfall |
++-----------+------+----------------------+-----------------+
+|  Adelaide | 1295 |              1158259 |      600.5      |
+|  Brisbane | 5905 |              1857594 |      1146.4     |
+|   Darwin  | 112  |               120900 |      1714.7     |
+|   Hobart  | 1357 |               205556 |      619.5      |
+|   Sydney  | 2058 |              4336374 |      1214.8     |
+| Melbourne | 1566 |              3806092 |      646.9      |
+|   Perth   | 5386 |              1554769 |      869.4      |
++-----------+------+----------------------+-----------------+
+""".strip()
+        )
+
+    def test_set_float_format(self, city_data: PrettyTable) -> None:
+        city_data.float_format = {"Annual Rainfall": "4.2"}
+        assert (
+            city_data.get_string()
+            == """
++-----------+------+------------+-----------------+
+| City name | Area | Population | Annual Rainfall |
++-----------+------+------------+-----------------+
+|  Adelaide | 1295 |  1158259   |      600.50     |
+|  Brisbane | 5905 |  1857594   |     1146.40     |
+|   Darwin  | 112  |   120900   |     1714.70     |
+|   Hobart  | 1357 |   205556   |      619.50     |
+|   Sydney  | 2058 |  4336374   |     1214.80     |
+| Melbourne | 1566 |  3806092   |      646.90     |
+|   Perth   | 5386 |  1554769   |      869.40     |
++-----------+------+------------+-----------------+
+""".strip()
+        )
+
+    def test_set_custom_format(self, city_data: PrettyTable) -> None:
+        city_data.custom_format = {"Annual Rainfall": lambda f, v: f"{v:.2f}"}
+        assert (
+            city_data.get_string()
+            == """
++-----------+------+------------+-----------------+
+| City name | Area | Population | Annual Rainfall |
++-----------+------+------------+-----------------+
+|  Adelaide | 1295 |  1158259   |      600.50     |
+|  Brisbane | 5905 |  1857594   |     1146.40     |
+|   Darwin  | 112  |   120900   |     1714.70     |
+|   Hobart  | 1357 |   205556   |      619.50     |
+|   Sydney  | 2058 |  4336374   |     1214.80     |
+| Melbourne | 1566 |  3806092   |      646.90     |
+|   Perth   | 5386 |  1554769   |      869.40     |
++-----------+------+------------+-----------------+
+""".strip()
+        )
+
+    def test_set_none_format(self, city_data: PrettyTable) -> None:
+        city_data.clear_rows()
+        city_data.add_row([None, None, None, None])
+        city_data.none_format = {"Annual Rainfall": "N/A"}
+        assert (
+            city_data.get_string()
+            == """
++-----------+------+------------+-----------------+
+| City name | Area | Population | Annual Rainfall |
++-----------+------+------------+-----------------+
+|    None   | None |    None    |       N/A       |
++-----------+------+------------+-----------------+
+""".strip()
+        )
+
+
 class TestBreakLine:
     @pytest.mark.parametrize(
         ["rows", "hrule", "expected_result"],
