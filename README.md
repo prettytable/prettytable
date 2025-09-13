@@ -29,11 +29,11 @@ PrettyTable lets you print tables in an attractive ASCII form:
 
 Install via pip:
 
-    python -m pip install -U prettytable
+    python3 -m pip install -U prettytable
 
 Install latest development version:
 
-    python -m pip install -U git+https://github.com/prettytable/prettytable
+    python3 -m pip install -U git+https://github.com/prettytable/prettytable
 
 Or from `requirements.txt`:
 
@@ -103,13 +103,10 @@ method, which takes two arguments - a string which is the name for the field the
 you are adding corresponds to, and a list or tuple which contains the column data:
 
 ```python
-table.add_column("City name",
-["Adelaide","Brisbane","Darwin","Hobart","Sydney","Melbourne","Perth"])
+table.add_column("City name", ["Adelaide", "Brisbane", "Darwin", "Hobart", "Sydney", "Melbourne", "Perth"])
 table.add_column("Area", [1295, 5905, 112, 1357, 2058, 1566, 5386])
-table.add_column("Population", [1158259, 1857594, 120900, 205556, 4336374, 3806092,
-1554769])
-table.add_column("Annual Rainfall",[600.5, 1146.4, 1714.7, 619.5, 1214.8, 646.9,
-869.4])
+table.add_column("Population", [1158259, 1857594, 120900, 205556, 4336374, 3806092, 1554769])
+table.add_column("Annual Rainfall",[600.5, 1146.4, 1714.7, 619.5, 1214.8, 646.9, 869.4])
 ```
 
 #### Mixing and matching
@@ -597,6 +594,43 @@ print(table.get_string(border=False))
 print(table)
 ```
 
+#### Custom Format Example
+
+For example to print strings in `blue`, positive numbers in `green` and negative numbers
+in `red` and the numbers are expected to have a precision of 2. In this example the same
+function is applied for all columns, and you can also evaluate the `field` parameter in
+the function, if you want field specific behaviour.
+
+```python
+import prettytable
+import colorama
+import typing
+
+def _colored(field: str, val: typing.Any) -> str:
+    if isinstance(val, (int, float)):
+        if val >= 0:
+            return f"{colorama.Fore.GREEN}{val:.2f}{colorama.Fore.RESET}"
+        return f"{colorama.Fore.RED}{val:.2f}{colorama.Fore.RESET}"
+    elif isinstance(val, (str)):
+        return f"{colorama.Fore.BLUE}{val}{colorama.Fore.RESET}"
+    return f"{val}"
+
+
+table = prettytable.PrettyTable(("Name", "Overtime"))
+table.custom_format = _colored
+
+for row in [["John Doe", 5.0], ["Jane Smith", -2.0]]:
+    table.add_row([row[0], row[1]])
+print(table)
+```
+
+Alternativly you can also add a function per field. In this example the function is
+called only for the Overtime field.
+
+```python
+table.custom_format["Overtime"] = _colored
+```
+
 ### Changing the appearance of your table - with _colors_!
 
 PrettyTable has the functionality of printing your table with ANSI color codes. This
@@ -761,10 +795,18 @@ new_table = old_table[0:5]
 
 ## Contributing
 
-After editing files, use the [Black](https://github.com/psf/black) linter to auto-format
-changed lines.
+After editing files, use at least the [Black](https://github.com/psf/black) linter to
+auto-format changed lines.
 
 ```sh
-python -m pip install black
+python3 -m pip install black
 black prettytable*.py
+```
+
+To run all pre-commit checks, linters, formatter and tests through
+[tox](https://github.com/tox-dev/tox) that are currently defined in this project:
+
+```sh
+python3 -m pip install tox
+tox
 ```
