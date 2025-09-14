@@ -594,12 +594,13 @@ print(table.get_string(border=False))
 print(table)
 ```
 
-#### Custom Format Example
+#### Custom Format Example (with _colors_)
 
-For example to print strings in `blue`, positive numbers in `green` and negative numbers
-in `red` and the numbers are expected to have a precision of 2. In this example the same
-function is applied for all columns, and you can also evaluate the `field` parameter in
-the function, if you want field specific behaviour.
+The `custom_format` attribute allows you to define a function for custom cell value
+formatting. For example, the following code demonstrates how to apply a single function
+across all columns to display strings in `blue`, positive numbers in `green`, and
+negative numbers in `red`, all with a precision of two decimal places. Your custom
+function can also inspect the `field` parameter to apply field-specific formatting.
 
 ```python
 import prettytable
@@ -624,8 +625,9 @@ for row in [["John Doe", 5.0], ["Jane Smith", -2.0]]:
 print(table)
 ```
 
-Alternativly you can also add a function per field. In this example the function is
-called only for the Overtime field.
+Alternatively, you can assign a custom format function to a specific field by treating
+`custom_format` as a dictionary. In this example, the `_colored` function is applied
+only to the "Overtime" field.
 
 ```python
 table.custom_format["Overtime"] = _colored
@@ -803,8 +805,8 @@ python3 -m pip install black
 black prettytable*.py
 ```
 
-To run all pre-commit checks, linters, formatter and tests through
-[tox](https://github.com/tox-dev/tox) that are currently defined in this project:
+To run all pre-commit checks, linters, formatters (including Black), and tests using
+[tox](https://github.com/tox-dev/tox):
 
 ```sh
 python3 -m pip install tox
