@@ -94,7 +94,7 @@ BASE_ALIGN_VALUE: Final = "base_align_value"
 RowType: TypeAlias = list[Any]
 AlignType: TypeAlias = Literal["l", "c", "r"]
 VAlignType: TypeAlias = Literal["t", "m", "b"]
-HeaderStyleType: TypeAlias = Literal["cap", "title", "upper", "lower", None]
+HeaderStyleType: TypeAlias = Literal["cap", "title", "upper", "lower"] | None
 
 
 class OptionsType(TypedDict):
