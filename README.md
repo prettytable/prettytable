@@ -511,7 +511,7 @@ PrettyTable has a number of style options which control various aspects of how t
 are displayed. You have the freedom to set each of these options individually to
 whatever you prefer. The `set_style` method just does this automatically for you.
 
-Table specific options are:
+Table-specific options are:
 
 | Option                       | Details                                                                                                                                     |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -544,9 +544,9 @@ Table specific options are:
 For options that can be set individually for each column (`align`, `valign`,
 `custom_format`, `max_width`, `min_width`, `int_format`, `float_format`, `none_format`)
 you can either set a value, that applies to all columns or set a dict with column names
-and individual values).
+and individual values.
 
-Column specific options are:
+Column-specific options are:
 
 | Option          | Details                                                                                                                                                                                                                                                                                                    |
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
