@@ -19,7 +19,7 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.x"
-      - uses: tox-dev/action-pre-commit-uv@v1
+      - uses: j178/prek-action@v1
 
   mypy:
     runs-on: ubuntu-latest
