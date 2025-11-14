@@ -6,6 +6,7 @@ permissions: {}
 
 env:
   FORCE_COLOR: 1
+  PIP_DISABLE_PIP_VERSION_CHECK: 1
 
 jobs:
   test:
@@ -13,7 +14,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["pypy3.11", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+        python-version:
+          - "pypy3.11"
+          - "3.15t"
+          - "3.15"
+          - "3.14t"
+          - "3.14"
+          - "3.13t"
+          - "3.13"
+          - "3.12"
+          - "3.11"
+          - "3.10"
         os: [windows-latest, macos-latest, ubuntu-latest]
 
     steps:
@@ -22,17 +33,22 @@ jobs:
           persist-credentials: false
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
           allow-prereleases: true
 
+      - name: Set PYTHON_GIL
+        if: endsWith(matrix.python-version, 't')
+        run: |
+          echo "PYTHON_GIL=0" >> "$GITHUB_ENV"
+
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
 
       - name: Tox tests
         run: |
-          uvx --with tox-uv tox -e py
+          uvx --python ${{ matrix.python-version }} --with tox-uv tox -e py
 
       - name: Upload coverage
         uses: codecov/codecov-action@v5
