@@ -629,7 +629,7 @@ def _colored(field: str, val: Any) -> str:
         return colored(val, "blue")
     return f"{val}"
 
-table = prettytable.PrettyTable(("Name", "Overtime"))
+table = PrettyTable(("Name", "Overtime"))
 table.custom_format = _colored
 
 for row in [["John Doe", 5.0], ["Jane Smith", -2.0]]:
@@ -801,7 +801,7 @@ new_table = old_table[0:5]
 
 ## Contributing
 
-After editing files, use at least the [Black](https://github.com/psf/black) linter to
+After editing files, use at least [Black](https://github.com/psf/black) to
 auto-format changed lines.
 
 ```sh
