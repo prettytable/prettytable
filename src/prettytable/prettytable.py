@@ -1667,7 +1667,7 @@ class PrettyTable:
         for row in rows[:-1]:
             self.add_row(row)
 
-        if rows:
+        if len(rows) > 0:
             self.add_row(rows[-1], divider=divider)
 
     def add_row(self, row: RowType, *, divider: bool = False) -> None:
