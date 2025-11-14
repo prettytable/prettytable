@@ -594,7 +594,7 @@ print(table.get_string(border=False))
 print(table)
 ```
 
-#### Custom Format Example (with _colors_)
+#### Custom format example (with _colors_)
 
 The `custom_format` attribute allows you to define a function for custom cell value
 formatting. For example, the following code demonstrates how to apply a single function
@@ -603,19 +603,18 @@ negative numbers in `red`, all with a precision of two decimal places. Your cust
 function can also inspect the `field` parameter to apply field-specific formatting.
 
 ```python
-import prettytable
-import colorama
-import typing
+from prettytable import PrettyTable
+from typing import Any
+from termcolor import colored
 
-def _colored(field: str, val: typing.Any) -> str:
+def _colored(field: str, val: Any) -> str:
     if isinstance(val, (int, float)):
         if val >= 0:
-            return f"{colorama.Fore.GREEN}{val:.2f}{colorama.Fore.RESET}"
-        return f"{colorama.Fore.RED}{val:.2f}{colorama.Fore.RESET}"
-    elif isinstance(val, (str)):
-        return f"{colorama.Fore.BLUE}{val}{colorama.Fore.RESET}"
+            return colored(f"{val:.2f}", "green")
+        return colored(f"{val:.2f}", "red")
+    elif isinstance(val, str):
+        return colored(val, "blue")
     return f"{val}"
-
 
 table = prettytable.PrettyTable(("Name", "Overtime"))
 table.custom_format = _colored
@@ -623,14 +622,6 @@ table.custom_format = _colored
 for row in [["John Doe", 5.0], ["Jane Smith", -2.0]]:
     table.add_row([row[0], row[1]])
 print(table)
-```
-
-Alternatively, you can assign a custom format function to a specific field by treating
-`custom_format` as a dictionary. In this example, the `_colored` function is applied
-only to the "Overtime" field.
-
-```python
-table.custom_format["Overtime"] = _colored
 ```
 
 ### Changing the appearance of your table - with _colors_!
@@ -802,10 +793,10 @@ auto-format changed lines.
 
 ```sh
 python3 -m pip install black
-black prettytable*.py
+black .
 ```
 
-To run all pre-commit checks, linters, formatters (including Black), and tests using
+To run all pre-commit checks, linters, formatters (including Black), and tests use
 [tox](https://github.com/tox-dev/tox):
 
 ```sh
