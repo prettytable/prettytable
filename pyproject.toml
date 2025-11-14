@@ -94,6 +94,11 @@ filterwarnings = [
 ]
 testpaths = [ "tests" ]
 
+[tool.coverage.run]
+omit = [
+  "**/__main__.py",
+]
+
 [tool.mypy]
 python_version = "3.10"
 pretty = true
