@@ -801,8 +801,8 @@ new_table = old_table[0:5]
 
 ## Contributing
 
-After editing files, use at least [Black](https://github.com/psf/black) to
-auto-format changed lines.
+After editing files, use at least [Black](https://github.com/psf/black) to auto-format
+changed lines.
 
 ```sh
 python3 -m pip install black
