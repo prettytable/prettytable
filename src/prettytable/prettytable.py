@@ -43,7 +43,6 @@ from typing import Any, Literal, TypedDict, cast
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
-    from sqlite3 import Cursor
     from typing import Final, TypeAlias
 
     from _typeshed import SupportsRichComparison
@@ -2941,7 +2940,7 @@ def from_csv(fp, field_names: Sequence[str] | None = None, **kwargs) -> PrettyTa
     return table
 
 
-def from_db_cursor(cursor: Cursor, **kwargs) -> PrettyTable | None:
+def from_db_cursor(cursor: Any, **kwargs) -> PrettyTable | None:
     if cursor.description:
         table = PrettyTable(**kwargs)
         table.field_names = [col[0] for col in cursor.description]
