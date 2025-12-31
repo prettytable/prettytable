@@ -2381,6 +2381,18 @@ class PrettyTable:
         return "\n".join(bits_str)
 
     def paginate(self, page_length: int = 58, line_break: str = "\f", **kwargs) -> str:
+        """Return string representation of table split into pages.
+
+        Arguments:
+
+        page_length - number of rows per page (default: 58)
+        line_break - string used to separate pages (default: "\f" form feed)
+        **kwargs - additional keyword arguments passed to get_string() method,
+            such as title, fields, header, border, etc.
+
+        The table is split into pages of the specified length, with each page
+        separated by the line_break character. All formatting options available
+        in get_string() can be used via kwargs."""
         pages: list[str] = []
         kwargs["start"] = kwargs.get("start", 0)
         true_end = kwargs.get("end", self.rowcount)
