@@ -220,6 +220,30 @@ def my_cli_function(table_format: str = 'text'):
   print(table.get_formatted_string(table_format))
 ```
 
+#### Paginating your table
+
+If you have a large table and want to split it into multiple pages, you can use the
+`paginate` method. This method splits the table into pages of a specified length and
+separates them with a line break character (by default, a form feed character `\f`):
+
+```python
+paginated_string = table.paginate(page_length=10)
+print(paginated_string)
+```
+
+The `page_length` parameter controls how many rows appear on each page (default: 58).
+The `line_break` parameter specifies the string used to separate pages (default: `"\f"`
+form feed). You can also pass any keyword arguments that are accepted by `get_string()`
+to control the formatting of each page:
+
+```python
+paginated_string = table.paginate(page_length=20, line_break="\n\n---\n\n", border=True)
+print(paginated_string)
+```
+
+This is particularly useful when printing large tables to a terminal or when you want to
+format output for pagination in documents.
+
 #### Controlling which data gets displayed
 
 If you like, you can restrict the output of `print(table)` or `table.get_string` to only
