@@ -764,21 +764,6 @@ class TestFloatFormat:
         assert "002.72" in string
         assert "001.41" in string
 
-    def test_overwrite_default_format_dict(self, float_pt: PrettyTable) -> None:
-        float_pt.float_format = "6.2"
-        float_pt.custom_format = {"Value": lambda f, v: f"+++{v:.4f}+++"}
-        assert (
-            float_pt.get_string()
-            == """
-+----------+--------------+
-| Constant |    Value     |
-+----------+--------------+
-|    Pi    | +++3.1416+++ |
-|    e     | +++2.7183+++ |
-| sqrt(2)  | +++1.4142+++ |
-+----------+--------------+""".strip()
-        )
-
 
 class TestColumnFormattingfromDict:
     def test_set_align_format(self, city_data: PrettyTable) -> None:
@@ -1244,6 +1229,26 @@ class TestCustomFormatter:
 | 01 Feb 2021 | February | 54321.123 | 87,654,321 |
 +-------------+----------+-----------+------------+
 """.strip()
+        )
+
+    def test_overwrite_default_format_dict(self, city_data: PrettyTable) -> None:
+        city_data.float_format = "6.2"
+        city_data.int_format = "10"
+        city_data.custom_format = {"Annual Rainfall": lambda f, v: f"+++{v:.4f}+++"}
+        assert (
+            city_data.get_string()
+            == """
++-----------+------------+------------+-----------------+
+| City name |    Area    | Population | Annual Rainfall |
++-----------+------------+------------+-----------------+
+|  Adelaide |       1295 |    1158259 |  +++600.5000+++ |
+|  Brisbane |       5905 |    1857594 | +++1146.4000+++ |
+|   Darwin  |        112 |     120900 | +++1714.7000+++ |
+|   Hobart  |       1357 |     205556 |  +++619.5000+++ |
+|   Sydney  |       2058 |    4336374 | +++1214.8000+++ |
+| Melbourne |       1566 |    3806092 |  +++646.9000+++ |
+|   Perth   |       5386 |    1554769 |  +++869.4000+++ |
++-----------+------------+------------+-----------------+""".strip()
         )
 
 
