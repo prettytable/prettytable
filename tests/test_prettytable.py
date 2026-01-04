@@ -415,11 +415,48 @@ class TestOptionAttribute:
         assert city_data.get_string() == city_data[:].get_string()
 
     def test_set_for_one_column(self, city_data: PrettyTable) -> None:
-        city_data.align["Rainfall"] = "l"
-        city_data.max_width["Name"] = 10
-        city_data.int_format["Population"] = "4"
-        city_data.float_format["Area"] = "2.2"
-        assert city_data.get_string() == city_data[:].get_string()
+        city_data.min_width["City name"] = 15
+        city_data.int_format["Area"] = "6"
+        city_data.float_format["Annual Rainfall"] = "6.2"
+        city_data.int_format["Population"] = "10"
+        city_data.align["Annual Rainfall"] = "l"
+        assert (
+            city_data.get_string()
+            == """
++-----------------+--------+------------+-----------------+
+|    City name    |  Area  | Population | Annual Rainfall |
++-----------------+--------+------------+-----------------+
+|     Adelaide    |   1295 |    1158259 | 600.50          |
+|     Brisbane    |   5905 |    1857594 | 1146.40         |
+|      Darwin     |    112 |     120900 | 1714.70         |
+|      Hobart     |   1357 |     205556 | 619.50          |
+|      Sydney     |   2058 |    4336374 | 1214.80         |
+|    Melbourne    |   1566 |    3806092 | 646.90          |
+|      Perth      |   5386 |    1554769 | 869.40          |
++-----------------+--------+------------+-----------------+""".strip()
+        )
+
+    def test_set_for_one_column2(self, city_data: PrettyTable) -> None:
+        city_data.min_width = {"City name": 15}
+        city_data.int_format = {"Area": "6"}
+        city_data.float_format = {"Annual Rainfall": "6.2"}
+        city_data.int_format = {"Population": "10"}
+        city_data.align = {"Annual Rainfall": "l"}
+        assert (
+            city_data.get_string()
+            == """
++-----------------+--------+------------+-----------------+
+|    City name    |  Area  | Population | Annual Rainfall |
++-----------------+--------+------------+-----------------+
+|     Adelaide    |   1295 |    1158259 | 600.50          |
+|     Brisbane    |   5905 |    1857594 | 1146.40         |
+|      Darwin     |    112 |     120900 | 1714.70         |
+|      Hobart     |   1357 |     205556 | 619.50          |
+|      Sydney     |   2058 |    4336374 | 1214.80         |
+|    Melbourne    |   1566 |    3806092 | 646.90          |
+|      Perth      |   5386 |    1554769 | 869.40          |
++-----------------+--------+------------+-----------------+""".strip()
+        )
 
     def test_preserve_internal_border(self) -> None:
         table = PrettyTable(preserve_internal_border=True)
