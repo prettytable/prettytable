@@ -782,17 +782,17 @@ class TestFloatFormat:
 
     def test_overwrite_default_format_dict(self, float_pt: PrettyTable) -> None:
         float_pt.float_format = "6.2"
-        float_pt.custom_format = {"Value": lambda f, v: f"+++{v}+++"}
+        float_pt.custom_format = {"Value": lambda f, v: f"+++{v:.4f}+++"}
         assert (
             float_pt.get_string()
             == """
-+----------+--------------------------+
-| Constant |          Value           |
-+----------+--------------------------+
-|    Pi    | +++3.141592653589793+++  |
-|    e     | +++2.718281828459045+++  |
-| sqrt(2)  | +++1.4142135623730951+++ |
-+----------+--------------------------+""".strip()
++----------+--------------+
+| Constant |    Value     |
++----------+--------------+
+|    Pi    | +++3.1416+++ |
+|    e     | +++2.7183+++ |
+| sqrt(2)  | +++1.4142+++ |
++----------+--------------+""".strip()
         )
 
 
