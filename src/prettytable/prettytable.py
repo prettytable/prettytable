@@ -789,10 +789,14 @@ class PrettyTable:
                 self._none_format[field] = None
             self._validate_none_format(val)
             for field in self._field_names:
+                if field in self._custom_format:
+                    del self._custom_format[field]
                 self._none_format[field] = val
         elif isinstance(val, dict) and val:
             for field, fval in val.items():
                 self._validate_none_format(fval)
+                if field in self._custom_format:
+                    del self._custom_format[field]
                 self._none_format[field] = fval
         else:
             for field in self._field_names:
@@ -1174,10 +1178,14 @@ class PrettyTable:
         if isinstance(val, str):
             self._validate_option("int_format", val)
             for field in self._field_names:
+                if field in self._custom_format:
+                    del self._custom_format[field]
                 self._int_format[field] = val
         elif isinstance(val, dict) and val:
             for field, fval in val.items():
                 self._validate_option("int_format", fval)
+                if field in self._custom_format:
+                    del self._custom_format[field]
                 self._int_format[field] = fval
         else:
             self._int_format = {}
@@ -1195,10 +1203,14 @@ class PrettyTable:
         if isinstance(val, str):
             self._validate_option("float_format", val)
             for field in self._field_names:
+                if field in self._custom_format:
+                    del self._custom_format[field]
                 self._float_format[field] = val
         elif isinstance(val, dict) and val:
             for field, fval in val.items():
                 self._validate_option("float_format", fval)
+                if field in self._custom_format:
+                    del self._custom_format[field]
                 self._float_format[field] = fval
         else:
             self._float_format = {}
@@ -1216,21 +1228,27 @@ class PrettyTable:
         self,
         val: Callable[[str, Any], str] | dict[str, Callable[[str, Any], str]] | None,
     ):
-        def replace_formatter(fld, func):
-            if fld in self._float_format:
-                del self._float_format[fld]
-            if fld in self._int_format:
-                del self._int_format[fld]
-            self._custom_format[field] = func
+        def remove_column_formatter(field_name: str) -> None:
+            """
+            remove all existing column formatters
+            """
+            if field_name in self._float_format:
+                del self._float_format[field_name]
+            if field_name in self._int_format:
+                del self._int_format[field_name]
+            if field_name in self._none_format:
+                del self._none_format[field_name]
 
         if isinstance(val, dict):
             for field, fval in val.items():
                 self._validate_function(f"custom_value.{field}", fval)
-                replace_formatter(field, fval)
+                remove_column_formatter(field)
+                self._custom_format[field] = fval
         elif hasattr(val, "__call__"):
             self._validate_function("custom_value", val)
             for field in self._field_names:
-                replace_formatter(field, val)
+                remove_column_formatter(field)
+                self._custom_format[field] = val
         elif isinstance(val, str):
             msg = "The custom_format property need to be a dictionary or callable"
             raise TypeError(msg)
