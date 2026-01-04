@@ -1235,7 +1235,9 @@ class PrettyTable:
             if field_name in self._none_format:
                 del self._none_format[field_name]
 
-        if isinstance(val, dict):
+        if val is None:
+            self._custom_format = {}
+        elif isinstance(val, dict):
             for field, fval in val.items():
                 self._validate_function(f"custom_value.{field}", fval)
                 remove_column_formatter(field)
