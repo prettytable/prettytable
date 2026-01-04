@@ -782,9 +782,7 @@ class PrettyTable:
 
         val - The alternative representation to be used for None values
         """
-        if not self._field_names:
-            self._none_format = {}
-        elif isinstance(val, str):
+        if isinstance(val, str):
             for field in self._field_names:
                 self._none_format[field] = None
             self._validate_none_format(val)
@@ -799,8 +797,7 @@ class PrettyTable:
                     del self._custom_format[field]
                 self._none_format[field] = fval
         else:
-            for field in self._field_names:
-                self._none_format[field] = None
+            self._none_format = {}
 
     @property
     def field_names(self) -> list[str]:
