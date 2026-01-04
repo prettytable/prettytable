@@ -343,7 +343,9 @@ class PrettyTable:
         ]
 
         self._none_format: dict[str, str | None] = {}
-        self._custom_format: dict[str, Callable[[str, Any], str]] = {}
+        self._custom_format: (
+            Callable[[str, Any], str] | dict[str, Callable[[str, Any], str]]
+        ) = {}
         self._kwargs = {}
         if field_names:
             self.field_names = field_names
@@ -1225,10 +1227,7 @@ class PrettyTable:
         self,
         val: Callable[[str, Any], str] | dict[str, Callable[[str, Any], str]] | None,
     ):
-        def remove_column_formatter(field_name: str) -> None:
-            """
-            remove all existing column formatters
-            """
+        def remove_column_formatter(field_name):
             if field_name in self._float_format:
                 del self._float_format[field_name]
             if field_name in self._int_format:
