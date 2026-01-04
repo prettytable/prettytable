@@ -343,6 +343,7 @@ class PrettyTable:
         ]
 
         self._none_format: dict[str, str | None] = {}
+        self._custom_format: dict[str, Callable[[str, Any], str]] = {}
         self._kwargs = {}
         if field_names:
             self.field_names = field_names
@@ -1215,19 +1216,26 @@ class PrettyTable:
         self,
         val: Callable[[str, Any], str] | dict[str, Callable[[str, Any], str]] | None,
     ):
-        if val is None:
-            self._custom_format = {}
-        elif isinstance(val, dict):
-            for k, v in val.items():
-                self._validate_function(f"custom_value.{k}", v)
-            self._custom_format = val
+        def replace_formatter(fld, func):
+            if fld in self._float_format:
+                del self._float_format[fld]
+            if fld in self._int_format:
+                del self._int_format[fld]
+            self._custom_format[field] = func
+
+        if isinstance(val, dict):
+            for field, fval in val.items():
+                self._validate_function(f"custom_value.{field}", fval)
+                replace_formatter(field, fval)
         elif hasattr(val, "__call__"):
             self._validate_function("custom_value", val)
             for field in self._field_names:
-                self._custom_format[field] = val
-        else:
+                replace_formatter(field, val)
+        elif isinstance(val, str):
             msg = "The custom_format property need to be a dictionary or callable"
             raise TypeError(msg)
+        else:
+            self._custom_format = {}
 
     @property
     def padding_width(self) -> int:
