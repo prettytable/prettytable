@@ -726,8 +726,7 @@ class TestBasic:
 
     def test_header_style_invalid(self) -> None:
         with pytest.raises(ValueError):
-            table = PrettyTable(header_style="FooBar")
-            table.get_string()
+            PrettyTable(header_style="FooBar")
 
     @pytest.mark.usefixtures("init_db")
     def test_no_blank_lines_from_db(self, db_cursor: sqlite3.Cursor) -> None:
