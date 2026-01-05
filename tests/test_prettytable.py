@@ -667,6 +667,48 @@ class TestBasic:
 """.strip()
         )
 
+    def test_header_style_cap(self) -> None:
+        table = PrettyTable(["cOl oNE", "col two", "COL THREE"], header_style="cap")
+        table.add_row([1, 2, 3])
+        assert (
+            table.get_string()
+            == """
++---------+---------+-----------+
+| Col one | Col two | Col three |
++---------+---------+-----------+
+|    1    |    2    |     3     |
++---------+---------+-----------+
+""".strip()
+        )
+
+    def test_header_style_title(self) -> None:
+        table = PrettyTable(["cOl oNE", "col two", "COL THREE"], header_style="title")
+        table.add_row([1, 2, 3])
+        assert (
+            table.get_string()
+            == """
++---------+---------+-----------+
+| Col One | Col Two | Col Three |
++---------+---------+-----------+
+|    1    |    2    |     3     |
++---------+---------+-----------+
+""".strip()
+        )
+
+    def test_header_style_lower(self) -> None:
+        table = PrettyTable(header_style="lower")
+        table.add_row([1, 2, 3])
+        assert (
+            table.get_string()
+            == """
++---------+---------+---------+
+| field 1 | field 2 | field 3 |
++---------+---------+---------+
+|    1    |    2    |    3    |
++---------+---------+---------+
+""".strip()
+        )
+
     def test_horizontal_align_char_setter(self) -> None:
         table = PrettyTable()
         table.horizontal_align_char = "!"
