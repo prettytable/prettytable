@@ -481,6 +481,15 @@ class TestBasic:
         table.add_rows([])
         assert str(city_data) == str(table)
 
+    def test_add_row_toolong(self) -> None:
+        table = PrettyTable(CITY_DATA_HEADER)
+        with pytest.raises(ValueError):
+            table.add_row(["Geelong", 1, 308915, 123.1, 1])
+
+    def test_add_column_invalid(self, city_data: PrettyTable) -> None:
+        with pytest.raises(ValueError):
+            city_data.add_column("City name", ["Geelong", 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
     def _test_no_blank_lines(self, table: PrettyTable) -> None:
         string = table.get_string()
         lines = string.split("\n")
@@ -829,6 +838,21 @@ def float_pt() -> PrettyTable:
 
 
 class TestFloatFormat:
+    def test_empty(self, float_pt: PrettyTable) -> None:
+        float_pt.float_format = ""
+        assert (
+            float_pt.get_string()
+            == """
++----------+----------+
+| Constant |  Value   |
++----------+----------+
+|    Pi    | 3.141593 |
+|    e     | 2.718282 |
+| sqrt(2)  | 1.414214 |
++----------+----------+
+""".strip()
+        )
+
     def test_no_decimals(self, float_pt: PrettyTable) -> None:
         float_pt.float_format = ".0f"
         assert "." not in float_pt.get_string()
