@@ -643,6 +643,36 @@ class TestBasic:
 """.strip()
         )
 
+    def test_header_style_upper_setter(self) -> None:
+        table = PrettyTable()
+        table.header_style = "upper"
+        table.add_row([1, 2, 3])
+        assert (
+            table.get_string()
+            == """
++---------+---------+---------+
+| FIELD 1 | FIELD 2 | FIELD 3 |
++---------+---------+---------+
+|    1    |    2    |    3    |
++---------+---------+---------+
+""".strip()
+        )
+
+    def test_horizontal_align_char_setter(self) -> None:
+        table = PrettyTable()
+        table.horizontal_align_char = "!"
+        table.add_row([1, 2, 3])
+        assert (
+            table.get_string()
+            == """
++ !-----! + !-----! + !-----! +
+| Field 1 | Field 2 | Field 3 |
++ !-----! + !-----! + !-----! +
+|    1    |    2    |    3    |
++ !-----! + !-----! + !-----! +
+""".strip()
+        )
+
     def test_header_style_invalid(self) -> None:
         with pytest.raises(ValueError):
             table = PrettyTable(header_style="FooBar")
