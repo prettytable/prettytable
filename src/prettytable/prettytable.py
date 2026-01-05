@@ -1289,6 +1289,17 @@ class PrettyTable:
         self,
         val: Callable[[str, Any], str] | dict[str, Callable[[str, Any], str]] | None,
     ):
+        """Set custom format for columns using callable functions.
+
+        Arguments:
+            val: Can be:
+                - None: Clears all custom formats
+                - dict: Dictionary mapping field names to callable functions
+                - callable: A single callable function applied to all fields
+
+        Raises:
+            TypeError: If val is not None, a dict, or a callable
+        """
         if val is None:
             self._custom_format.clear()
         elif isinstance(val, dict):
@@ -1299,11 +1310,9 @@ class PrettyTable:
             self._validate_function("custom_value", val)
             for field in self._field_names:
                 self._custom_format[field] = val
-        elif isinstance(val, str):
+        else:
             msg = "The custom_format property need to be a dictionary or callable"
             raise TypeError(msg)
-        else:
-            self._custom_format.clear()
 
     @property
     def padding_width(self) -> int:
