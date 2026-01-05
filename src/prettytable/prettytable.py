@@ -97,11 +97,34 @@ HeaderStyleType: TypeAlias = Literal["cap", "title", "upper", "lower"] | None
 
 
 class ObservableDict(dict[str, Any]):
+    """A dictionary that notifies a callback when items are set or changed.
+
+    This dictionary subclass allows setting a callback function that will be
+    invoked whenever an item is set or its value changes. This is used to
+    maintain consistency between related format dictionaries.
+    """
+
     def __init__(self, *args, **kwargs):
+        """Initialize the observable dictionary.
+
+        Arguments:
+            *args: Positional arguments passed to dict.__init__
+            **kwargs: Keyword arguments passed to dict.__init__
+        """
         super().__init__(*args, **kwargs)
         self.callback = None
 
     def __setitem__(self, key: str, value: Any):
+        """Set an item and trigger callback if value changed.
+
+        Sets the item in the dictionary and calls the callback function
+        (if set) with the key, old value, and new value when the value
+        actually changes.
+
+        Arguments:
+            key: The dictionary key
+            value: The new value to set
+        """
         old_value = self.get(key)
         super().__setitem__(key, value)
         if self.callback is not None and old_value != value:
@@ -360,9 +383,7 @@ class PrettyTable:
         self._float_format: dict[str, str | None] = ObservableDict()
         self._float_format.callback = self._remove_custom_format_callback
 
-        self._custom_format: (
-            Callable[[str, Any], str] | dict[str, Callable[[str, Any], str]]
-        ) = ObservableDict()
+        self._custom_format: dict[str, Callable[[str, Any], str]] = ObservableDict()
         self._custom_format.callback = self._custom_format_callback
 
         self._kwargs = {}
@@ -790,10 +811,6 @@ class PrettyTable:
     def xhtml(self, val: bool) -> None:
         self._validate_option("xhtml", val)
         self._xhtml = val
-
-    def _remove_custom_format_callback(self, field_name, old_value, new_value):
-        if field_name in self._custom_format:
-            del self._custom_format[field_name]
 
     @property
     def none_format(self) -> dict[str, str | None]:
@@ -1225,7 +1242,33 @@ class PrettyTable:
         else:
             self._float_format.clear()
 
+    def _remove_custom_format_callback(self, field_name, old_value, new_value):
+        """Callback to remove custom format when a field is removed from format dicts.
+
+        This callback is triggered when a field is removed from _none_format,
+        _int_format, or _float_format dictionaries, and removes the corresponding
+        entry from _custom_format if it exists.
+
+        Arguments:
+            field_name: Name of the field being removed
+            old_value: Previous value (unused)
+            new_value: New value (unused)
+        """
+        if field_name in self._custom_format:
+            del self._custom_format[field_name]
+
     def _custom_format_callback(self, field_name, old_value, new_value):
+        """Callback to remove std formats when a field is removed from custom_format.
+
+        This callback is triggered when a field is removed from _custom_format
+        dictionary, and removes the corresponding entries from _float_format,
+        _int_format, and _none_format if they exist.
+
+        Arguments:
+            field_name: Name of the field being removed
+            old_value: Previous value (unused)
+            new_value: New value (unused)
+        """
         if field_name in self._float_format:
             del self._float_format[field_name]
         if field_name in self._int_format:
