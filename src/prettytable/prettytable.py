@@ -96,6 +96,18 @@ VAlignType: TypeAlias = Literal["t", "m", "b"]
 HeaderStyleType: TypeAlias = Literal["cap", "title", "upper", "lower"] | None
 
 
+class ObservableDict(dict[str, Any]):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.callback = None
+
+    def __setitem__(self, key: str, value: Any):
+        old_value = self.get(key)
+        super().__setitem__(key, value)
+        if self.callback is not None and old_value != value:
+            self.callback(key, old_value, value)
+
+
 class OptionsType(TypedDict):
     title: str | None
     start: int
@@ -285,9 +297,6 @@ class PrettyTable:
         self.valign = {}
         self.max_width = {}
         self.min_width = {}
-        self.int_format = {}
-        self.float_format = {}
-        self.custom_format = {}
         self._style = None
 
         # Options
@@ -342,10 +351,20 @@ class PrettyTable:
             "break_on_hyphens",
         ]
 
-        self._none_format: dict[str, str | None] = {}
+        self._none_format: dict[str, str | None] = ObservableDict()
+        self._none_format.callback = self._remove_custom_format_callback
+
+        self._int_format: dict[str, str | None] = ObservableDict()
+        self._int_format.callback = self._remove_custom_format_callback
+
+        self._float_format: dict[str, str | None] = ObservableDict()
+        self._float_format.callback = self._remove_custom_format_callback
+
         self._custom_format: (
             Callable[[str, Any], str] | dict[str, Callable[[str, Any], str]]
-        ) = {}
+        ) = ObservableDict()
+        self._custom_format.callback = self._custom_format_callback
+
         self._kwargs = {}
         if field_names:
             self.field_names = field_names
@@ -772,6 +791,10 @@ class PrettyTable:
         self._validate_option("xhtml", val)
         self._xhtml = val
 
+    def _remove_custom_format_callback(self, field_name, old_value, new_value):
+        if field_name in self._custom_format:
+            del self._custom_format[field_name]
+
     @property
     def none_format(self) -> dict[str, str | None]:
         return self._none_format
@@ -789,17 +812,13 @@ class PrettyTable:
                 self._none_format[field] = None
             self._validate_none_format(val)
             for field in self._field_names:
-                if field in self._custom_format:
-                    del self._custom_format[field]
                 self._none_format[field] = val
         elif isinstance(val, dict) and val:
             for field, fval in val.items():
                 self._validate_none_format(fval)
-                if field in self._custom_format:
-                    del self._custom_format[field]
                 self._none_format[field] = fval
         else:
-            self._none_format = {}
+            self._none_format.clear()
 
     @property
     def field_names(self) -> list[str]:
@@ -1177,17 +1196,13 @@ class PrettyTable:
         if isinstance(val, str):
             self._validate_option("int_format", val)
             for field in self._field_names:
-                if field in self._custom_format:
-                    del self._custom_format[field]
                 self._int_format[field] = val
         elif isinstance(val, dict) and val:
             for field, fval in val.items():
                 self._validate_option("int_format", fval)
-                if field in self._custom_format:
-                    del self._custom_format[field]
                 self._int_format[field] = fval
         else:
-            self._int_format = {}
+            self._int_format.clear()
 
     @property
     def float_format(self) -> dict[str, str]:
@@ -1202,17 +1217,21 @@ class PrettyTable:
         if isinstance(val, str):
             self._validate_option("float_format", val)
             for field in self._field_names:
-                if field in self._custom_format:
-                    del self._custom_format[field]
                 self._float_format[field] = val
         elif isinstance(val, dict) and val:
             for field, fval in val.items():
                 self._validate_option("float_format", fval)
-                if field in self._custom_format:
-                    del self._custom_format[field]
                 self._float_format[field] = fval
         else:
-            self._float_format = {}
+            self._float_format.clear()
+
+    def _custom_format_callback(self, field_name, old_value, new_value):
+        if field_name in self._float_format:
+            del self._float_format[field_name]
+        if field_name in self._int_format:
+            del self._int_format[field_name]
+        if field_name in self._none_format:
+            del self._none_format[field_name]
 
     @property
     def custom_format(self) -> dict[str, Callable[[str, Any], str]]:
@@ -1227,31 +1246,21 @@ class PrettyTable:
         self,
         val: Callable[[str, Any], str] | dict[str, Callable[[str, Any], str]] | None,
     ):
-        def remove_column_formatter(field_name):
-            if field_name in self._float_format:
-                del self._float_format[field_name]
-            if field_name in self._int_format:
-                del self._int_format[field_name]
-            if field_name in self._none_format:
-                del self._none_format[field_name]
-
         if val is None:
-            self._custom_format = {}
+            self._custom_format.clear()
         elif isinstance(val, dict):
             for field, fval in val.items():
                 self._validate_function(f"custom_value.{field}", fval)
-                remove_column_formatter(field)
                 self._custom_format[field] = fval
         elif hasattr(val, "__call__"):
             self._validate_function("custom_value", val)
             for field in self._field_names:
-                remove_column_formatter(field)
                 self._custom_format[field] = val
         elif isinstance(val, str):
             msg = "The custom_format property need to be a dictionary or callable"
             raise TypeError(msg)
         else:
-            self._custom_format = {}
+            self._custom_format.clear()
 
     @property
     def padding_width(self) -> int:
