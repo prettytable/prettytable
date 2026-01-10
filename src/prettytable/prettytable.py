@@ -965,7 +965,7 @@ class PrettyTable:
     def _max_width_callback(self, field_name, old_value, new_value):
         """Callback to call validators if dict attrs are modified.
 
-        This callback is triggered when a field is modified from valign dict
+        This callback is triggered when a field is modified from max_width dict
         and calls the validator for the new val.
 
         Arguments:
@@ -998,7 +998,7 @@ class PrettyTable:
     def _min_width_callback(self, field_name, old_value, new_value):
         """Callback to call validators if dict attrs are modified.
 
-        This callback is triggered when a field is modified from valign dict
+        This callback is triggered when a field is modified from min_width dict
         and calls the validator for the new val.
 
         Arguments:
