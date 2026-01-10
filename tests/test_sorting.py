@@ -94,31 +94,41 @@ class TestSorting:
 
     def test_sort_slice(self) -> None:
         """Make sure sorting and slicing interact in the expected way"""
+        # Arrange
         table_new = PrettyTable(["Foo"])
         table_old = PrettyTable(["Foo"], oldsortslice=True)
         for i in range(20, 0, -1):
             table_new.add_row([i])
             table_old.add_row([i])
+
+        # Act
         new_style = table_new.get_string(sortby="Foo", end=10)
+        old_style = table_old.get_string(sortby="Foo", end=10)
+
+        # Assert
         assert "10" in new_style
         assert "20" not in new_style
-        oldstyle = table_old.get_string(sortby="Foo", end=10)
-        assert "10" not in oldstyle
-        assert "20" in oldstyle
+        assert "10" not in old_style
+        assert "20" in old_style
 
     def test_sort_slice_setter(self) -> None:
+        # Arrange
         table_new = PrettyTable(["Foo"])
         table_old = PrettyTable(["Foo"])
         table_old.oldsortslice = True
         for i in range(20, 0, -1):
             table_new.add_row([i])
             table_old.add_row([i])
+
+        # Act
         new_style = table_new.get_string(sortby="Foo", end=10)
+        old_style = table_old.get_string(sortby="Foo", end=10)
+
+        # Assert
         assert "10" in new_style
         assert "20" not in new_style
-        oldstyle = table_old.get_string(sortby="Foo", end=10)
-        assert "10" not in oldstyle
-        assert "20" in oldstyle
+        assert "10" not in old_style
+        assert "20" in old_style
 
     def test_sortby_at_class_declaration(self) -> None:
         """
