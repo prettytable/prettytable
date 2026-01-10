@@ -412,11 +412,11 @@ class TestAlignment:
         )
 
     def test_aligned_one_column_invalid(self, city_data: PrettyTable) -> None:
-        with pytest.raises(ValueError) as e:
+        with pytest.raises(ValueError):
             city_data.align["Population"] = "rice"
 
     def test_aligned_one_column_invalid_dict(self, city_data: PrettyTable) -> None:
-        with pytest.raises(ValueError) as e:
+        with pytest.raises(ValueError):
             city_data.align = {"Population": "rice"}
 
 
