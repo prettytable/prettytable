@@ -419,6 +419,7 @@ class TestAlignment:
         with pytest.raises(ValueError):
             city_data.align = {"Population": "rice"}  # type: ignore[dict-item]
 
+
 class TestOptionOverride:
     """Make sure all options are properly overwritten by get_string."""
 
