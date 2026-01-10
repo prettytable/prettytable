@@ -316,10 +316,6 @@ class PrettyTable:
         self._field_names: list[str] = []
         self._rows: list[RowType] = []
         self._dividers: list[bool] = []
-        self.align = {}
-        self.valign = {}
-        self.max_width = {}
-        self.min_width = {}
         self._style = None
 
         # Options
@@ -955,7 +951,7 @@ class PrettyTable:
     @valign.setter
     def valign(self, val: VAlignType | dict[str, VAlignType] | None) -> None:
         if not self._field_names:
-            self._valign = {}
+            self._valign.clear()
         if isinstance(val, str):
             for field in self._field_names:
                 self._valign[field] = val
@@ -997,7 +993,7 @@ class PrettyTable:
             for field, fval in val.items():
                 self._max_width[field] = fval
         else:
-            self._max_width = {}
+            self._max_width.clear()
 
     def _min_width_callback(self, field_name, old_value, new_value):
         """Callback to call validators if dict attrs are modified.
@@ -1030,7 +1026,7 @@ class PrettyTable:
             for field, fval in val.items():
                 self._min_width[field] = fval
         else:
-            self._min_width = {}
+            self._min_width.clear()
 
     @property
     def min_table_width(self) -> int | None:
