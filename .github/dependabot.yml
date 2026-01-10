@@ -14,6 +14,9 @@ updates:
         update-types:
           - "version-update:semver-minor"
           - "version-update:semver-patch"
+    cooldown:
+      default-days: 7
+
   - package-ecosystem: pip
     directory: "/"
     schedule:
@@ -23,3 +26,5 @@ updates:
     labels:
       - "changelog: skip"
       - "dependencies"
+    cooldown:
+      default-days: 7
