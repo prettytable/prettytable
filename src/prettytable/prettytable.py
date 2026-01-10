@@ -126,10 +126,9 @@ class ObservableDict(dict[str, Any]):
             value: The new value to set
         """
         old_value = self.get(key)
-        super().__setitem__(key, value)
         if self.callback is not None and old_value != value:
             self.callback(key, old_value, value)
-
+        super().__setitem__(key, value)
 
 class OptionsType(TypedDict):
     title: str | None
@@ -385,6 +384,19 @@ class PrettyTable:
 
         self._custom_format: dict[str, Callable[[str, Any], str]] = ObservableDict()
         self._custom_format.callback = self._custom_format_callback
+
+        self._align: dict[str, str | None] = ObservableDict()
+        self._align[BASE_ALIGN_VALUE] = "c"
+        self._align.callback = self._align_callback
+
+        self._valign: dict[str, str | None] = ObservableDict()
+        self._valign.callback = self._valign_callback
+
+        self._max_width: dict[str, str | None] = ObservableDict()
+        self._max_width.callback = self._max_width_callback
+
+        self._min_width: dict[str, str | None] = ObservableDict()
+        self._min_width.callback = self._min_width_callback
 
         self._kwargs = {}
         if field_names:
@@ -877,6 +889,20 @@ class PrettyTable:
         else:
             self.valign = "t"
 
+    def _align_callback(self, field_name, old_value, new_value):
+        """Callback to call validators if dict attrs are modified.
+
+        This callback is triggered when a field is modified from align dict and
+        calls the validator for the new val.
+
+        Arguments:
+            field_name: Name of the field being removed
+            old_value: Previous value (unused)
+            new_value: New value (unused)
+
+        """
+        self._validate_align(new_value)
+
     @property
     def align(self) -> dict[str, AlignType]:
         """Controls alignment of fields
@@ -888,7 +914,6 @@ class PrettyTable:
     @align.setter
     def align(self, val: AlignType | dict[str, AlignType] | None) -> None:
         if isinstance(val, str):
-            self._validate_align(val)
             if not self._field_names:
                 self._align = {BASE_ALIGN_VALUE: val}
             else:
@@ -896,7 +921,6 @@ class PrettyTable:
                     self._align[field] = val
         elif isinstance(val, dict) and val:
             for field, fval in val.items():
-                self._validate_align(fval)
                 self._align[field] = fval
         else:
             if not self._field_names:
@@ -904,6 +928,20 @@ class PrettyTable:
             else:
                 for field in self._field_names:
                     self._align[field] = "c"
+
+    def _valign_callback(self, field_name, old_value, new_value):
+        """Callback to call validators if dict attrs are modified.
+
+        This callback is triggered when a field is modified from valign dict
+        and calls the validator for the new val.
+
+        Arguments:
+            field_name: Name of the field being removed
+            old_value: Previous value (unused)
+            new_value: New value (unused)
+
+        """
+        self._validate_valign(new_value)
 
     @property
     def valign(self) -> dict[str, VAlignType]:
@@ -918,16 +956,28 @@ class PrettyTable:
         if not self._field_names:
             self._valign = {}
         if isinstance(val, str):
-            self._validate_valign(val)
             for field in self._field_names:
                 self._valign[field] = val
         elif isinstance(val, dict) and val:
             for field, fval in val.items():
-                self._validate_valign(fval)
                 self._valign[field] = fval
         else:
             for field in self._field_names:
                 self._valign[field] = "t"
+
+    def _max_width_callback(self, field_name, old_value, new_value):
+        """Callback to call validators if dict attrs are modified.
+
+        This callback is triggered when a field is modified from valign dict
+        and calls the validator for the new val.
+
+        Arguments:
+            field_name: Name of the field being removed
+            old_value: Previous value (unused)
+            new_value: New value (unused)
+
+        """
+        self._validate_option("max_width", new_value)
 
     @property
     def max_width(self) -> dict[str, int]:
@@ -940,15 +990,27 @@ class PrettyTable:
     @max_width.setter
     def max_width(self, val: int | dict[str, int] | None) -> None:
         if isinstance(val, int):
-            self._validate_option("max_width", val)
             for field in self._field_names:
                 self._max_width[field] = val
         elif isinstance(val, dict) and val:
             for field, fval in val.items():
-                self._validate_option("max_width", fval)
                 self._max_width[field] = fval
         else:
             self._max_width = {}
+
+    def _min_width_callback(self, field_name, old_value, new_value):
+        """Callback to call validators if dict attrs are modified.
+
+        This callback is triggered when a field is modified from valign dict
+        and calls the validator for the new val.
+
+        Arguments:
+            field_name: Name of the field being removed
+            old_value: Previous value (unused)
+            new_value: New value (unused)
+
+        """
+        self._validate_option("min_width", new_value)
 
     @property
     def min_width(self) -> dict[str, int]:
@@ -961,12 +1023,10 @@ class PrettyTable:
     @min_width.setter
     def min_width(self, val: int | dict[str, int] | None) -> None:
         if isinstance(val, int):
-            self._validate_option("min_width", val)
             for field in self._field_names:
                 self._min_width[field] = val
         elif isinstance(val, dict) and val:
             for field, fval in val.items():
-                self._validate_option("min_width", fval)
                 self._min_width[field] = fval
         else:
             self._min_width = {}

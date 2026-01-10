@@ -393,6 +393,29 @@ class TestAlignment:
             header=True
         ) == aligned_after_table.get_mediawiki_string(header=True)
 
+    def test_aligned_one_column(self, city_data: PrettyTable) -> None:
+        city_data.align["Population"] = "r"
+        assert city_data.get_string() == """
++-----------+------+------------+-----------------+
+| City name | Area | Population | Annual Rainfall |
++-----------+------+------------+-----------------+
+|  Adelaide | 1295 |    1158259 |      600.5      |
+|  Brisbane | 5905 |    1857594 |      1146.4     |
+|   Darwin  | 112  |     120900 |      1714.7     |
+|   Hobart  | 1357 |     205556 |      619.5      |
+|   Sydney  | 2058 |    4336374 |      1214.8     |
+| Melbourne | 1566 |    3806092 |      646.9      |
+|   Perth   | 5386 |    1554769 |      869.4      |
++-----------+------+------------+-----------------+""".strip()
+
+    def test_aligned_one_column_invalid(self, city_data: PrettyTable) -> None:
+        with pytest.raises(ValueError) as e:
+            city_data.align["Population"] = "rice"
+
+    def test_aligned_one_column_invalid_dict(self, city_data: PrettyTable) -> None:
+        with pytest.raises(ValueError) as e:
+            city_data.align = {"Population": "rice"}
+
 
 class TestOptionOverride:
     """Make sure all options are properly overwritten by get_string."""
