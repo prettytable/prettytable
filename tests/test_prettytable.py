@@ -646,12 +646,12 @@ class TestBasic:
 
     def test_no_blank_lines_with_float_format(self, city_data: PrettyTable) -> None:
         """No table should ever have blank lines in it."""
-        city_data.float_format = "6.2f"
+        city_data.float_format = "6.2"
         self._test_no_blank_lines(city_data)
 
     def test_all_lengths_equal_with_float_format(self, city_data: PrettyTable) -> None:
         """All lines in a table should be of the same length."""
-        city_data.float_format = "6.2f"
+        city_data.float_format = "6.2"
         self._test_all_length_equal(city_data)
 
     def test_no_blank_lines_from_csv(self, city_data_from_csv: PrettyTable) -> None:
@@ -812,11 +812,11 @@ def float_pt() -> PrettyTable:
 
 class TestFloatFormat:
     def test_no_decimals(self, float_pt: PrettyTable) -> None:
-        float_pt.float_format = ".0f"
+        float_pt.float_format = ".0"
         assert "." not in float_pt.get_string()
 
     def test_round_to_5dp(self, float_pt: PrettyTable) -> None:
-        float_pt.float_format = ".5f"
+        float_pt.float_format = ".5"
         string = float_pt.get_string()
         assert "3.14159" in string
         assert "3.141592" not in string
@@ -827,7 +827,7 @@ class TestFloatFormat:
         assert "1.414213" not in string
 
     def test_pad_with_2zeroes(self, float_pt: PrettyTable) -> None:
-        float_pt.float_format = "06.2f"
+        float_pt.float_format = "06.2"
         string = float_pt.get_string()
         assert "003.14" in string
         assert "002.72" in string
