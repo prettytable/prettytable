@@ -154,6 +154,38 @@ class TestNoneOption:
 """.strip()
         )
 
+    def test_replace_custom_format_with_none(self) -> None:
+        table = PrettyTable()
+        table.custom_format = {"Field 2": lambda f, v: f"'{v}'"}
+        table.add_row(["Hello", None, "World"])
+        table.none_format = "0123456789"
+        assert (
+            table.get_string().strip()
+            == """
++---------+------------+---------+
+| Field 1 |  Field 2   | Field 3 |
++---------+------------+---------+
+|  Hello  | 0123456789 |  World  |
++---------+------------+---------+
+""".strip()
+        )
+
+    def test_replace_custom_format_with_none_dict(self) -> None:
+        table = PrettyTable()
+        table.custom_format = {"Field 2": lambda f, v: f"'{v}'"}
+        table.add_row(["Hello", None, "World"])
+        table.none_format = {"Field 2": "0123456789"}
+        assert (
+            table.get_string().strip()
+            == """
++---------+------------+---------+
+| Field 1 |  Field 2   | Field 3 |
++---------+------------+---------+
+|  Hello  | 0123456789 |  World  |
++---------+------------+---------+
+""".strip()
+        )
+
 
 class TestBuildEquivalence:
     """Make sure that building a table row-by-row and column-by-column yield the same
@@ -1051,8 +1083,87 @@ class TestColumnFormattingfromDict:
 """.strip()
         )
 
+    def test_set_int_format_overwrite_dict(self, city_data: PrettyTable) -> None:
+        city_data.custom_format = {"Population": lambda f, v: f"'{v}'"}
+        city_data.int_format = {"Population": "20"}
+        assert (
+            city_data.get_string()
+            == """
++-----------+------+----------------------+-----------------+
+| City name | Area |      Population      | Annual Rainfall |
++-----------+------+----------------------+-----------------+
+|  Adelaide | 1295 |              1158259 |      600.5      |
+|  Brisbane | 5905 |              1857594 |      1146.4     |
+|   Darwin  | 112  |               120900 |      1714.7     |
+|   Hobart  | 1357 |               205556 |      619.5      |
+|   Sydney  | 2058 |              4336374 |      1214.8     |
+| Melbourne | 1566 |              3806092 |      646.9      |
+|   Perth   | 5386 |              1554769 |      869.4      |
++-----------+------+----------------------+-----------------+
+""".strip()
+        )
+
+    def test_set_int_format_overwrite(self, city_data: PrettyTable) -> None:
+        city_data.custom_format = {"Population": lambda f, v: f"'{v}'"}
+        city_data.int_format = "20"
+        assert (
+            city_data.get_string()
+            == """
++-----------+----------------------+----------------------+-----------------+
+| City name |         Area         |      Population      | Annual Rainfall |
++-----------+----------------------+----------------------+-----------------+
+|  Adelaide |                 1295 |              1158259 |      600.5      |
+|  Brisbane |                 5905 |              1857594 |      1146.4     |
+|   Darwin  |                  112 |               120900 |      1714.7     |
+|   Hobart  |                 1357 |               205556 |      619.5      |
+|   Sydney  |                 2058 |              4336374 |      1214.8     |
+| Melbourne |                 1566 |              3806092 |      646.9      |
+|   Perth   |                 5386 |              1554769 |      869.4      |
++-----------+----------------------+----------------------+-----------------+""".strip()
+        )
+
     def test_set_float_format(self, city_data: PrettyTable) -> None:
         city_data.float_format = {"Annual Rainfall": "4.2"}
+        assert (
+            city_data.get_string()
+            == """
++-----------+------+------------+-----------------+
+| City name | Area | Population | Annual Rainfall |
++-----------+------+------------+-----------------+
+|  Adelaide | 1295 |  1158259   |      600.50     |
+|  Brisbane | 5905 |  1857594   |     1146.40     |
+|   Darwin  | 112  |   120900   |     1714.70     |
+|   Hobart  | 1357 |   205556   |      619.50     |
+|   Sydney  | 2058 |  4336374   |     1214.80     |
+| Melbourne | 1566 |  3806092   |      646.90     |
+|   Perth   | 5386 |  1554769   |      869.40     |
++-----------+------+------------+-----------------+
+""".strip()
+        )
+
+    def test_set_float_format_overwrite_dict(self, city_data: PrettyTable) -> None:
+        city_data.custom_format = {"Annual Rainfall": lambda f, v: f"'{v}'"}
+        city_data.float_format = {"Annual Rainfall": "4.2"}
+        assert (
+            city_data.get_string()
+            == """
++-----------+------+------------+-----------------+
+| City name | Area | Population | Annual Rainfall |
++-----------+------+------------+-----------------+
+|  Adelaide | 1295 |  1158259   |      600.50     |
+|  Brisbane | 5905 |  1857594   |     1146.40     |
+|   Darwin  | 112  |   120900   |     1714.70     |
+|   Hobart  | 1357 |   205556   |      619.50     |
+|   Sydney  | 2058 |  4336374   |     1214.80     |
+| Melbourne | 1566 |  3806092   |      646.90     |
+|   Perth   | 5386 |  1554769   |      869.40     |
++-----------+------+------------+-----------------+
+""".strip()
+        )
+
+    def test_set_float_format_overwrite(self, city_data: PrettyTable) -> None:
+        city_data.custom_format = {"Annual Rainfall": lambda f, v: f"'{v}'"}
+        city_data.float_format = "4.2"
         assert (
             city_data.get_string()
             == """
@@ -1381,6 +1492,47 @@ class TestCustomFormatter:
 | 01 Feb 2021 | February | 54321.123 | 87,654,321 |
 +-------------+----------+-----------+------------+
 """.strip()
+        )
+
+    def test_overwrite_default_format(self, city_data: PrettyTable) -> None:
+        city_data.float_format = "6.2"
+        city_data.int_format = "10"
+        city_data.custom_format["Annual Rainfall"] = lambda f, v: f"+++{v:.4f}+++"
+        assert (
+            city_data.get_string()
+            == """
++-----------+------------+------------+-----------------+
+| City name |    Area    | Population | Annual Rainfall |
++-----------+------------+------------+-----------------+
+|  Adelaide |       1295 |    1158259 |  +++600.5000+++ |
+|  Brisbane |       5905 |    1857594 | +++1146.4000+++ |
+|   Darwin  |        112 |     120900 | +++1714.7000+++ |
+|   Hobart  |       1357 |     205556 |  +++619.5000+++ |
+|   Sydney  |       2058 |    4336374 | +++1214.8000+++ |
+| Melbourne |       1566 |    3806092 |  +++646.9000+++ |
+|   Perth   |       5386 |    1554769 |  +++869.4000+++ |
++-----------+------------+------------+-----------------+""".strip()
+        )
+
+    def test_overwrite_default_format_dict(self, city_data: PrettyTable) -> None:
+        city_data.none_format = "N/A"
+        city_data.float_format = "6.2"
+        city_data.int_format = "10"
+        city_data.custom_format = {"Annual Rainfall": lambda f, v: f"+++{v:.4f}+++"}
+        assert (
+            city_data.get_string()
+            == """
++-----------+------------+------------+-----------------+
+| City name |    Area    | Population | Annual Rainfall |
++-----------+------------+------------+-----------------+
+|  Adelaide |       1295 |    1158259 |  +++600.5000+++ |
+|  Brisbane |       5905 |    1857594 | +++1146.4000+++ |
+|   Darwin  |        112 |     120900 | +++1714.7000+++ |
+|   Hobart  |       1357 |     205556 |  +++619.5000+++ |
+|   Sydney  |       2058 |    4336374 | +++1214.8000+++ |
+| Melbourne |       1566 |    3806092 |  +++646.9000+++ |
+|   Perth   |       5386 |    1554769 |  +++869.4000+++ |
++-----------+------------+------------+-----------------+""".strip()
         )
 
 

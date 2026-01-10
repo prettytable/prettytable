@@ -96,6 +96,41 @@ VAlignType: TypeAlias = Literal["t", "m", "b"]
 HeaderStyleType: TypeAlias = Literal["cap", "title", "upper", "lower"] | None
 
 
+class ObservableDict(dict[str, Any]):
+    """A dictionary that notifies a callback when items are set or changed.
+
+    This dictionary subclass allows setting a callback function that will be
+    invoked whenever an item is set or its value changes. This is used to
+    maintain consistency between related format dictionaries.
+    """
+
+    def __init__(self, *args, **kwargs):
+        """Initialize the observable dictionary.
+
+        Arguments:
+            *args: Positional arguments passed to dict.__init__
+            **kwargs: Keyword arguments passed to dict.__init__
+        """
+        super().__init__(*args, **kwargs)
+        self.callback = None
+
+    def __setitem__(self, key: str, value: Any):
+        """Set an item and trigger callback if value changed.
+
+        Sets the item in the dictionary and calls the callback function
+        (if set) with the key, old value, and new value when the value
+        actually changes.
+
+        Arguments:
+            key: The dictionary key
+            value: The new value to set
+        """
+        old_value = self.get(key)
+        super().__setitem__(key, value)
+        if self.callback is not None and old_value != value:
+            self.callback(key, old_value, value)
+
+
 class OptionsType(TypedDict):
     title: str | None
     start: int
@@ -285,9 +320,6 @@ class PrettyTable:
         self.valign = {}
         self.max_width = {}
         self.min_width = {}
-        self.int_format = {}
-        self.float_format = {}
-        self.custom_format = {}
         self._style = None
 
         # Options
@@ -342,7 +374,18 @@ class PrettyTable:
             "break_on_hyphens",
         ]
 
-        self._none_format: dict[str, str | None] = {}
+        self._none_format: dict[str, str | None] = ObservableDict()
+        self._none_format.callback = self._remove_custom_format_callback
+
+        self._int_format: dict[str, str | None] = ObservableDict()
+        self._int_format.callback = self._remove_custom_format_callback
+
+        self._float_format: dict[str, str | None] = ObservableDict()
+        self._float_format.callback = self._remove_custom_format_callback
+
+        self._custom_format: dict[str, Callable[[str, Any], str]] = ObservableDict()
+        self._custom_format.callback = self._custom_format_callback
+
         self._kwargs = {}
         if field_names:
             self.field_names = field_names
@@ -776,9 +819,7 @@ class PrettyTable:
 
         val - The alternative representation to be used for None values
         """
-        if not self._field_names:
-            self._none_format = {}
-        elif isinstance(val, str):
+        if isinstance(val, str):
             for field in self._field_names:
                 self._none_format[field] = None
             self._validate_none_format(val)
@@ -789,8 +830,7 @@ class PrettyTable:
                 self._validate_none_format(fval)
                 self._none_format[field] = fval
         else:
-            for field in self._field_names:
-                self._none_format[field] = None
+            self._none_format.clear()
 
     @property
     def field_names(self) -> list[str]:
@@ -1174,7 +1214,7 @@ class PrettyTable:
                 self._validate_option("int_format", fval)
                 self._int_format[field] = fval
         else:
-            self._int_format = {}
+            self._int_format.clear()
 
     @property
     def float_format(self) -> dict[str, str]:
@@ -1195,7 +1235,41 @@ class PrettyTable:
                 self._validate_option("float_format", fval)
                 self._float_format[field] = fval
         else:
-            self._float_format = {}
+            self._float_format.clear()
+
+    def _remove_custom_format_callback(self, field_name, old_value, new_value):
+        """Callback to remove custom format when a field is removed from format dicts.
+
+        This callback is triggered when a field is removed from _none_format,
+        _int_format, or _float_format dictionaries, and removes the corresponding
+        entry from _custom_format if it exists.
+
+        Arguments:
+            field_name: Name of the field being removed
+            old_value: Previous value (unused)
+            new_value: New value (unused)
+        """
+        if field_name in self._custom_format:
+            del self._custom_format[field_name]
+
+    def _custom_format_callback(self, field_name, old_value, new_value):
+        """Callback to remove std formats when a field is removed from custom_format.
+
+        This callback is triggered when a field is removed from _custom_format
+        dictionary, and removes the corresponding entries from _float_format,
+        _int_format, and _none_format if they exist.
+
+        Arguments:
+            field_name: Name of the field being removed
+            old_value: Previous value (unused)
+            new_value: New value (unused)
+        """
+        if field_name in self._float_format:
+            del self._float_format[field_name]
+        if field_name in self._int_format:
+            del self._int_format[field_name]
+        if field_name in self._none_format:
+            del self._none_format[field_name]
 
     @property
     def custom_format(self) -> dict[str, Callable[[str, Any], str]]:
@@ -1210,12 +1284,23 @@ class PrettyTable:
         self,
         val: Callable[[str, Any], str] | dict[str, Callable[[str, Any], str]] | None,
     ):
+        """Set custom format for columns using callable functions.
+
+        Arguments:
+            val: Can be:
+                - None: Clears all custom formats
+                - dict: Dictionary mapping field names to callable functions
+                - callable: A single callable function applied to all fields
+
+        Raises:
+            TypeError: If val is not None, a dict, or a callable
+        """
         if val is None:
-            self._custom_format = {}
+            self._custom_format.clear()
         elif isinstance(val, dict):
-            for k, v in val.items():
-                self._validate_function(f"custom_value.{k}", v)
-            self._custom_format = val
+            for field, fval in val.items():
+                self._validate_function(f"custom_value.{field}", fval)
+                self._custom_format[field] = fval
         elif hasattr(val, "__call__"):
             self._validate_function("custom_value", val)
             for field in self._field_names:
@@ -2376,6 +2461,18 @@ class PrettyTable:
         return "\n".join(bits_str)
 
     def paginate(self, page_length: int = 58, line_break: str = "\f", **kwargs) -> str:
+        """Return string representation of table split into pages.
+
+        Arguments:
+
+        page_length - number of rows per page (default: 58)
+        line_break - string used to separate pages (default: "\f" form feed)
+        **kwargs - additional keyword arguments passed to get_string() method,
+            such as title, fields, header, border, etc.
+
+        The table is split into pages of the specified length, with each page
+        separated by the line_break character. All formatting options available
+        in get_string() can be used via kwargs."""
         pages: list[str] = []
         kwargs["start"] = kwargs.get("start", 0)
         true_end = kwargs.get("end", self.rowcount)
