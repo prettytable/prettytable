@@ -395,7 +395,9 @@ class TestAlignment:
 
     def test_aligned_one_column(self, city_data: PrettyTable) -> None:
         city_data.align["Population"] = "r"
-        assert city_data.get_string() == """
+        assert (
+            city_data.get_string()
+            == """
 +-----------+------+------------+-----------------+
 | City name | Area | Population | Annual Rainfall |
 +-----------+------+------------+-----------------+
@@ -407,6 +409,7 @@ class TestAlignment:
 | Melbourne | 1566 |    3806092 |      646.9      |
 |   Perth   | 5386 |    1554769 |      869.4      |
 +-----------+------+------------+-----------------+""".strip()
+        )
 
     def test_aligned_one_column_invalid(self, city_data: PrettyTable) -> None:
         with pytest.raises(ValueError) as e:

@@ -130,6 +130,7 @@ class ObservableDict(dict[str, Any]):
             self.callback(key, old_value, value)
         super().__setitem__(key, value)
 
+
 class OptionsType(TypedDict):
     title: str | None
     start: int
