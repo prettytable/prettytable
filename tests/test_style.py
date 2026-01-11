@@ -167,6 +167,8 @@ class TestStyle:
             pytest.param(
                 TableStyle.DEFAULT,
                 """
++---------------------------------+
+|           Helper Table          |
 +---+---------+---------+---------+
 |   | Field 1 | Field 2 | Field 3 |
 +---+---------+---------+---------+
@@ -185,12 +187,16 @@ class TestStyle:
 |  1  | value 1 |  value2 |  value3 |
 |  4  | value 4 |  value5 |  value6 |
 |  7  | value 7 |  value8 |  value9 |
+
+: Helper Table
 """,
                 id="MARKDOWN",
             ),
             pytest.param(
                 TableStyle.MSWORD_FRIENDLY,
                 """
++---------------------------------+
+|           Helper Table          |
 |   | Field 1 | Field 2 | Field 3 |
 | 1 | value 1 |  value2 |  value3 |
 | 4 | value 4 |  value5 |  value6 |
@@ -201,6 +207,8 @@ class TestStyle:
             pytest.param(
                 TableStyle.ORGMODE,
                 """
+|---------------------------------|
+|           Helper Table          |
 |---+---------+---------+---------|
 |   | Field 1 | Field 2 | Field 3 |
 |---+---------+---------+---------|
@@ -214,6 +222,7 @@ class TestStyle:
             pytest.param(
                 TableStyle.PLAIN_COLUMNS,
                 """
+Helper Table                           
          Field 1        Field 2        Field 3        
 1        value 1         value2         value3        
 4        value 4         value5         value6        
@@ -225,6 +234,8 @@ class TestStyle:
                 TableStyle.RANDOM,
                 """
 '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
+%                Helper Table           %
+'^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
 %    1     value 1     value2     value3%
 %    4     value 4     value5     value6%
 %    7     value 7     value8     value9%
@@ -235,7 +246,9 @@ class TestStyle:
             pytest.param(
                 TableStyle.DOUBLE_BORDER,
                 """
-╔═══╦═════════╦═════════╦═════════╗
+╔═════════════════════════════════╗
+║           Helper Table          ║
+╠═══╦═════════╦═════════╦═════════╣
 ║   ║ Field 1 ║ Field 2 ║ Field 3 ║
 ╠═══╬═════════╬═════════╬═════════╣
 ║ 1 ║ value 1 ║  value2 ║  value3 ║
@@ -247,7 +260,9 @@ class TestStyle:
             pytest.param(
                 TableStyle.SINGLE_BORDER,
                 """
-┌───┬─────────┬─────────┬─────────┐
+┌─────────────────────────────────┐
+│           Helper Table          │
+├───┬─────────┬─────────┬─────────┤
 │   │ Field 1 │ Field 2 │ Field 3 │
 ├───┼─────────┼─────────┼─────────┤
 │ 1 │ value 1 │  value2 │  value3 │
@@ -262,6 +277,7 @@ class TestStyle:
         self, helper_table: PrettyTable, style: TableStyle, expected: str
     ) -> None:
         random.seed(1234)
+        helper_table.title = "Helper Table"
         helper_table.set_style(style)
         assert helper_table.get_string().strip() == expected.strip()
 
