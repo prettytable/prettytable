@@ -97,7 +97,7 @@ class TestHtmlOutput:
         </tr>
     </tbody>
 </table>
-""".strip()  # noqa: E501
+""".strip()
         )
 
     def test_html_output_with_title(self, helper_table: PrettyTable) -> None:
@@ -181,7 +181,7 @@ class TestHtmlOutput:
         </tr>
     </tbody>
 </table>
-""".strip()  # noqa: E501
+""".strip()
         )
 
     def test_html_output_without_escaped_header(
@@ -309,7 +309,7 @@ class TestHtmlOutput:
         </tr>
     </tbody>
 </table>
-""".strip()  # noqa: E501
+""".strip()
         )
 
     def test_html_output_formatted_without_escaped_header(
@@ -337,7 +337,7 @@ class TestHtmlOutput:
     <tbody>
     </tbody>
 </table>
-""".strip()  # noqa: E501
+""".strip()
         )
 
     def test_html_output_formatted_without_escaped_data(
@@ -373,7 +373,7 @@ class TestHtmlOutput:
         </tr>
     </tbody>
 </table>
-""".strip()  # noqa: E501
+""".strip()
         )
 
     def test_html_output_formatted_with_escaped_header(
@@ -401,7 +401,7 @@ class TestHtmlOutput:
     <tbody>
     </tbody>
 </table>
-""".strip()  # noqa: E501
+""".strip()
         )
 
     def test_html_output_formatted_with_escaped_data(
@@ -437,7 +437,7 @@ class TestHtmlOutput:
         </tr>
     </tbody>
 </table>
-""".strip()  # noqa: E501
+""".strip()
         )
 
     def test_table_formatted_html_autoindex(self) -> None:
@@ -482,7 +482,7 @@ class TestHtmlOutput:
             <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 207</td>
         </tr>
     </tbody>
-</table>""".strip()  # noqa: E501
+</table>""".strip()
         )
 
     def test_internal_border_preserved_html(self, helper_table: PrettyTable) -> None:
@@ -523,7 +523,7 @@ class TestHtmlOutput:
         </tr>
     </tbody>
 </table>
-""".strip()  # noqa: E501
+""".strip()
         )
 
     def test_break_line_html(self) -> None:
