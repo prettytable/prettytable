@@ -535,7 +535,6 @@ class PrettyTable:
         new.field_names = self.field_names
         for attr in self._options:
             setattr(new, "_" + attr, getattr(self, "_" + attr))
-        new._align = self._align
         if isinstance(index, slice):
             for row in self._rows[index]:
                 new.add_row(row)
