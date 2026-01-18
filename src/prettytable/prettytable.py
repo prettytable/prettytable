@@ -504,20 +504,19 @@ class PrettyTable:
             return text + excess * " "
         elif align == "r":
             return excess * " " + text
-        else:
-            if excess % 2:
-                # Uneven padding
-                # Put more space on right if text is of odd length...
-                if _str_block_width(text) % 2:
-                    return (excess // 2) * " " + text + (excess // 2 + 1) * " "
-                # and more space on left if text is of even length
-                else:
-                    return (excess // 2 + 1) * " " + text + (excess // 2) * " "
-                # Why distribute extra space this way?  To match the behaviour of
-                # the inbuilt str.center() method.
+        elif excess % 2:
+            # Uneven padding
+            # Put more space on right if text is of odd length...
+            if _str_block_width(text) % 2:
+                return (excess // 2) * " " + text + (excess // 2 + 1) * " "
+            # and more space on left if text is of even length
             else:
-                # Equal padding on either side
-                return (excess // 2) * " " + text + (excess // 2) * " "
+                return (excess // 2 + 1) * " " + text + (excess // 2) * " "
+            # Why distribute extra space this way?  To match the behaviour of
+            # the inbuilt str.center() method.
+        else:
+            # Equal padding on either side
+            return (excess // 2) * " " + text + (excess // 2) * " "
 
     def __getattr__(self, name):
         if name == "rowcount":
@@ -898,12 +897,11 @@ class PrettyTable:
             for field, fval in val.items():
                 self._validate_align(fval)
                 self._align[field] = fval
+        elif not self._field_names:
+            self._align = {BASE_ALIGN_VALUE: "c"}
         else:
-            if not self._field_names:
-                self._align = {BASE_ALIGN_VALUE: "c"}
-            else:
-                for field in self._field_names:
-                    self._align[field] = "c"
+            for field in self._field_names:
+                self._align[field] = "c"
 
     @property
     def valign(self) -> dict[str, VAlignType]:
