@@ -54,11 +54,9 @@ local_scheme = "no-local-version"
 [tool.ruff]
 fix = true
 
-lint.select = [
+lint.extend-select = [
   "C4",     # flake8-comprehensions
-  "E",      # pycodestyle errors
   "EM",     # flake8-errmsg
-  "F",      # pyflakes
   "I",      # isort
   "ICN",    # flake8-import-conventions
   "ISC",    # flake8-implicit-str-concat
@@ -73,10 +71,6 @@ lint.select = [
   "YTT",    # flake8-2020
 ]
 lint.ignore = [
-  "E203",   # Whitespace before ':'
-  "E221",   # Multiple spaces before operator
-  "E226",   # Missing whitespace around arithmetic operator
-  "E241",   # Multiple spaces after ','
   "PIE790", # flake8-pie: unnecessary-placeholder
 ]
 lint.flake8-import-conventions.aliases.datetime = "dt"
