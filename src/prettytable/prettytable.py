@@ -521,12 +521,7 @@ class PrettyTable:
         if name == "rowcount":
             return len(self._rows)
         elif name == "colcount":
-            if self._field_names:
-                return len(self._field_names)
-            elif self._rows:
-                return len(self._rows[0])
-            else:
-                return 0
+            return len(self._field_names)
         else:
             raise AttributeError(name)
 

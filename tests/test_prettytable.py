@@ -550,6 +550,15 @@ class TestBasic:
         table.add_rows([])
         assert str(city_data) == str(table)
 
+    def test_add_row_toolong(self) -> None:
+        table = PrettyTable(CITY_DATA_HEADER)
+        with pytest.raises(ValueError):
+            table.add_row(["Geelong", 1, 308915, 123.1, 1])
+
+    def test_add_column_invalid(self, city_data: PrettyTable) -> None:
+        with pytest.raises(ValueError):
+            city_data.add_column("City name", ["Geelong", 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
     def _test_no_blank_lines(self, table: PrettyTable) -> None:
         string = table.get_string()
         lines = string.split("\n")
@@ -680,6 +689,10 @@ class TestBasic:
     def test_colcount(self, city_data: PrettyTable) -> None:
         assert city_data.colcount == 4
 
+    def test_colcount_empty(self) -> None:
+        table = PrettyTable()
+        assert table.colcount == 0
+
     def test_getitem(self, city_data: PrettyTable) -> None:
         assert (
             city_data[1].get_string()
@@ -693,6 +706,96 @@ class TestBasic:
     def test_invalid_getitem(self, city_data: PrettyTable) -> None:
         with pytest.raises(IndexError):
             assert city_data[10]
+
+    def test_header_style_upper(self) -> None:
+        table = PrettyTable(header_style="upper")
+        table.add_row([1, 2, 3])
+        assert (
+            table.get_string()
+            == """
++---------+---------+---------+
+| FIELD 1 | FIELD 2 | FIELD 3 |
++---------+---------+---------+
+|    1    |    2    |    3    |
++---------+---------+---------+
+""".strip()
+        )
+
+    def test_header_style_upper_setter(self) -> None:
+        table = PrettyTable()
+        table.header_style = "upper"
+        table.add_row([1, 2, 3])
+        assert (
+            table.get_string()
+            == """
++---------+---------+---------+
+| FIELD 1 | FIELD 2 | FIELD 3 |
++---------+---------+---------+
+|    1    |    2    |    3    |
++---------+---------+---------+
+""".strip()
+        )
+
+    def test_header_style_cap(self) -> None:
+        table = PrettyTable(["cOl oNE", "col two", "COL THREE"], header_style="cap")
+        table.add_row([1, 2, 3])
+        assert (
+            table.get_string()
+            == """
++---------+---------+-----------+
+| Col one | Col two | Col three |
++---------+---------+-----------+
+|    1    |    2    |     3     |
++---------+---------+-----------+
+""".strip()
+        )
+
+    def test_header_style_title(self) -> None:
+        table = PrettyTable(["cOl oNE", "col two", "COL THREE"], header_style="title")
+        table.add_row([1, 2, 3])
+        assert (
+            table.get_string()
+            == """
++---------+---------+-----------+
+| Col One | Col Two | Col Three |
++---------+---------+-----------+
+|    1    |    2    |     3     |
++---------+---------+-----------+
+""".strip()
+        )
+
+    def test_header_style_lower(self) -> None:
+        table = PrettyTable(header_style="lower")
+        table.add_row([1, 2, 3])
+        assert (
+            table.get_string()
+            == """
++---------+---------+---------+
+| field 1 | field 2 | field 3 |
++---------+---------+---------+
+|    1    |    2    |    3    |
++---------+---------+---------+
+""".strip()
+        )
+
+    def test_horizontal_align_char_setter(self) -> None:
+        table = PrettyTable()
+        table.horizontal_align_char = "!"
+        table.add_row([1, 2, 3])
+        assert (
+            table.get_string()
+            == """
++ !-----! + !-----! + !-----! +
+| Field 1 | Field 2 | Field 3 |
++ !-----! + !-----! + !-----! +
+|    1    |    2    |    3    |
++ !-----! + !-----! + !-----! +
+""".strip()
+        )
+
+    def test_header_style_invalid(self) -> None:
+        with pytest.raises(ValueError):
+            PrettyTable(header_style="FooBar")
 
     @pytest.mark.usefixtures("init_db")
     def test_no_blank_lines_from_db(self, db_cursor: sqlite3.Cursor) -> None:
@@ -710,9 +813,43 @@ class TestBasic:
         assert table is not None
         self._test_all_length_equal(table)
 
+    def test_border(self) -> None:
+        table = PrettyTable(border=False)
+        table.add_row([1, 2, "3"])
+        assert (
+            table.get_string().strip()
+            == """
+Field 1  Field 2  Field 3 
+    1        2        3    """.strip()  # noqa: W291
+        )
+
+    def test_reversesort(self) -> None:
+        table = PrettyTable(["A", "B", "C"], sortby="A", reversesort=True)
+        table.add_row([1, 2, "3"])
+        table.add_row([3, 4, "5"])
+        assert (
+            table.get_string().strip()
+            == """
++---+---+---+
+| A | B | C |
++---+---+---+
+| 3 | 4 | 5 |
+| 1 | 2 | 3 |
++---+---+---+""".strip()
+        )
+
 
 class TestEmptyTable:
     """Make sure the print_empty option works"""
+
+    def test_print_empty(self) -> None:
+        table = PrettyTable(print_empty=False)
+        assert table.get_string().strip() == ""
+
+    def test_print_empty_setter(self) -> None:
+        table = PrettyTable()
+        table.print_empty = False
+        assert table.get_string().strip() == ""
 
     def test_print_empty_true(self, city_data: PrettyTable) -> None:
         table = PrettyTable()
@@ -811,6 +948,21 @@ def float_pt() -> PrettyTable:
 
 
 class TestFloatFormat:
+    def test_empty(self, float_pt: PrettyTable) -> None:
+        float_pt.float_format = ""
+        assert (
+            float_pt.get_string()
+            == """
++----------+----------+
+| Constant |  Value   |
++----------+----------+
+|    Pi    | 3.141593 |
+|    e     | 2.718282 |
+| sqrt(2)  | 1.414214 |
++----------+----------+
+""".strip()
+        )
+
     def test_no_decimals(self, float_pt: PrettyTable) -> None:
         float_pt.float_format = ".0"
         assert "." not in float_pt.get_string()
