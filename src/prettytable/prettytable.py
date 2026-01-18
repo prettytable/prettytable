@@ -2561,17 +2561,12 @@ class PrettyTable:
                 objects.append(self.field_names)
         rows = self._get_rows(options)
         if options["fields"]:
-            for row in rows:
-                objects.append(
-                    {
-                        f: d
-                        for f, d in zip(self._field_names, row)
-                        if f in options["fields"]
-                    }
-                )
+            objects.extend(
+                {f: d for f, d in zip(self._field_names, row) if f in options["fields"]}
+                for row in rows
+            )
         else:
-            for row in rows:
-                objects.append(dict(zip(self._field_names, row)))
+            objects.extend(dict(zip(self._field_names, row)) for row in rows)
 
         return json.dumps(objects, **json_options)
 
