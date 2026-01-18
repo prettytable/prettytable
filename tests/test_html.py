@@ -440,6 +440,52 @@ class TestHtmlOutput:
 """.strip()
         )
 
+    def test_escape_ctor(self) -> None:
+        table = PrettyTable(["<>", "&"], escape_data=False, escape_header=False)
+        table.add_row(["<>", "&"])
+        assert (
+            table.get_html_string().strip()
+            == """
+<table>
+    <thead>
+        <tr>
+            <th><></th>
+            <th>&</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><></td>
+            <td>&</td>
+        </tr>
+    </tbody>
+</table>""".strip()
+        )
+
+    def test_escape_setter(self) -> None:
+        table = PrettyTable(["<>", "&"])
+        table.escape_data = False
+        table.escape_header = False
+        table.add_row(["<>", "&"])
+        assert (
+            table.get_html_string().strip()
+            == """
+<table>
+    <thead>
+        <tr>
+            <th><></th>
+            <th>&</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><></td>
+            <td>&</td>
+        </tr>
+    </tbody>
+</table>""".strip()
+        )
+
     def test_table_formatted_html_autoindex(self) -> None:
         """See also #199"""
         table = PrettyTable(["Field 1", "Field 2", "Field 3"])
