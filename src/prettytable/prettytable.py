@@ -1947,7 +1947,7 @@ class PrettyTable:
     def _compute_table_width(self, options) -> int:
         if options["vrules"] == VRuleStyle.FRAME:
             table_width = 2
-        if options["vrules"] == VRuleStyle.ALL:
+        elif options["vrules"] == VRuleStyle.ALL:
             table_width = 1
         else:
             table_width = 0
