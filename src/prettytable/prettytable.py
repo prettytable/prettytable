@@ -2744,15 +2744,14 @@ class PrettyTable:
         lines.append("    <tbody>")
         rows = self._get_rows(options)
         formatted_rows = self._format_rows(rows)
-        aligns: list[str] = []
-        valigns: list[str] = []
-        for field in self._field_names:
-            aligns.append(
-                {"l": "left", "r": "right", "c": "center"}[self._align[field]]
-            )
-            valigns.append(
-                {"t": "top", "m": "middle", "b": "bottom"}[self._valign[field]]
-            )
+        aligns: list[str] = [
+            {"l": "left", "r": "right", "c": "center"}[self._align[field]]
+            for field in self._field_names
+        ]
+        valigns: list[str] = [
+            {"t": "top", "m": "middle", "b": "bottom"}[self._valign[field]]
+            for field in self._field_names
+        ]
         for row in formatted_rows:
             lines.append("        <tr>")
             for field, datum, align, valign in zip(
@@ -2817,7 +2816,6 @@ class PrettyTable:
     def _get_simple_latex_string(self, options: OptionsType) -> str:
         lines: list[str] = []
 
-        wanted_fields = []
         if options["fields"]:
             wanted_fields = [
                 field for field in self._field_names if field in options["fields"]
@@ -2928,12 +2926,9 @@ class PrettyTable:
         options = self._get_options(kwargs)
         lines: list[str] = []
 
-        if (
-            options.get("attributes")
-            and isinstance(options["attributes"], dict)
-            and options["attributes"]
-        ):
-            attr_str = " ".join(f'{k}="{v}"' for k, v in options["attributes"].items())
+        attributes_option = options.get("attributes")
+        if attributes_option and isinstance(attributes_option, dict):
+            attr_str = " ".join(f'{k}="{v}"' for k, v in attributes_option.items())
             lines.append("{| " + attr_str)
         else:
             lines.append('{| class="wikitable"')
@@ -2942,14 +2937,15 @@ class PrettyTable:
         if caption:
             lines.append("|+ " + caption)
 
+        fields_option = options.get("fields")
         if options.get("header"):
             lines.append("|-")
-            headers = []
-            fields_option = options.get("fields")
-            for field in self._field_names:
-                if fields_option is not None and field not in fields_option:
-                    continue
-                headers.append(field)
+            if fields_option is None:
+                headers = self._field_names
+            else:
+                headers = [
+                    field for field in self._field_names if field in fields_option
+                ]
             if headers:
                 header_line = " !! ".join(headers)
                 lines.append("! " + header_line)
@@ -2958,12 +2954,14 @@ class PrettyTable:
         formatted_rows = self._format_rows(rows)
         for row in formatted_rows:
             lines.append("|-")
-            cells = []
-            fields_option = options.get("fields")
-            for field, cell in zip(self._field_names, row):
-                if fields_option is not None and field not in fields_option:
-                    continue
-                cells.append(cell)
+            if fields_option is None:
+                cells = row
+            else:
+                cells = [
+                    cell
+                    for field, cell in zip(self._field_names, row)
+                    if field in fields_option
+                ]
             if cells:
                 lines.append("| " + " || ".join(cells))
 
