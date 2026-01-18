@@ -535,7 +535,6 @@ class PrettyTable:
         new.field_names = self.field_names
         for attr in self._options:
             setattr(new, "_" + attr, getattr(self, "_" + attr))
-        setattr(new, "_align", getattr(self, "_align"))
         if isinstance(index, slice):
             for row in self._rows[index]:
                 new.add_row(row)
@@ -741,7 +740,7 @@ class PrettyTable:
 
     def _validate_function(self, name, val):
         try:
-            assert hasattr(val, "__call__")
+            assert callable(val)
         except AssertionError:
             msg = f"Invalid value for {name}. Must be a function."
             raise ValueError(msg)
@@ -1304,7 +1303,7 @@ class PrettyTable:
             for field, fval in val.items():
                 self._validate_function(f"custom_value.{field}", fval)
                 self._custom_format[field] = fval
-        elif hasattr(val, "__call__"):
+        elif callable(val):
             self._validate_function("custom_value", val)
             for field in self._field_names:
                 self._custom_format[field] = val
