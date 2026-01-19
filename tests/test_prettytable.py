@@ -413,11 +413,11 @@ class TestAlignment:
 
     def test_aligned_one_column_invalid(self, city_data: PrettyTable) -> None:
         with pytest.raises(ValueError):
-            city_data.align["Population"] = "rice"  # type: ignore[assignment]
+            city_data.align["Population"] = "unexpected"  # type: ignore[assignment]
 
     def test_aligned_one_column_invalid_dict(self, city_data: PrettyTable) -> None:
         with pytest.raises(ValueError):
-            city_data.align = {"Population": "rice"}  # type: ignore[dict-item]
+            city_data.align = {"Population": "unexpected"}  # type: ignore[dict-item]
 
 
 class TestOptionOverride:

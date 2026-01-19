@@ -389,10 +389,10 @@ class PrettyTable:
         self._valign: dict[str, str | None] = ObservableDict()
         self._valign.callback = self._valign_callback
 
-        self._max_width: dict[str, str | None] = ObservableDict()
+        self._max_width: dict[str, int | None] = ObservableDict()
         self._max_width.callback = self._max_width_callback
 
-        self._min_width: dict[str, str | None] = ObservableDict()
+        self._min_width: dict[str, int | None] = ObservableDict()
         self._min_width.callback = self._min_width_callback
 
         self._kwargs = {}
@@ -890,10 +890,10 @@ class PrettyTable:
         """Callback to call validators if dict attrs are modified.
 
         This callback is triggered when a field is modified from align dict and
-        calls the validator for the new val.
+        calls the validator for the new value.
 
         Arguments:
-            field_name: Name of the field being removed
+            field_name: Name of the field being modified
             old_value: Previous value (unused)
             new_value: New value (unused)
 
@@ -930,10 +930,10 @@ class PrettyTable:
         """Callback to call validators if dict attrs are modified.
 
         This callback is triggered when a field is modified from valign dict
-        and calls the validator for the new val.
+        and calls the validator for the new value.
 
         Arguments:
-            field_name: Name of the field being removed
+            field_name: Name of the field being modified
             old_value: Previous value (unused)
             new_value: New value (unused)
 
@@ -966,10 +966,10 @@ class PrettyTable:
         """Callback to call validators if dict attrs are modified.
 
         This callback is triggered when a field is modified from max_width dict
-        and calls the validator for the new val.
+        and calls the validator for the new value.
 
         Arguments:
-            field_name: Name of the field being removed
+            field_name: Name of the field being modified
             old_value: Previous value (unused)
             new_value: New value (unused)
 
@@ -999,10 +999,10 @@ class PrettyTable:
         """Callback to call validators if dict attrs are modified.
 
         This callback is triggered when a field is modified from min_width dict
-        and calls the validator for the new val.
+        and calls the validator for the new value.
 
         Arguments:
-            field_name: Name of the field being removed
+            field_name: Name of the field being modified
             old_value: Previous value (unused)
             new_value: New value (unused)
 
