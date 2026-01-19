@@ -182,14 +182,14 @@ class TestStyle:
             pytest.param(
                 TableStyle.MARKDOWN,  # TODO fix
                 """
+**Helper Table**
+
 |     | Field 1 | Field 2 | Field 3 |
 | :-: | :-----: | :-----: | :-----: |
 |  1  | value 1 |  value2 |  value3 |
 |  4  | value 4 |  value5 |  value6 |
 |  7  | value 7 |  value8 |  value9 |
-
-: Helper Table
-""",
+""".strip(),
                 id="MARKDOWN",
             ),
             pytest.param(
