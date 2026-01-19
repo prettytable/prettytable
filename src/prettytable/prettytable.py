@@ -910,11 +910,11 @@ class PrettyTable:
         elif isinstance(val, dict) and val:
             for field, fval in val.items():
                 self._align[field] = fval
-        elif not self._field_names:
-            self._align = {BASE_ALIGN_VALUE: "c"}
-        else:
+        elif self._field_names:
             for field in self._field_names:
                 self._align[field] = "c"
+        else:
+            self._align = {BASE_ALIGN_VALUE: "c"}
 
     def _valign_callback(self, field_name, old_value, new_value):
         """Callback to call validators if dict attrs are modified.
