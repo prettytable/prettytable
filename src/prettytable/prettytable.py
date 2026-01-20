@@ -511,20 +511,19 @@ class PrettyTable:
             return text + excess * " "
         elif align == "r":
             return excess * " " + text
-        else:
-            if excess % 2:
-                # Uneven padding
-                # Put more space on right if text is of odd length...
-                if _str_block_width(text) % 2:
-                    return (excess // 2) * " " + text + (excess // 2 + 1) * " "
-                # and more space on left if text is of even length
-                else:
-                    return (excess // 2 + 1) * " " + text + (excess // 2) * " "
-                # Why distribute extra space this way?  To match the behaviour of
-                # the inbuilt str.center() method.
+        elif excess % 2:
+            # Uneven padding
+            # Put more space on right if text is of odd length...
+            if _str_block_width(text) % 2:
+                return (excess // 2) * " " + text + (excess // 2 + 1) * " "
+            # and more space on left if text is of even length
             else:
-                # Equal padding on either side
-                return (excess // 2) * " " + text + (excess // 2) * " "
+                return (excess // 2 + 1) * " " + text + (excess // 2) * " "
+            # Why distribute extra space this way?  To match the behaviour of
+            # the inbuilt str.center() method.
+        else:
+            # Equal padding on either side
+            return (excess // 2) * " " + text + (excess // 2) * " "
 
     def __getattr__(self, name):
         if name == "rowcount":
@@ -911,12 +910,11 @@ class PrettyTable:
         elif isinstance(val, dict) and val:
             for field, fval in val.items():
                 self._align[field] = fval
+        elif self._field_names:
+            for field in self._field_names:
+                self._align[field] = "c"
         else:
-            if not self._field_names:
-                self._align = {BASE_ALIGN_VALUE: "c"}
-            else:
-                for field in self._field_names:
-                    self._align[field] = "c"
+            self._align = {BASE_ALIGN_VALUE: "c"}
 
     def _valign_callback(self, field_name, old_value, new_value):
         """Callback to call validators if dict attrs are modified.
@@ -2447,11 +2445,7 @@ class PrettyTable:
             value = "\n".join(lines)
             row[index] = value
 
-        row_height = 0
-        for c in row:
-            h = _get_size(c)[1]
-            if h > row_height:
-                row_height = h
+        row_height = max(_get_size(c)[1] for c in row)
 
         bits: list[list[str]] = []
         lpad, rpad = self._get_padding_widths(options)
