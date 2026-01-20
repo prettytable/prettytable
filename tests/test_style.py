@@ -168,7 +168,7 @@ class TestStyle:
                 TableStyle.DEFAULT,
                 """
 +---------------------------------+
-|           Table Caption         |
+|          Table Caption          |
 +---+---------+---------+---------+
 |   | Field 1 | Field 2 | Field 3 |
 +---+---------+---------+---------+
@@ -222,7 +222,7 @@ class TestStyle:
             pytest.param(
                 TableStyle.PLAIN_COLUMNS,
                 """
-Table Caption                          
+Table Caption                           
          Field 1        Field 2        Field 3        
 1        value 1         value2         value3        
 4        value 4         value5         value6        
@@ -247,7 +247,7 @@ Table Caption
                 TableStyle.DOUBLE_BORDER,
                 """
 ╔═════════════════════════════════╗
-║           Table Caption         ║
+║          Table Caption          ║
 ╠═══╦═════════╦═════════╦═════════╣
 ║   ║ Field 1 ║ Field 2 ║ Field 3 ║
 ╠═══╬═════════╬═════════╬═════════╣
