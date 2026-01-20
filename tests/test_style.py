@@ -168,7 +168,7 @@ class TestStyle:
                 TableStyle.DEFAULT,
                 """
 +---------------------------------+
-|           Helper Table          |
+|           Table Caption         |
 +---+---------+---------+---------+
 |   | Field 1 | Field 2 | Field 3 |
 +---+---------+---------+---------+
@@ -182,7 +182,7 @@ class TestStyle:
             pytest.param(
                 TableStyle.MARKDOWN,  # TODO fix
                 """
-**Helper Table**
+**Table Caption**
 
 |     | Field 1 | Field 2 | Field 3 |
 | :-: | :-----: | :-----: | :-----: |
@@ -196,7 +196,7 @@ class TestStyle:
                 TableStyle.MSWORD_FRIENDLY,
                 """
 +---------------------------------+
-|           Helper Table          |
+|          Table Caption          |
 |   | Field 1 | Field 2 | Field 3 |
 | 1 | value 1 |  value2 |  value3 |
 | 4 | value 4 |  value5 |  value6 |
@@ -208,7 +208,7 @@ class TestStyle:
                 TableStyle.ORGMODE,
                 """
 |---------------------------------|
-|           Helper Table          |
+|          Table Caption          |
 |---+---------+---------+---------|
 |   | Field 1 | Field 2 | Field 3 |
 |---+---------+---------+---------|
@@ -222,7 +222,7 @@ class TestStyle:
             pytest.param(
                 TableStyle.PLAIN_COLUMNS,
                 """
-Helper Table                           
+Table Caption                          
          Field 1        Field 2        Field 3        
 1        value 1         value2         value3        
 4        value 4         value5         value6        
@@ -234,7 +234,7 @@ Helper Table
                 TableStyle.RANDOM,
                 """
 '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
-%                Helper Table           %
+%               Table Caption           %
 '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
 %    1     value 1     value2     value3%
 %    4     value 4     value5     value6%
@@ -247,7 +247,7 @@ Helper Table
                 TableStyle.DOUBLE_BORDER,
                 """
 ╔═════════════════════════════════╗
-║           Helper Table          ║
+║           Table Caption         ║
 ╠═══╦═════════╦═════════╦═════════╣
 ║   ║ Field 1 ║ Field 2 ║ Field 3 ║
 ╠═══╬═════════╬═════════╬═════════╣
@@ -261,7 +261,7 @@ Helper Table
                 TableStyle.SINGLE_BORDER,
                 """
 ┌─────────────────────────────────┐
-│           Helper Table          │
+│          Table Caption          │
 ├───┬─────────┬─────────┬─────────┤
 │   │ Field 1 │ Field 2 │ Field 3 │
 ├───┼─────────┼─────────┼─────────┤
@@ -277,7 +277,7 @@ Helper Table
         self, helper_table: PrettyTable, style: TableStyle, expected: str
     ) -> None:
         random.seed(1234)
-        helper_table.title = "Helper Table"
+        helper_table.title = "Table Caption"
         helper_table.set_style(style)
         assert helper_table.get_string().strip() == expected.strip()
 
