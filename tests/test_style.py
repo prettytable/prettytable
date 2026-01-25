@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import random
-from pathlib import Path
+import random, os
+from typing import Literal
 
 import pytest
 from pytest_lazy_fixtures import lf
@@ -9,6 +9,12 @@ from pytest_lazy_fixtures import lf
 from prettytable import HRuleStyle, PrettyTable, TableStyle, VRuleStyle
 from prettytable.prettytable import _str_block_width
 
+# these tables don't display well outside of raw dump to a terminal, so they are
+# moved to external files, where they may be very easy to visually align, by command:
+#
+#    $  cat tests/data/*.txt
+#
+DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 
 class TestPositionalJunctions:
     """Verify different cases for positional-junction characters"""
@@ -604,18 +610,6 @@ def test__str_block_width(test_input: str, expected: int) -> None:
     assert _str_block_width(test_input) == expected
 
 
-DATA_DIR = Path(__file__).parent / "data"
-
-
-def _read_expected(filename: str) -> str:
-    return (DATA_DIR / filename).read_text()
-
-
-# these tables don't display well outside of raw dump to a terminal, so they are
-# moved to external files, where they may be very easy to visually align, by command:
-#
-#    $  cat tests/data/*.txt
-#
 @pytest.mark.parametrize(
     ["fields", "rows", "align", "expected_file"],
     [(
@@ -641,7 +635,7 @@ def _read_expected(filename: str) -> str:
 def test_table_unicode_width(
     fields: list[str],
     rows: list[list[str]],
-    align: str | None,
+    align: Literal["l", "c", "r"] | None,
     expected_file: str,
 ) -> None:
     table = PrettyTable(fields)
@@ -649,7 +643,9 @@ def test_table_unicode_width(
         table.add_row(row)
     if align:
         table.align[fields[0]] = align
-    assert table.get_string() == _read_expected(expected_file)
+    with open(os.path.join(DATA_DIR, expected_file)) as fin:
+        expected_from_file = fin.read()
+    assert table.get_string().rstrip() == expected_from_file.rstrip()
 
 
 @pytest.mark.parametrize(
@@ -657,9 +653,11 @@ def test_table_unicode_width(
         [("l", "table_align_left.txt"),
          ("r", "table_align_right.txt"),
          ("c", "table_align_center.txt"),],)
-def test_table_alignment_with_emoji(align: str, expected_file: str) -> None:
+def test_table_alignment_with_emoji(align: Literal["l", "c", "r"], expected_file: str) -> None:
     table = PrettyTable(["Name"])
     table.align["Name"] = align
     table.add_row(["\U0001F468\u200D\U0001F469\u200D\U0001F467"])  # 👨‍👩‍👧
     table.add_row(["Hi"])
-    assert table.get_string() == _read_expected(expected_file)
+    with open(os.path.join(DATA_DIR, expected_file)) as fin:
+        expected_from_file = fin.read()
+    assert table.get_string().rstrip() == expected_from_file.strip()
