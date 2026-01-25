@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import random
+from pathlib import Path
 
 import pytest
 from pytest_lazy_fixtures import lf
@@ -579,15 +580,15 @@ def test_link_and_color() -> None:
         ("a", 1),
         ("abc", 3),
         ("abc def", 7),
-        ("\x1b[34mblue\x1b[39m", 4),
-        ("\033]8;;https://example.com\033\\link\033]8;;\033\\", 4),
+        ("\x1b[34mblue\x1b[39m", 4),  # ANSI color
+        ("\033]8;;https://example.com\033\\link\033]8;;\033\\", 4),  # OSC8 hyperlink
         ("\033]8;;https://example.com\033\\\x1b[34mblue link\x1b[39m\033]8;;\033\\", 9),
         ("\x1b[34m\033]8;;https://example.com\033\\blue link\033]8;;\033\\\x1b[39m", 9),
-        ("\u4e2d\u6587", 4),  # CJK wide characters
-        ("cafe\u0301", 4),  # combining acute accent
-        ("\U0001F468\u200D\U0001F469\u200D\U0001F467", 2),  # ZWJ family emoji
-        ("\u263A\uFE0F", 2),  # VS16 emoji
-        ("\U0001F1FA\U0001F1F8", 2),  # regional flag
+        ("\u4e2d\u6587", 4),  # 中文 CJK wide characters
+        ("cafe\u0301", 4),  # café combining acute accent
+        ("\U0001F468\u200D\U0001F469\u200D\U0001F467", 2),  # 👨‍👩‍👧 ZWJ family
+        ("\u263A\uFE0F", 2),  # ☺️ VS16 emoji
+        ("\U0001F1FA\U0001F1F8", 2),  # 🇺🇸 regional flag
         ("abc\x07def", 6),  # control code (bell)
     ],
 )
@@ -595,32 +596,75 @@ def test__str_block_width(test_input: str, expected: int) -> None:
     assert _str_block_width(test_input) == expected
 
 
-def test_table_with_zwj_emoji() -> None:
-    table = PrettyTable(["Emoji", "Name"])
-    table.add_row(["\U0001F468\u200D\U0001F469\u200D\U0001F467", "Family"])
-    table.add_row(["\U0001F1FA\U0001F1F8", "USA"])
-    table.add_row(["Hi", "Text"])
-    output = table.get_string()
-    lines = output.strip().split("\n")
-    assert len(lines[0]) == len(lines[2]) == len(lines[4]) == len(lines[6])
+DATA_DIR = Path(__file__).parent / "data"
 
 
-def test_table_with_combining_characters() -> None:
-    table = PrettyTable(["Word", "Length"])
-    table.add_row(["cafe\u0301", "4"])  # café with combining accent
-    table.add_row(["cafe", "4"])
-    output = table.get_string()
-    lines = output.strip().split("\n")
-    assert len(lines[0]) == len(lines[2]) == len(lines[4])
+def _read_expected(filename: str) -> str:
+    return (DATA_DIR / filename).read_text()
 
 
-def test_table_alignment_with_ansi_colors() -> None:
-    table = PrettyTable(["Status", "Count"])
-    table.add_row(["\x1b[32mOK\x1b[0m", "10"])
-    table.add_row(["\x1b[31mFailed\x1b[0m", "2"])
-    table.add_row(["Normal", "5"])
-    output = table.get_string()
-    import wcwidth
-    lines = output.strip().split("\n")
-    widths = [wcwidth.width(line) for line in lines]
-    assert all(w == widths[0] for w in widths)
+@pytest.mark.parametrize(
+    ["fields", "rows", "align", "expected_file"],
+    [
+        (
+            ["Emoji", "Name"],
+            [
+                ["\U0001F468\u200D\U0001F469\u200D\U0001F467", "Family"],  # 👨‍👩‍👧
+                ["\U0001F1FA\U0001F1F8", "USA"],  # 🇺🇸
+                ["Hi", "Text"],
+            ],
+            None,
+            "table_complex_emoji.txt",
+        ),
+        (
+            ["Word", "Lang"],
+            [["cafe\u0301", "FR"], ["cafe", "EN"]],  # café combining accent
+            None,
+            "table_combining_chars.txt",
+        ),
+        (
+            ["CJK", "Width"],
+            [["\u4e2d\u6587", "4"], ["Test", "4"]],  # 中文
+            None,
+            "table_cjk.txt",
+        ),
+        (
+            ["Status", "Count"],
+            [
+                ["\x1b[32mOK\x1b[0m", "10"],  # green
+                ["\x1b[31mFailed\x1b[0m", "2"],  # red
+                ["Normal", "5"],
+            ],
+            None,
+            "table_ansi_colors.txt",
+        ),
+    ],
+)
+def test_table_unicode_width(
+    fields: list[str],
+    rows: list[list[str]],
+    align: str | None,
+    expected_file: str,
+) -> None:
+    table = PrettyTable(fields)
+    for row in rows:
+        table.add_row(row)
+    if align:
+        table.align[fields[0]] = align
+    assert table.get_string() == _read_expected(expected_file)
+
+
+@pytest.mark.parametrize(
+    ["align", "expected_file"],
+    [
+        ("l", "table_align_left.txt"),
+        ("r", "table_align_right.txt"),
+        ("c", "table_align_center.txt"),
+    ],
+)
+def test_table_alignment_with_emoji(align: str, expected_file: str) -> None:
+    table = PrettyTable(["Name"])
+    table.align["Name"] = align
+    table.add_row(["\U0001F468\u200D\U0001F469\u200D\U0001F467"])  # 👨‍👩‍👧
+    table.add_row(["Hi"])
+    assert table.get_string() == _read_expected(expected_file)
