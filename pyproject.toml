@@ -30,7 +30,7 @@ classifiers = [
 ]
 dynamic = [ "version" ]
 dependencies = [
-  "wcwidth>=0.3.4",
+  "wcwidth>=0.3.5,<1",
 ]
 optional-dependencies.tests = [
   "pytest",
