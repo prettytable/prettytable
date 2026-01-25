@@ -581,27 +581,17 @@ def test_link_and_color() -> None:
         ("abc def", 7),
         ("\x1b[34mblue\x1b[39m", 4),
         ("\033]8;;https://example.com\033\\link\033]8;;\033\\", 4),
-        # colour inside link
         ("\033]8;;https://example.com\033\\\x1b[34mblue link\x1b[39m\033]8;;\033\\", 9),
-        # link inside colour
         ("\x1b[34m\033]8;;https://example.com\033\\blue link\033]8;;\033\\\x1b[39m", 9),
+        ("\u4e2d\u6587", 4),  # CJK wide characters
+        ("cafe\u0301", 4),  # combining acute accent
+        ("\U0001F468\u200D\U0001F469\u200D\U0001F467", 2),  # ZWJ family emoji
+        ("\u263A\uFE0F", 2),  # VS16 emoji
+        ("\U0001F1FA\U0001F1F8", 2),  # regional flag
+        ("abc\x07def", 6),  # control code (bell)
     ],
 )
 def test__str_block_width(test_input: str, expected: int) -> None:
-    assert _str_block_width(test_input) == expected
-
-
-@pytest.mark.parametrize(
-    ["test_input", "expected"],
-    [
-        ("\U0001F468\u200D\U0001F469\u200D\U0001F467", 2),  # 👨‍👩‍👧 ZWJ family
-        ("\u263A\uFE0F", 2),  # ☺️ smiley with VS16
-        ("\U0001F1FA\U0001F1F8", 2),  # 🇺🇸 USA flag
-        ("\U0001F1EF\U0001F1F5", 2),  # 🇯🇵 Japan flag
-        ("abc\x07def", 6),  # control code (bell) should be ignored
-    ],
-)
-def test__str_block_width_complex_emoji(test_input: str, expected: int) -> None:
     assert _str_block_width(test_input) == expected
 
 
@@ -613,3 +603,24 @@ def test_table_with_zwj_emoji() -> None:
     output = table.get_string()
     lines = output.strip().split("\n")
     assert len(lines[0]) == len(lines[2]) == len(lines[4]) == len(lines[6])
+
+
+def test_table_with_combining_characters() -> None:
+    table = PrettyTable(["Word", "Length"])
+    table.add_row(["cafe\u0301", "4"])  # café with combining accent
+    table.add_row(["cafe", "4"])
+    output = table.get_string()
+    lines = output.strip().split("\n")
+    assert len(lines[0]) == len(lines[2]) == len(lines[4])
+
+
+def test_table_alignment_with_ansi_colors() -> None:
+    table = PrettyTable(["Status", "Count"])
+    table.add_row(["\x1b[32mOK\x1b[0m", "10"])
+    table.add_row(["\x1b[31mFailed\x1b[0m", "2"])
+    table.add_row(["Normal", "5"])
+    output = table.get_string()
+    import wcwidth
+    lines = output.strip().split("\n")
+    widths = [wcwidth.width(line) for line in lines]
+    assert all(w == widths[0] for w in widths)

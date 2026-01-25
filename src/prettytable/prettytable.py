@@ -182,10 +182,6 @@ class OptionsType(TypedDict):
     break_on_hyphens: bool
 
 
-# ANSI colour codes
-_re = re.compile(r"\033\[[0-9;]*m|\033\(B")
-# OSC 8 hyperlinks
-_osc8_re = re.compile(r"\033\]8;;.*?\033\\(.*?)\033\]8;;\033\\")
 
 
 @lru_cache
@@ -513,20 +509,7 @@ class PrettyTable:
         elif align == "r":
             return wcwidth.rjust(text, width)
         else:
-            # Keep custom center logic for backwards compatibility
-            # (matches inbuilt str.center() parity-based padding distribution)
-            excess = width - _str_block_width(text)
-            if excess % 2:
-                # Uneven padding
-                # Put more space on right if text is of odd length...
-                if _str_block_width(text) % 2:
-                    return (excess // 2) * " " + text + (excess // 2 + 1) * " "
-                # and more space on left if text is of even length
-                else:
-                    return (excess // 2 + 1) * " " + text + (excess // 2) * " "
-            else:
-                # Equal padding on either side
-                return (excess // 2) * " " + text + (excess // 2) * " "
+            return wcwidth.center(text, width)
 
     def __getattr__(self, name):
         if name == "rowcount":
@@ -3032,8 +3015,6 @@ class PrettyTable:
 def _str_block_width(val: str) -> int:
     import wcwidth
 
-    val = _osc8_re.sub(r"\1", val)
-    val = _re.sub("", val)
     return wcwidth.width(val)
 
 
