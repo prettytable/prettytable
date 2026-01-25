@@ -1,3 +1,2 @@
 mypy==1.19.1
 types-colorama
-wcwidth-stubs
