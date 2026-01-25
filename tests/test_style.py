@@ -580,16 +580,24 @@ def test_link_and_color() -> None:
         ("a", 1),
         ("abc", 3),
         ("abc def", 7),
-        ("\x1b[34mblue\x1b[39m", 4),  # ANSI color
-        ("\033]8;;https://example.com\033\\link\033]8;;\033\\", 4),  # OSC8 hyperlink
+        ("\x1b[34mblue\x1b[39m", 4),
+        ("\033]8;;https://example.com\033\\link\033]8;;\033\\", 4),
+        # colour inside link
         ("\033]8;;https://example.com\033\\\x1b[34mblue link\x1b[39m\033]8;;\033\\", 9),
+        # link inside colour
         ("\x1b[34m\033]8;;https://example.com\033\\blue link\033]8;;\033\\\x1b[39m", 9),
-        ("\u4e2d\u6587", 4),  # 中文 CJK wide characters
-        ("cafe\u0301", 4),  # café combining acute accent
-        ("\U0001F468\u200D\U0001F469\u200D\U0001F467", 2),  # 👨‍👩‍👧 ZWJ family
-        ("\u263A\uFE0F", 2),  # ☺️ VS16 emoji
-        ("\U0001F1FA\U0001F1F8", 2),  # 🇺🇸 regional flag
-        ("abc\x07def", 6),  # control code (bell)
+        # 中文 CJK wide characters
+        ("\u4e2d\u6587", 4),
+        # café (combining acute accent)
+        ("cafe\u0301", 4),
+        # 👨‍👩‍👧 ZWJ family
+        ("\U0001F468\u200D\U0001F469\u200D\U0001F467", 2),
+        # ☺️ VS16 emoji
+        ("\u263A\uFE0F", 2),
+        # 🇺🇸 regional flag
+        ("\U0001F1FA\U0001F1F8", 2),
+        # control code (bell)
+        ("abc\x07def", 6),
     ],
 )
 def test__str_block_width(test_input: str, expected: int) -> None:
