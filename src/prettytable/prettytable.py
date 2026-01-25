@@ -182,8 +182,6 @@ class OptionsType(TypedDict):
     break_on_hyphens: bool
 
 
-
-
 @lru_cache
 def _get_size(text: str) -> tuple[int, int]:
     lines = text.split("\n")

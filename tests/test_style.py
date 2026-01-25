@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-import random, os
+import os
+import random
 from typing import Literal
 
 import pytest
@@ -15,6 +16,7 @@ from prettytable.prettytable import _str_block_width
 #    $  cat tests/data/*.txt
 #
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
+
 
 class TestPositionalJunctions:
     """Verify different cases for positional-junction characters"""
@@ -597,11 +599,11 @@ def test_link_and_color() -> None:
         # café (combining acute accent)
         ("cafe\u0301", 4),
         # 👨‍👩‍👧 ZWJ family
-        ("\U0001F468\u200D\U0001F469\u200D\U0001F467", 2),
+        ("\U0001f468\u200d\U0001f469\u200d\U0001f467", 2),
         # ☺️ VS16 emoji
-        ("\u263A\uFE0F", 2),
+        ("\u263a\ufe0f", 2),
         # 🇺🇸 regional flag
-        ("\U0001F1FA\U0001F1F8", 2),
+        ("\U0001f1fa\U0001f1f8", 2),
         # control code (bell)
         ("abc\x07def", 6),
     ],
@@ -612,26 +614,41 @@ def test__str_block_width(test_input: str, expected: int) -> None:
 
 @pytest.mark.parametrize(
     ["fields", "rows", "align", "expected_file"],
-    [(
-        ["Emoji", "Name"],
-        [["\U0001F468\u200D\U0001F469\u200D\U0001F467", "Family"],
-         ["\U0001F1FA\U0001F1F8", "USA"],
-         ["Hi", "Text"],
-         ], None, "table_complex_emoji.txt",
-    ), (
-        ["Word", "Lang"],
-        [["cafe\u0301", "FR"], ["cafe", "EN"]],
-        None, "table_combining_chars.txt",
-    ), (
-        ["CJK", "Width"],
-        [["\u4e2d\u6587", "4"], ["Test", "4"]],
-        None, "table_cjk.txt",
-    ), (
-        ["Status", "Count"],
-        [["\x1b[32mOK\x1b[0m", "10"],
-         ["\x1b[31mFailed\x1b[0m", "2"],
-         ["Normal", "5"],
-         ], None, "table_ansi_colors.txt",),],)
+    [
+        (
+            ["Emoji", "Name"],
+            [
+                ["\U0001f468\u200d\U0001f469\u200d\U0001f467", "Family"],
+                ["\U0001f1fa\U0001f1f8", "USA"],
+                ["Hi", "Text"],
+            ],
+            None,
+            "table_complex_emoji.txt",
+        ),
+        (
+            ["Word", "Lang"],
+            [["cafe\u0301", "FR"], ["cafe", "EN"]],
+            None,
+            "table_combining_chars.txt",
+        ),
+        (
+            ["CJK", "Width"],
+            [["\u4e2d\u6587", "4"], ["Test", "4"]],
+            None,
+            "table_cjk.txt",
+        ),
+        (
+            ["Status", "Count"],
+            [
+                ["\x1b[32mOK\x1b[0m", "10"],
+                ["\x1b[31mFailed\x1b[0m", "2"],
+                ["Normal", "5"],
+            ],
+            None,
+            "table_ansi_colors.txt",
+        ),
+    ],
+)
 def test_table_unicode_width(
     fields: list[str],
     rows: list[list[str]],
@@ -649,14 +666,19 @@ def test_table_unicode_width(
 
 
 @pytest.mark.parametrize(
-        ["align", "expected_file"],
-        [("l", "table_align_left.txt"),
-         ("r", "table_align_right.txt"),
-         ("c", "table_align_center.txt"),],)
-def test_table_alignment_with_emoji(align: Literal["l", "c", "r"], expected_file: str) -> None:
+    ["align", "expected_file"],
+    [
+        ("l", "table_align_left.txt"),
+        ("r", "table_align_right.txt"),
+        ("c", "table_align_center.txt"),
+    ],
+)
+def test_table_alignment_with_emoji(
+    align: Literal["l", "c", "r"], expected_file: str
+) -> None:
     table = PrettyTable(["Name"])
     table.align["Name"] = align
-    table.add_row(["\U0001F468\u200D\U0001F469\u200D\U0001F467"])  # 👨‍👩‍👧
+    table.add_row(["\U0001f468\u200d\U0001f469\u200d\U0001f467"])  # 👨‍👩‍👧
     table.add_row(["Hi"])
     with open(os.path.join(DATA_DIR, expected_file)) as fin:
         expected_from_file = fin.read()
