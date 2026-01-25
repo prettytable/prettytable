@@ -622,19 +622,16 @@ def test__str_block_width(test_input: str, expected: int) -> None:
                 ["\U0001f1fa\U0001f1f8", "USA"],
                 ["Hi", "Text"],
             ],
-            None,
             "table_complex_emoji.txt",
         ),
         (
             ["Word", "Lang"],
             [["cafe\u0301", "FR"], ["cafe", "EN"]],
-            None,
             "table_combining_chars.txt",
         ),
         (
             ["CJK", "Width"],
             [["\u4e2d\u6587", "4"], ["Test", "4"]],
-            None,
             "table_cjk.txt",
         ),
         (
@@ -644,7 +641,6 @@ def test__str_block_width(test_input: str, expected: int) -> None:
                 ["\x1b[31mFailed\x1b[0m", "2"],
                 ["Normal", "5"],
             ],
-            None,
             "table_ansi_colors.txt",
         ),
     ],
@@ -652,14 +648,11 @@ def test__str_block_width(test_input: str, expected: int) -> None:
 def test_table_unicode_width(
     fields: list[str],
     rows: list[list[str]],
-    align: Literal["l", "c", "r"] | None,
     expected_file: str,
 ) -> None:
     table = PrettyTable(fields)
     for row in rows:
         table.add_row(row)
-    if align:
-        table.align[fields[0]] = align
     with open(os.path.join(DATA_DIR, expected_file), encoding="utf-8") as fin:
         expected_from_file = fin.read()
     assert table.get_string().rstrip() == expected_from_file.rstrip()
