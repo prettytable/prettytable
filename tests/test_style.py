@@ -167,6 +167,8 @@ class TestStyle:
             pytest.param(
                 TableStyle.DEFAULT,
                 """
++---------------------------------+
+|          Table Caption          |
 +---+---------+---------+---------+
 |   | Field 1 | Field 2 | Field 3 |
 +---+---------+---------+---------+
@@ -180,17 +182,21 @@ class TestStyle:
             pytest.param(
                 TableStyle.MARKDOWN,  # TODO fix
                 """
+**Table Caption**
+
 |     | Field 1 | Field 2 | Field 3 |
 | :-: | :-----: | :-----: | :-----: |
 |  1  | value 1 |  value2 |  value3 |
 |  4  | value 4 |  value5 |  value6 |
 |  7  | value 7 |  value8 |  value9 |
-""",
+""".strip(),
                 id="MARKDOWN",
             ),
             pytest.param(
                 TableStyle.MSWORD_FRIENDLY,
                 """
++---------------------------------+
+|          Table Caption          |
 |   | Field 1 | Field 2 | Field 3 |
 | 1 | value 1 |  value2 |  value3 |
 | 4 | value 4 |  value5 |  value6 |
@@ -201,6 +207,8 @@ class TestStyle:
             pytest.param(
                 TableStyle.ORGMODE,
                 """
+|---------------------------------|
+|          Table Caption          |
 |---+---------+---------+---------|
 |   | Field 1 | Field 2 | Field 3 |
 |---+---------+---------+---------|
@@ -214,6 +222,7 @@ class TestStyle:
             pytest.param(
                 TableStyle.PLAIN_COLUMNS,
                 """
+Table Caption                           
          Field 1        Field 2        Field 3        
 1        value 1         value2         value3        
 4        value 4         value5         value6        
@@ -225,6 +234,8 @@ class TestStyle:
                 TableStyle.RANDOM,
                 """
 '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
+%               Table Caption           %
+'^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
 %    1     value 1     value2     value3%
 %    4     value 4     value5     value6%
 %    7     value 7     value8     value9%
@@ -235,7 +246,9 @@ class TestStyle:
             pytest.param(
                 TableStyle.DOUBLE_BORDER,
                 """
-╔═══╦═════════╦═════════╦═════════╗
+╔═════════════════════════════════╗
+║          Table Caption          ║
+╠═══╦═════════╦═════════╦═════════╣
 ║   ║ Field 1 ║ Field 2 ║ Field 3 ║
 ╠═══╬═════════╬═════════╬═════════╣
 ║ 1 ║ value 1 ║  value2 ║  value3 ║
@@ -247,7 +260,9 @@ class TestStyle:
             pytest.param(
                 TableStyle.SINGLE_BORDER,
                 """
-┌───┬─────────┬─────────┬─────────┐
+┌─────────────────────────────────┐
+│          Table Caption          │
+├───┬─────────┬─────────┬─────────┤
 │   │ Field 1 │ Field 2 │ Field 3 │
 ├───┼─────────┼─────────┼─────────┤
 │ 1 │ value 1 │  value2 │  value3 │
@@ -262,6 +277,7 @@ class TestStyle:
         self, helper_table: PrettyTable, style: TableStyle, expected: str
     ) -> None:
         random.seed(1234)
+        helper_table.title = "Table Caption"
         helper_table.set_style(style)
         assert helper_table.get_string().strip() == expected.strip()
 

@@ -2234,7 +2234,10 @@ class PrettyTable:
         # Add title
         title = options["title"] or self._title
         if title:
-            lines.append(self._stringify_title(title, options))
+            if self._style != TableStyle.MARKDOWN:
+                lines.append(self._stringify_title(title, options))
+            else:
+                lines.extend([f"**{title}**", ""])
 
         # Add header or top of border
         if options["header"]:
