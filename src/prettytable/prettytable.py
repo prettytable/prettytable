@@ -506,24 +506,27 @@ class PrettyTable:
             )
 
     def _justify(self, text: str, width: int, align: AlignType) -> str:
-        excess = width - _str_block_width(text)
+        import wcwidth
+
         if align == "l":
-            return text + excess * " "
+            return wcwidth.ljust(text, width)
         elif align == "r":
-            return excess * " " + text
-        elif excess % 2:
-            # Uneven padding
-            # Put more space on right if text is of odd length...
-            if _str_block_width(text) % 2:
-                return (excess // 2) * " " + text + (excess // 2 + 1) * " "
-            # and more space on left if text is of even length
-            else:
-                return (excess // 2 + 1) * " " + text + (excess // 2) * " "
-            # Why distribute extra space this way?  To match the behaviour of
-            # the inbuilt str.center() method.
+            return wcwidth.rjust(text, width)
         else:
-            # Equal padding on either side
-            return (excess // 2) * " " + text + (excess // 2) * " "
+            # Keep custom center logic for backwards compatibility
+            # (matches inbuilt str.center() parity-based padding distribution)
+            excess = width - _str_block_width(text)
+            if excess % 2:
+                # Uneven padding
+                # Put more space on right if text is of odd length...
+                if _str_block_width(text) % 2:
+                    return (excess // 2) * " " + text + (excess // 2 + 1) * " "
+                # and more space on left if text is of even length
+                else:
+                    return (excess // 2 + 1) * " " + text + (excess // 2) * " "
+            else:
+                # Equal padding on either side
+                return (excess // 2) * " " + text + (excess // 2) * " "
 
     def __getattr__(self, name):
         if name == "rowcount":
@@ -3030,7 +3033,8 @@ def _str_block_width(val: str) -> int:
     import wcwidth
 
     val = _osc8_re.sub(r"\1", val)
-    return wcwidth.wcswidth(_re.sub("", val))
+    val = _re.sub("", val)
+    return wcwidth.width(val)
 
 
 ##############################

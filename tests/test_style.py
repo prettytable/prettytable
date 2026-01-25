@@ -589,3 +589,27 @@ def test_link_and_color() -> None:
 )
 def test__str_block_width(test_input: str, expected: int) -> None:
     assert _str_block_width(test_input) == expected
+
+
+@pytest.mark.parametrize(
+    ["test_input", "expected"],
+    [
+        ("\U0001F468\u200D\U0001F469\u200D\U0001F467", 2),  # 👨‍👩‍👧 ZWJ family
+        ("\u263A\uFE0F", 2),  # ☺️ smiley with VS16
+        ("\U0001F1FA\U0001F1F8", 2),  # 🇺🇸 USA flag
+        ("\U0001F1EF\U0001F1F5", 2),  # 🇯🇵 Japan flag
+        ("abc\x07def", 6),  # control code (bell) should be ignored
+    ],
+)
+def test__str_block_width_complex_emoji(test_input: str, expected: int) -> None:
+    assert _str_block_width(test_input) == expected
+
+
+def test_table_with_zwj_emoji() -> None:
+    table = PrettyTable(["Emoji", "Name"])
+    table.add_row(["\U0001F468\u200D\U0001F469\u200D\U0001F467", "Family"])
+    table.add_row(["\U0001F1FA\U0001F1F8", "USA"])
+    table.add_row(["Hi", "Text"])
+    output = table.get_string()
+    lines = output.strip().split("\n")
+    assert len(lines[0]) == len(lines[2]) == len(lines[4]) == len(lines[6])
