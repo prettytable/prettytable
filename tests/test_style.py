@@ -613,7 +613,7 @@ def test__str_block_width(test_input: str, expected: int) -> None:
 
 
 @pytest.mark.parametrize(
-    ["fields", "rows", "align", "expected_file"],
+    ["fields", "rows", "expected_file"],
     [
         (
             ["Emoji", "Name"],
