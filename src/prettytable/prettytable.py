@@ -306,7 +306,7 @@ class PrettyTable:
         valign - default valign for each row (None, "t", "m" or "b")
         reversesort - True or False to sort in descending or ascending order
         oldsortslice - Slice rows before sorting in the "old style"
-        break_on_hyphens - Whether long lines are broken on hypens or not, default: True
+        break_on_hyphens - Whether long lines are broken on hyphens or not, default: True
         """
         self.encoding = kwargs.get("encoding", "UTF-8")
 
@@ -2652,7 +2652,7 @@ class PrettyTable:
             styling options (True or False)
         escape_data - escapes the text within a data field (True or False)
         xhtml - print <br/> tags if True, <br> tags if False
-        break_on_hyphens - Whether long lines are broken on hypens or not, default: True
+        break_on_hyphens - Whether long lines are broken on hyphens or not, default: True
         """
 
         options = self._get_options(kwargs)
