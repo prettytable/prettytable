@@ -603,43 +603,33 @@ def _read_expected(filename: str) -> str:
     return (DATA_DIR / filename).read_text()
 
 
+# these tables don't display well outside of raw dump to a terminal, so they are
+# moved to external files, where they may be very easy to visually align, by command:
+#
+#    $  cat tests/data/*.txt
+#
 @pytest.mark.parametrize(
     ["fields", "rows", "align", "expected_file"],
-    [
-        (
-            ["Emoji", "Name"],
-            [
-                ["\U0001F468\u200D\U0001F469\u200D\U0001F467", "Family"],  # 👨‍👩‍👧
-                ["\U0001F1FA\U0001F1F8", "USA"],  # 🇺🇸
-                ["Hi", "Text"],
-            ],
-            None,
-            "table_complex_emoji.txt",
-        ),
-        (
-            ["Word", "Lang"],
-            [["cafe\u0301", "FR"], ["cafe", "EN"]],  # café combining accent
-            None,
-            "table_combining_chars.txt",
-        ),
-        (
-            ["CJK", "Width"],
-            [["\u4e2d\u6587", "4"], ["Test", "4"]],  # 中文
-            None,
-            "table_cjk.txt",
-        ),
-        (
-            ["Status", "Count"],
-            [
-                ["\x1b[32mOK\x1b[0m", "10"],  # green
-                ["\x1b[31mFailed\x1b[0m", "2"],  # red
-                ["Normal", "5"],
-            ],
-            None,
-            "table_ansi_colors.txt",
-        ),
-    ],
-)
+    [(
+        ["Emoji", "Name"],
+        [["\U0001F468\u200D\U0001F469\u200D\U0001F467", "Family"],
+         ["\U0001F1FA\U0001F1F8", "USA"],
+         ["Hi", "Text"],
+         ], None, "table_complex_emoji.txt",
+    ), (
+        ["Word", "Lang"],
+        [["cafe\u0301", "FR"], ["cafe", "EN"]],
+        None, "table_combining_chars.txt",
+    ), (
+        ["CJK", "Width"],
+        [["\u4e2d\u6587", "4"], ["Test", "4"]],
+        None, "table_cjk.txt",
+    ), (
+        ["Status", "Count"],
+        [["\x1b[32mOK\x1b[0m", "10"],
+         ["\x1b[31mFailed\x1b[0m", "2"],
+         ["Normal", "5"],
+         ], None, "table_ansi_colors.txt",),],)
 def test_table_unicode_width(
     fields: list[str],
     rows: list[list[str]],
@@ -655,13 +645,10 @@ def test_table_unicode_width(
 
 
 @pytest.mark.parametrize(
-    ["align", "expected_file"],
-    [
-        ("l", "table_align_left.txt"),
-        ("r", "table_align_right.txt"),
-        ("c", "table_align_center.txt"),
-    ],
-)
+        ["align", "expected_file"],
+        [("l", "table_align_left.txt"),
+         ("r", "table_align_right.txt"),
+         ("c", "table_align_center.txt"),],)
 def test_table_alignment_with_emoji(align: str, expected_file: str) -> None:
     table = PrettyTable(["Name"])
     table.align["Name"] = align
