@@ -660,7 +660,7 @@ def test_table_unicode_width(
         table.add_row(row)
     if align:
         table.align[fields[0]] = align
-    with open(os.path.join(DATA_DIR, expected_file)) as fin:
+    with open(os.path.join(DATA_DIR, expected_file), encoding="utf-8") as fin:
         expected_from_file = fin.read()
     assert table.get_string().rstrip() == expected_from_file.rstrip()
 
@@ -680,6 +680,6 @@ def test_table_alignment_with_emoji(
     table.align["Name"] = align
     table.add_row(["\U0001f468\u200d\U0001f469\u200d\U0001f467"])  # 👨‍👩‍👧
     table.add_row(["Hi"])
-    with open(os.path.join(DATA_DIR, expected_file)) as fin:
+    with open(os.path.join(DATA_DIR, expected_file), encoding="utf-8") as fin:
         expected_from_file = fin.read()
     assert table.get_string().rstrip() == expected_from_file.strip()
