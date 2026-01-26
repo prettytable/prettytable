@@ -1,12 +1,21 @@
 from __future__ import annotations
 
+import os
 import random
+from typing import Literal
 
 import pytest
 from pytest_lazy_fixtures import lf
 
 from prettytable import HRuleStyle, PrettyTable, TableStyle, VRuleStyle
 from prettytable.prettytable import _str_block_width
+
+# these tables don't display well outside of raw dump to a terminal, so they are
+# moved to external files, where they may be very easy to visually align, by command:
+#
+#    $  cat tests/data/*.txt
+#
+DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 
 
 class TestPositionalJunctions:
@@ -601,7 +610,85 @@ def test_link_and_color() -> None:
         ("\033]8;;https://example.com\033\\\x1b[34mblue link\x1b[39m\033]8;;\033\\", 9),
         # link inside colour
         ("\x1b[34m\033]8;;https://example.com\033\\blue link\033]8;;\033\\\x1b[39m", 9),
+        # 中文 CJK wide characters
+        ("\u4e2d\u6587", 4),
+        # café (combining acute accent)
+        ("cafe\u0301", 4),
+        # 👨‍👩‍👧 ZWJ family
+        ("\U0001f468\u200d\U0001f469\u200d\U0001f467", 2),
+        # ☺️ VS16 emoji
+        ("\u263a\ufe0f", 2),
+        # 🇺🇸 regional flag
+        ("\U0001f1fa\U0001f1f8", 2),
+        # control code (bell)
+        ("abc\x07def", 6),
     ],
 )
 def test__str_block_width(test_input: str, expected: int) -> None:
     assert _str_block_width(test_input) == expected
+
+
+@pytest.mark.parametrize(
+    ["fields", "rows", "expected_file"],
+    [
+        (
+            ["Emoji", "Name"],
+            [
+                ["\U0001f468\u200d\U0001f469\u200d\U0001f467", "Family"],
+                ["\U0001f1fa\U0001f1f8", "USA"],
+                ["Hi", "Text"],
+            ],
+            "table_complex_emoji.txt",
+        ),
+        (
+            ["Word", "Lang"],
+            [["cafe\u0301", "FR"], ["cafe", "EN"]],
+            "table_combining_chars.txt",
+        ),
+        (
+            ["CJK", "Width"],
+            [["\u4e2d\u6587", "4"], ["Test", "4"]],
+            "table_cjk.txt",
+        ),
+        (
+            ["Status", "Count"],
+            [
+                ["\x1b[32mOK\x1b[0m", "10"],
+                ["\x1b[31mFailed\x1b[0m", "2"],
+                ["Normal", "5"],
+            ],
+            "table_ansi_colors.txt",
+        ),
+    ],
+)
+def test_table_unicode_width(
+    fields: list[str],
+    rows: list[list[str]],
+    expected_file: str,
+) -> None:
+    table = PrettyTable(fields)
+    for row in rows:
+        table.add_row(row)
+    with open(os.path.join(DATA_DIR, expected_file), encoding="utf-8") as fin:
+        expected_from_file = fin.read()
+    assert table.get_string().rstrip() == expected_from_file.rstrip()
+
+
+@pytest.mark.parametrize(
+    ["align", "expected_file"],
+    [
+        ("l", "table_align_left.txt"),
+        ("r", "table_align_right.txt"),
+        ("c", "table_align_center.txt"),
+    ],
+)
+def test_table_alignment_with_emoji(
+    align: Literal["l", "c", "r"], expected_file: str
+) -> None:
+    table = PrettyTable(["Name"])
+    table.align["Name"] = align
+    table.add_row(["\U0001f468\u200d\U0001f469\u200d\U0001f467"])  # 👨‍👩‍👧
+    table.add_row(["Hi"])
+    with open(os.path.join(DATA_DIR, expected_file), encoding="utf-8") as fin:
+        expected_from_file = fin.read()
+    assert table.get_string().rstrip() == expected_from_file.strip()
