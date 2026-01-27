@@ -32,7 +32,6 @@
 from __future__ import annotations
 
 import io
-import re
 from enum import IntEnum
 from functools import lru_cache
 from html.parser import HTMLParser
@@ -3207,11 +3206,11 @@ def from_mediawiki(wiki_text: str, **kwargs) -> PrettyTable:
         if line.startswith("|+"):
             continue
         if line.startswith("!"):
-            header = [cell.strip() for cell in re.split(r"\s*!!\s*", line[1:])]
+            header = [cell.strip() for cell in line[1:].split("!!")]
             table.field_names = header
             continue
         if line.startswith("|"):
-            row_data = [cell.strip() for cell in re.split(r"\s*\|\|\s*", line[1:])]
+            row_data = [cell.strip() for cell in line[1:].split("||")]
             rows.append(row_data)
             continue
 
