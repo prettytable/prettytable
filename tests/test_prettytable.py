@@ -819,6 +819,11 @@ class TestBasic:
 """.strip()
         )
 
+    def test_horizontal_align_char_getter(self) -> None:
+        table = PrettyTable()
+        table.horizontal_align_char = ":"
+        assert table.horizontal_align_char == ":"
+
     def test_header_style_invalid(self) -> None:
         with pytest.raises(ValueError):
             PrettyTable(header_style="FooBar")
