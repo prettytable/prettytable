@@ -2925,7 +2925,6 @@ class PrettyTable:
         # Data
         rows = self._get_rows(options)
         formatted_rows = self._format_rows(rows)
-        rows = self._get_rows(options)
         for row in formatted_rows:
             wanted_data = [
                 d for f, d in zip(self._field_names, row) if f in wanted_fields
