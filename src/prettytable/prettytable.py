@@ -2046,7 +2046,10 @@ class PrettyTable:
         # Are we under min_table_width or title width?
         if self._min_table_width or options["title"]:
             if options["title"]:
-                title_width = _str_block_width(options["title"]) + per_col_padding
+                title_width = (
+                    max(_str_block_width(line) for line in options["title"].split("\n"))
+                    + per_col_padding
+                )
                 if options["vrules"] in (VRuleStyle.FRAME, VRuleStyle.ALL):
                     title_width += 2
             else:
@@ -2220,7 +2223,7 @@ class PrettyTable:
             if self._style != TableStyle.MARKDOWN:
                 lines.append(self._stringify_title(title, options))
             else:
-                lines.extend([f"**{title}**", ""])
+                lines.extend([f"**{line}**" for line in title.split("\n")] + [""])
 
         # Add header or top of border
         if options["header"]:
@@ -2319,21 +2322,21 @@ class PrettyTable:
                 options["vrules"] = VRuleStyle.ALL
             elif options["vrules"] == VRuleStyle.FRAME:
                 lines.append(self._stringify_hrule(options, "top_"))
-        bits: list[str] = []
         endpoint = (
             options["vertical_char"]
             if options["vrules"] in (VRuleStyle.ALL, VRuleStyle.FRAME)
             and options["border"]
             else " "
         )
-        bits.append(endpoint)
-        title = " " * lpad + title + " " * rpad
         lpad, rpad = self._get_padding_widths(options)
         sum_widths = sum([n + lpad + rpad + 1 for n in self._widths])
-
-        bits.append(self._justify(title, sum_widths - 1, "c"))
-        bits.append(endpoint)
-        lines.append("".join(bits))
+        for title_line in title.split("\n"):
+            bits: list[str] = []
+            bits.append(endpoint)
+            padded = " " * lpad + title_line + " " * rpad
+            bits.append(self._justify(padded, sum_widths - 1, "c"))
+            bits.append(endpoint)
+            lines.append("".join(bits))
         return "\n".join(lines)
 
     def _stringify_header(self, options: OptionsType) -> str:
@@ -2669,7 +2672,11 @@ class PrettyTable:
         # Title
         title = options["title"] or self._title
         if title:
-            lines.append(f"    <caption>{escape(title)}</caption>")
+            lines.append(
+                f"    <caption>"
+                f"{escape(title).replace(chr(10), linebreak)}"
+                f"</caption>"
+            )
 
         # Headers
         if options["header"]:
@@ -2755,7 +2762,11 @@ class PrettyTable:
         # Title
         title = options["title"] or self._title
         if title:
-            lines.append(f"    <caption>{escape(title)}</caption>")
+            lines.append(
+                f"    <caption>"
+                f"{escape(title).replace(chr(10), linebreak)}"
+                f"</caption>"
+            )
 
         # Headers
         if options["header"]:

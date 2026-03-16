@@ -619,6 +619,34 @@ class TestBasic:
         city_data.title = "My table (75 characters wide) " + "=" * 45
         self._test_all_length_equal(city_data)
 
+    def test_multiline_title(self, city_data: PrettyTable) -> None:
+        """A title with \\n should produce multiple bordered title lines."""
+        city_data.title = "Line 1\nLine 2"
+        string = city_data.get_string()
+        lines = string.split("\n")
+        # First line is top hrule, next two are title lines
+        assert lines[1].startswith("|")
+        assert lines[1].endswith("|")
+        assert "Line 1" in lines[1]
+        assert "Line 2" in lines[2]
+
+    def test_multiline_title_no_blank_lines(self, city_data: PrettyTable) -> None:
+        """No table should ever have blank lines in it."""
+        city_data.title = "Line 1\nLine 2"
+        self._test_no_blank_lines(city_data)
+
+    def test_multiline_title_all_lengths_equal(self, city_data: PrettyTable) -> None:
+        """All lines in a table should be of the same length."""
+        city_data.title = "Line 1\nLine 2"
+        self._test_all_length_equal(city_data)
+
+    def test_multiline_title_html(self, city_data: PrettyTable) -> None:
+        """Multiline titles should use <br> in HTML caption."""
+        city_data.title = "Line 1\nLine 2"
+        html = city_data.get_html_string()
+        assert "<br>" in html
+        assert "<caption>" in html
+
     def test_no_blank_lines_without_border(self, city_data: PrettyTable) -> None:
         """No table should ever have blank lines in it."""
         city_data.border = False
