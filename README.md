@@ -514,6 +514,8 @@ In addition to `MARKDOWN` you can use these in-built styles:
 - `MSWORD_FRIENDLY` - A format which works nicely with Microsoft Word's "Convert to
   table" feature
 - `ORGMODE` - A table style that fits [Org mode](https://orgmode.org/) syntax
+- `RST` - A table style that produces reStructuredText
+  [grid tables](https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html#tables)
 - `SINGLE_BORDER` and `DOUBLE_BORDER` - Styles that use continuous single/double border
   lines with Box drawing characters for a fancier display on terminal
 
