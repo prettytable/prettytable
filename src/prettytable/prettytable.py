@@ -2454,7 +2454,7 @@ class PrettyTable:
         return "".join(bits)
 
     def _stringify_row(self, row: list[str], options: OptionsType, hrule: str) -> str:
-        import textwrap
+        import wcwidth
 
         for index, field, value, width in zip(
             range(len(row)), self._field_names, row, self._widths
@@ -2469,8 +2469,10 @@ class PrettyTable:
                 ):
                     line = none_val
                 if _str_block_width(line) > width:
-                    line = textwrap.fill(
-                        line, width, break_on_hyphens=options["break_on_hyphens"]
+                    line = "\n".join(
+                        wcwidth.wrap(
+                            line, width, break_on_hyphens=options["break_on_hyphens"]
+                        )
                     )
                 new_lines.append(line)
             lines = new_lines
