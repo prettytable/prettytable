@@ -2547,7 +2547,7 @@ class PrettyTable:
             else:
                 csv_writer.writerow(self._field_names)
 
-        rows = self._get_rows(options)
+        rows = self._format_rows(self._get_rows(options))
         if options["fields"]:
             rows = [
                 [d for f, d in zip(self._field_names, row) if f in options["fields"]]

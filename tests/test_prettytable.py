@@ -1381,6 +1381,22 @@ class TestCsvOutput:
             "value 7,value9\r\n"
         )
 
+    def test_csv_formatting(self) -> None:
+        table = PrettyTable()
+        table.add_column("Name", ["Alice", "Bob", "Charlie"])
+        table.add_column("int_format", [7, 0, -42])
+        table.add_column("float_format", [3.14159, 10.0, -2.71828])
+        table.add_column("custom_format", [1234, 0, -5678])
+        table.int_format["int_format"] = "05"
+        table.float_format["float_format"] = ".1"
+        table.custom_format["custom_format"] = lambda f, v: f"{v:,}"
+        assert table.get_csv_string() == (
+            "Name,int_format,float_format,custom_format\r\n"
+            'Alice,00007,3.1,"1,234"\r\n'
+            "Bob,00000,10.0,0\r\n"
+            'Charlie,-0042,-2.7,"-5,678"\r\n'
+        )
+
 
 def test_paginate(city_data: PrettyTable) -> None:
     expected_page_1 = """
