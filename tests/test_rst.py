@@ -70,24 +70,28 @@ def test_rst_style_does_not_leak(helper_table: PrettyTable) -> None:
 
 
 def test_rst_output_with_multiline_title(helper_table: PrettyTable) -> None:
+    # Arrange
     helper_table.set_style(TableStyle.RST)
+    # Act
     helper_table.title = "Line 1\nLine 2"
-    result = helper_table.get_string()
-    lines = result.splitlines()
-    # Top border
-    assert lines[0].startswith("+") and lines[0].endswith("+")
-    # Two title lines bordered with |
-    assert lines[1].startswith("|") and lines[1].endswith("|")
-    assert "Line 1" in lines[1]
-    assert lines[2].startswith("|") and lines[2].endswith("|")
-    assert "Line 2" in lines[2]
-    # Separator between title and header uses junction char +
-    assert lines[3].startswith("+") and lines[3].endswith("+")
-    # Header separator uses = (RST distinguishing feature)
-    header_sep = lines[5]
-    assert "=" in header_sep
-    # All lines should be the same length
-    assert len({len(line) for line in lines}) == 1
+    # Assert
+    assert (
+        helper_table.get_string()
+        == """
++---------------------------------+
+|              Line 1             |
+|              Line 2             |
++---+---------+---------+---------+
+|   | Field 1 | Field 2 | Field 3 |
++===+=========+=========+=========+
+| 1 | value 1 |  value2 |  value3 |
++---+---------+---------+---------+
+| 4 | value 4 |  value5 |  value6 |
++---+---------+---------+---------+
+| 7 | value 7 |  value8 |  value9 |
++---+---------+---------+---------+
+""".strip()
+    )
 
 
 def test_markdown_to_rst_does_not_leak(helper_table: PrettyTable) -> None:
