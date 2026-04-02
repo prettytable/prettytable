@@ -87,7 +87,7 @@ def test_rst_output_with_multiline_title(helper_table: PrettyTable) -> None:
     header_sep = lines[5]
     assert "=" in header_sep
     # All lines should be the same length
-    assert len(set(len(line) for line in lines)) == 1
+    assert len({len(line) for line in lines}) == 1
 
 
 def test_markdown_to_rst_does_not_leak(helper_table: PrettyTable) -> None:
