@@ -2720,11 +2720,8 @@ class PrettyTable:
         # Title
         title = options["title"] or self._title
         if title:
-            lines.append(
-                f"    <caption>"
-                f"{escape(title).replace(chr(10), linebreak)}"
-                f"</caption>"
-            )
+            caption = escape(title).replace("\n", linebreak)
+            lines.append(f"    <caption>{caption}</caption>")
 
         # Headers
         if options["header"]:
@@ -2810,11 +2807,8 @@ class PrettyTable:
         # Title
         title = options["title"] or self._title
         if title:
-            lines.append(
-                f"    <caption>"
-                f"{escape(title).replace(chr(10), linebreak)}"
-                f"</caption>"
-            )
+            caption = escape(title).replace("\n", linebreak)
+            lines.append(f"    <caption>{caption}</caption>")
 
         # Headers
         if options["header"]:
