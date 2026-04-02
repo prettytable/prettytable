@@ -67,6 +67,7 @@ class TableStyle(IntEnum):
     ORGMODE = 14
     DOUBLE_BORDER = 15
     SINGLE_BORDER = 16
+    RST = 17
     RANDOM = 20
 
 
@@ -158,6 +159,7 @@ class OptionsType(TypedDict):
     vertical_char: str
     horizontal_char: str
     horizontal_align_char: str
+    header_horizontal_char: str | None
     junction_char: str
     header_style: HeaderStyleType
     xhtml: bool
@@ -221,6 +223,7 @@ class PrettyTable:
     _vertical_char: str
     _horizontal_char: str
     _horizontal_align_char: str | None
+    _header_horizontal_char: str | None
     _junction_char: str
     _top_junction_char: str | None
     _bottom_junction_char: str | None
@@ -338,6 +341,7 @@ class PrettyTable:
             "vertical_char",
             "horizontal_char",
             "horizontal_align_char",
+            "header_horizontal_char",
             "junction_char",
             "header_style",
             "xhtml",
@@ -456,6 +460,7 @@ class PrettyTable:
         self._vertical_char = kwargs["vertical_char"] or "|"
         self._horizontal_char = kwargs["horizontal_char"] or "-"
         self._horizontal_align_char = kwargs["horizontal_align_char"]
+        self._header_horizontal_char = kwargs["header_horizontal_char"]
         self._junction_char = kwargs["junction_char"] or "+"
         self._top_junction_char = kwargs["top_junction_char"]
         self._bottom_junction_char = kwargs["bottom_junction_char"]
@@ -612,6 +617,7 @@ class PrettyTable:
             "vertical_char",
             "horizontal_char",
             "horizontal_align_char",
+            "header_horizontal_char",
             "junction_char",
             "top_junction_char",
             "bottom_junction_char",
@@ -1432,6 +1438,23 @@ class PrettyTable:
         self._horizontal_align_char = val
 
     @property
+    def header_horizontal_char(self) -> str | None:
+        """The character used when printing the header separator line
+
+        Arguments:
+
+        header_horizontal_char - single character string used to draw the header
+        separator, or None to use the same as horizontal_char"""
+        return self._header_horizontal_char
+
+    @header_horizontal_char.setter
+    def header_horizontal_char(self, val: str | None) -> None:
+        if val is not None:
+            val = str(val)
+            self._validate_option("header_horizontal_char", val)
+        self._header_horizontal_char = val
+
+    @property
     def junction_char(self) -> str:
         """The character used when printing table borders to draw line junctions
 
@@ -1693,6 +1716,8 @@ class PrettyTable:
             self._set_double_border_style()
         elif style == TableStyle.SINGLE_BORDER:
             self._set_single_border_style()
+        elif style == TableStyle.RST:
+            self._set_rst_style()
         elif style == TableStyle.RANDOM:
             self._set_random_style()
         elif style != TableStyle.DEFAULT:
@@ -1713,6 +1738,19 @@ class PrettyTable:
         self.junction_char = "|"
         self._horizontal_align_char = ":"
 
+    def _set_rst_style(self) -> None:
+        self.header = True
+        self.border = True
+        self._hrules = HRuleStyle.ALL
+        self.padding_width = 1
+        self.left_padding_width = 1
+        self.right_padding_width = 1
+        self.vertical_char = "|"
+        self.junction_char = "+"
+        self.horizontal_char = "-"
+        self._horizontal_align_char = None
+        self.header_horizontal_char = "="
+
     def _set_default_style(self) -> None:
         self.header = True
         self.border = True
@@ -1724,6 +1762,7 @@ class PrettyTable:
         self.vertical_char = "|"
         self.horizontal_char = "-"
         self._horizontal_align_char = None
+        self.header_horizontal_char = None
         self.junction_char = "+"
         self._top_junction_char = None
         self._bottom_junction_char = None
@@ -2407,11 +2446,18 @@ class PrettyTable:
             "hrules"
         ] != HRuleStyle.NONE:
             bits.append("\n")
-            bits.append(self._hrule)
+            if options["header_horizontal_char"]:
+                header_options = {
+                    **options,
+                    "horizontal_char": options["header_horizontal_char"],
+                }
+                bits.append(self._stringify_hrule(header_options))  # type: ignore[arg-type]
+            else:
+                bits.append(self._hrule)
         return "".join(bits)
 
     def _stringify_row(self, row: list[str], options: OptionsType, hrule: str) -> str:
-        import textwrap
+        import wcwidth
 
         for index, field, value, width in zip(
             range(len(row)), self._field_names, row, self._widths
@@ -2426,8 +2472,10 @@ class PrettyTable:
                 ):
                     line = none_val
                 if _str_block_width(line) > width:
-                    line = textwrap.fill(
-                        line, width, break_on_hyphens=options["break_on_hyphens"]
+                    line = "\n".join(
+                        wcwidth.wrap(
+                            line, width, break_on_hyphens=options["break_on_hyphens"]
+                        )
                     )
                 new_lines.append(line)
             lines = new_lines
@@ -2550,7 +2598,7 @@ class PrettyTable:
             else:
                 csv_writer.writerow(self._field_names)
 
-        rows = self._get_rows(options)
+        rows = self._format_rows(self._get_rows(options))
         if options["fields"]:
             rows = [
                 [d for f, d in zip(self._field_names, row) if f in options["fields"]]

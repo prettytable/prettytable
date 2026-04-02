@@ -280,6 +280,23 @@ Table Caption
 └───┴─────────┴─────────┴─────────┘
 """,
             ),
+            pytest.param(
+                TableStyle.RST,
+                """
++---------------------------------+
+|          Table Caption          |
++---+---------+---------+---------+
+|   | Field 1 | Field 2 | Field 3 |
++===+=========+=========+=========+
+| 1 | value 1 |  value2 |  value3 |
++---+---------+---------+---------+
+| 4 | value 4 |  value5 |  value6 |
++---+---------+---------+---------+
+| 7 | value 7 |  value8 |  value9 |
++---+---------+---------+---------+
+""",
+                id="RST",
+            ),
         ],
     )
     def test_style(
@@ -399,6 +416,22 @@ Table Caption
 └───┴─────────┴─────────┴─────────┘
 """,
                 id="SINGLE_BORDER",
+            ),
+            pytest.param(
+                TableStyle.MARKDOWN,
+                TableStyle.RST,
+                """
++---+---------+---------+---------+
+|   | Field 1 | Field 2 | Field 3 |
++===+=========+=========+=========+
+| 1 | value 1 |  value2 |  value3 |
++---+---------+---------+---------+
+| 4 | value 4 |  value5 |  value6 |
++---+---------+---------+---------+
+| 7 | value 7 |  value8 |  value9 |
++---+---------+---------+---------+
+""",
+                id="RST",
             ),
         ],
     )
@@ -692,3 +725,41 @@ def test_table_alignment_with_emoji(
     with open(os.path.join(DATA_DIR, expected_file), encoding="utf-8") as fin:
         expected_from_file = fin.read()
     assert table.get_string().rstrip() == expected_from_file.strip()
+
+
+def test_ansi_wrap_width():
+    """ANSI escape sequences should not count toward column width when wrapping."""
+    table = PrettyTable(["Key", "Value"])
+    table.header = False
+    table.max_width["Value"] = 35
+    table.add_row(
+        [
+            "NEW_ENVIRON",
+            "\x1b[38;5;208mOversharing: HOME, PWD, SHELL,"
+            " SSH_AUTH_SOCK, XDG_SESSION_PATH\x1b[0m",
+        ]
+    )
+    result = table.get_string()
+    for line in result.split("\n"):
+        if "|" not in line:
+            continue
+        parts = line.split("|")
+        value_cell = parts[2] if len(parts) > 2 else ""
+        assert "\x1b[38;5;208m" not in value_cell or "\x1b[0m" in value_cell
+
+
+def test_ansi_wrap_no_bleed():
+    """Wrapped ANSI-colored text must close SGR on every line."""
+    table = PrettyTable(["Key", "Value"])
+    table.header = False
+    table.max_width["Value"] = 30
+    table.add_row(
+        [
+            "TEST",
+            "\x1b[31mRed text that is long enough to wrap across lines\x1b[0m",
+        ]
+    )
+    result = table.get_string()
+    for line in result.split("\n"):
+        if "\x1b[31m" in line:
+            assert "\x1b[0m" in line

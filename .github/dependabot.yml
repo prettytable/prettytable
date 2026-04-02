@@ -5,6 +5,10 @@ updates:
     schedule:
       interval: monthly
       time: "03:00"
+    groups:
+      actions:
+        patterns:
+          - "*"
     open-pull-requests-limit: 10
     labels:
       - "changelog: skip"
@@ -22,6 +26,10 @@ updates:
     schedule:
       interval: monthly
       time: "03:00"
+    groups:
+      actions:
+        patterns:
+          - "*"
     open-pull-requests-limit: 10
     labels:
       - "changelog: skip"
