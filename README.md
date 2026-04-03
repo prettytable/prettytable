@@ -486,6 +486,39 @@ to get a table like this:
 
 Any added dividers will be removed if a table is sorted.
 
+### Adding a title to your table
+
+You can add a title to your table with the `title` attribute:
+
+```python
+table.title = "Australian Cities"
+```
+
+Titles can span multiple lines by including `\n` in the string:
+
+```python
+table.title = "Australian Cities\nPopulation Data"
+print(table)
+```
+
+This produces:
+
+```
++-------------------------------------------------+
+|                Australian Cities                |
+|                 Population Data                 |
++-----------+------+------------+-----------------+
+| City name | Area | Population | Annual Rainfall |
++-----------+------+------------+-----------------+
+|  Adelaide | 1295 |  1158259   |      600.5      |
+|  Brisbane | 5905 |  1857594   |      1146.4     |
+|   Darwin  | 112  |   120900   |      1714.7     |
++-----------+------+------------+-----------------+
+```
+
+Each line of the title is centered and bordered independently. Multiline titles also
+work with HTML output (using `<br>` in the `<caption>` tag) and Markdown output.
+
 ### Changing the appearance of your table - the easy way
 
 By default, PrettyTable produces ASCII tables that look like the ones used in SQL
