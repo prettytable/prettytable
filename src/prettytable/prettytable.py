@@ -2353,7 +2353,6 @@ class PrettyTable:
 
     def _stringify_title(self, title: str, options: OptionsType) -> str:
         lines: list[str] = []
-        lpad, rpad = self._get_padding_widths(options)
         if options["border"]:
             if options["vrules"] == VRuleStyle.ALL:
                 options["vrules"] = VRuleStyle.FRAME
