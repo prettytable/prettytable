@@ -2370,12 +2370,10 @@ class PrettyTable:
         lpad, rpad = self._get_padding_widths(options)
         sum_widths = sum([n + lpad + rpad + 1 for n in self._widths])
         for title_line in title.split("\n"):
-            bits: list[str] = []
-            bits.append(endpoint)
             padded = " " * lpad + title_line + " " * rpad
-            bits.append(self._justify(padded, sum_widths - 1, "c"))
-            bits.append(endpoint)
-            lines.append("".join(bits))
+            lines.append(
+                endpoint + self._justify(padded, sum_widths - 1, "c") + endpoint
+            )
         return "\n".join(lines)
 
     def _stringify_header(self, options: OptionsType) -> str:
