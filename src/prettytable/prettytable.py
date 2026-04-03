@@ -31,7 +31,6 @@
 
 from __future__ import annotations
 
-import io
 from enum import IntEnum
 from functools import lru_cache
 from typing import Any, Literal, cast
@@ -2592,6 +2591,7 @@ class PrettyTable:
         delimiter as a csv.writer keyword argument.
         """
         import csv
+        import io
 
         options = self._get_options(kwargs)
         csv_options = {
