@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
 from ._version import __version__
 from .prettytable import (  # noqa: F401
     _DEPRECATED_ALL,
@@ -30,6 +28,11 @@ from .prettytable import (  # noqa: F401
     from_json,
     from_mediawiki,
 )
+
+TYPE_CHECKING = False
+if TYPE_CHECKING:
+    from typing import Any
+
 
 __all__ = [
     "ALL",
