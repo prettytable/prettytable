@@ -5,9 +5,7 @@ from prettytable import PrettyTable, TableStyle
 
 def test_rst_output_without_header(helper_table: PrettyTable) -> None:
     helper_table.set_style(TableStyle.RST)
-    assert (
-        helper_table.get_string(header=False).strip()
-        == """
+    assert helper_table.get_string(header=False).strip() == """
 +---+---------+--------+--------+
 | 1 | value 1 | value2 | value3 |
 +---+---------+--------+--------+
@@ -16,14 +14,11 @@ def test_rst_output_without_header(helper_table: PrettyTable) -> None:
 | 7 | value 7 | value8 | value9 |
 +---+---------+--------+--------+
 """.strip()
-    )
 
 
 def test_rst_output_with_fields(helper_table: PrettyTable) -> None:
     helper_table.set_style(TableStyle.RST)
-    assert (
-        helper_table.get_string(fields=["Field 1", "Field 3"]).strip()
-        == """
+    assert helper_table.get_string(fields=["Field 1", "Field 3"]).strip() == """
 +---------+---------+
 | Field 1 | Field 3 |
 +=========+=========+
@@ -34,7 +29,6 @@ def test_rst_output_with_fields(helper_table: PrettyTable) -> None:
 | value 7 |  value9 |
 +---------+---------+
 """.strip()
-    )
 
 
 def test_rst_header_uses_equals(helper_table: PrettyTable) -> None:
@@ -75,9 +69,7 @@ def test_rst_output_with_multiline_title(helper_table: PrettyTable) -> None:
     # Act
     helper_table.title = "Line 1\nLine 2"
     # Assert
-    assert (
-        helper_table.get_string()
-        == """
+    assert helper_table.get_string() == """
 +---------------------------------+
 |              Line 1             |
 |              Line 2             |
@@ -91,7 +83,6 @@ def test_rst_output_with_multiline_title(helper_table: PrettyTable) -> None:
 | 7 | value 7 |  value8 |  value9 |
 +---+---------+---------+---------+
 """.strip()
-    )
 
 
 def test_markdown_to_rst_does_not_leak(helper_table: PrettyTable) -> None:
