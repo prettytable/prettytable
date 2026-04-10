@@ -33,7 +33,7 @@ dependencies = [
   "wcwidth>=0.3.5",
 ]
 optional-dependencies.tests = [
-  "pytest",
+  "pytest>=9",
   "pytest-cov",
   "pytest-lazy-fixtures",
 ]
@@ -88,10 +88,11 @@ warn_redundant_casts = true
 warn_unused_ignores = true
 
 [tool.pytest]
-ini_options.filterwarnings = [
+minversion = "9.0"
+testpaths = [ "tests" ]
+filterwarnings = [
   "error",
 ]
-ini_options.testpaths = [ "tests" ]
 
 [tool.coverage]
 run.omit = [
