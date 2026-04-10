@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar, Final
+from .prettytable import PrettyTable
 
+TYPE_CHECKING = False
 if TYPE_CHECKING:
     from collections.abc import Sequence
-
-from .prettytable import PrettyTable
+    from typing import ClassVar, Final
 
 try:
     from colorama import init
