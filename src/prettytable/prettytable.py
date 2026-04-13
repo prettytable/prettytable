@@ -34,7 +34,7 @@ from __future__ import annotations
 import io
 from enum import IntEnum
 from functools import lru_cache
-from typing import Any, Literal, TypedDict, cast
+from typing import Any, Literal, TypedDict
 
 TYPE_CHECKING = False
 if TYPE_CHECKING:
@@ -42,7 +42,7 @@ if TYPE_CHECKING:
     from typing import Final, TypeAlias
 
     from _typeshed import SupportsRichComparison
-    from typing_extensions import Self
+    from typing_extensions import Self, Unpack
 
 
 class HRuleStyle(IntEnum):
@@ -91,6 +91,57 @@ RowType: TypeAlias = list[Any]
 AlignType: TypeAlias = Literal["l", "c", "r"]
 VAlignType: TypeAlias = Literal["t", "m", "b"]
 HeaderStyleType: TypeAlias = Literal["cap", "title", "upper", "lower"] | None
+_OptionKey: TypeAlias = Literal[
+    "title",
+    "start",
+    "end",
+    "fields",
+    "header",
+    "use_header_width",
+    "border",
+    "preserve_internal_border",
+    "sortby",
+    "reversesort",
+    "sort_key",
+    "row_filter",
+    "attributes",
+    "format",
+    "hrules",
+    "vrules",
+    "int_format",
+    "float_format",
+    "custom_format",
+    "min_table_width",
+    "max_table_width",
+    "padding_width",
+    "left_padding_width",
+    "right_padding_width",
+    "vertical_char",
+    "horizontal_char",
+    "horizontal_align_char",
+    "header_horizontal_char",
+    "junction_char",
+    "header_style",
+    "xhtml",
+    "print_empty",
+    "oldsortslice",
+    "top_junction_char",
+    "bottom_junction_char",
+    "right_junction_char",
+    "left_junction_char",
+    "top_right_junction_char",
+    "top_left_junction_char",
+    "bottom_right_junction_char",
+    "bottom_left_junction_char",
+    "align",
+    "valign",
+    "max_width",
+    "min_width",
+    "none_format",
+    "escape_header",
+    "escape_data",
+    "break_on_hyphens",
+]
 
 
 class ObservableDict(dict[str, Any]):
@@ -128,7 +179,7 @@ class ObservableDict(dict[str, Any]):
         super().__setitem__(key, value)
 
 
-class OptionsType(TypedDict):
+class OptionsType(TypedDict, total=False):
     title: str | None
     start: int
     end: int | None
@@ -172,8 +223,8 @@ class OptionsType(TypedDict):
     top_left_junction_char: str
     bottom_right_junction_char: str
     bottom_left_junction_char: str
-    align: dict[str, AlignType]
-    valign: dict[str, VAlignType]
+    align: AlignType
+    valign: VAlignType
     min_width: int | dict[str, int] | None
     max_width: int | dict[str, int] | None
     none_format: str | dict[str, str | None] | None
@@ -244,7 +295,9 @@ class PrettyTable:
     _hrule: str
     _break_on_hyphens: bool
 
-    def __init__(self, field_names: Sequence[str] | None = None, **kwargs) -> None:
+    def __init__(
+        self, field_names: Sequence[str] | None = None, **kwargs: Unpack[OptionsType]
+    ) -> None:
         """Return a new PrettyTable instance
 
         Arguments:
@@ -312,7 +365,7 @@ class PrettyTable:
         self._style = None
 
         # Options
-        self._options = [
+        self._options: list[_OptionKey] = [
             "title",
             "start",
             "end",
@@ -389,7 +442,7 @@ class PrettyTable:
         self._min_width: dict[str, int | None] = ObservableDict()
         self._min_width.callback = self._min_width_callback
 
-        self._kwargs = {}
+        self._kwargs: OptionsType = {}
         if field_names:
             self.field_names = field_names
         else:
@@ -433,8 +486,10 @@ class PrettyTable:
             self._reversesort = kwargs["reversesort"]
         else:
             self._reversesort = False
-        self._sort_key = kwargs["sort_key"] or (lambda x: x)
-        self._row_filter = kwargs["row_filter"] or (lambda x: True)
+
+        # using `.get` here avoids a mypy error
+        self._sort_key = kwargs.get("sort_key") or (lambda x: x)
+        self._row_filter = kwargs.get("row_filter") or (lambda x: True)
 
         if kwargs["escape_data"] in (True, False):
             self._escape_data = kwargs["escape_data"]
@@ -836,7 +891,7 @@ class PrettyTable:
 
     @field_names.setter
     def field_names(self, val: Sequence[Any]) -> None:
-        val = cast("list[str]", [str(x) for x in val])
+        val = [str(x) for x in val]
         self._validate_option("field_names", val)
         old_names = None
         if self._field_names:
@@ -1687,14 +1742,14 @@ class PrettyTable:
     ##############################
 
     def _get_options(self, kwargs: Mapping[str, Any]) -> OptionsType:
-        options: dict[str, Any] = {}
+        options: OptionsType = {}
         for option in self._options:
             if option in kwargs:
                 self._validate_option(option, kwargs[option])
                 options[option] = kwargs[option]
             else:
                 options[option] = getattr(self, option)
-        return cast(OptionsType, options)
+        return options
 
     ##############################
     # PRESET STYLE LOGIC         #
