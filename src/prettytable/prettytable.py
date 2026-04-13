@@ -34,7 +34,6 @@ from __future__ import annotations
 import io
 from enum import IntEnum
 from functools import lru_cache
-from html.parser import HTMLParser
 from typing import Any, Literal, TypedDict, cast
 
 TYPE_CHECKING = False
@@ -3129,77 +3128,101 @@ def from_json(json_string: str | bytes, **kwargs) -> PrettyTable:
     return table
 
 
-class TableHandler(HTMLParser):
-    def __init__(self, **kwargs) -> None:
-        HTMLParser.__init__(self)
-        self.kwargs = kwargs
-        self.tables: list[PrettyTable] = []
-        self.last_row: list[str] = []
-        self.rows: list[tuple[list[str], bool]] = []
-        self.max_row_width = 0
-        self.active: str | None = None
-        self.last_content = ""
-        self.is_last_row_header = False
-        self.colspan = 0
+def _make_table_handler():
+    from html.parser import HTMLParser
 
-    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        self.active = tag
-        if tag == "th":
-            self.is_last_row_header = True
-        for key, value in attrs:
-            if key == "colspan":
-                self.colspan = int(value)  # type: ignore[arg-type]
-
-    def handle_endtag(self, tag: str) -> None:
-        if tag in ["th", "td"]:
-            stripped_content = self.last_content.strip()
-            self.last_row.append(stripped_content)
-            if self.colspan:
-                for _ in range(1, self.colspan):
-                    self.last_row.append("")
-                self.colspan = 0
-
-        if tag == "tr":
-            self.rows.append((self.last_row, self.is_last_row_header))
-            self.max_row_width = max(self.max_row_width, len(self.last_row))
-            self.last_row = []
+    class _TableHandler(HTMLParser):
+        def __init__(self, **kwargs) -> None:
+            HTMLParser.__init__(self)
+            self.kwargs = kwargs
+            self.tables: list[PrettyTable] = []
+            self.last_row: list[str] = []
+            self.rows: list[tuple[list[str], bool]] = []
+            self.max_row_width = 0
+            self.active: str | None = None
+            self.last_content = ""
             self.is_last_row_header = False
-        if tag == "table":
-            table = self.generate_table(self.rows)
-            self.tables.append(table)
-            self.rows = []
-        self.last_content = " "
-        self.active = None
+            self.colspan = 0
 
-    def handle_data(self, data: str) -> None:
-        self.last_content += data
+        def handle_starttag(
+            self, tag: str, attrs: list[tuple[str, str | None]]
+        ) -> None:
+            self.active = tag
+            if tag == "th":
+                self.is_last_row_header = True
+            for key, value in attrs:
+                if key == "colspan":
+                    self.colspan = int(value)  # type: ignore[arg-type]
 
-    def generate_table(self, rows: list[tuple[list[str], bool]]) -> PrettyTable:
-        """
-        Generates from a list of rows a PrettyTable object.
-        """
-        table = PrettyTable(**self.kwargs)
-        for row in self.rows:
-            if len(row[0]) < self.max_row_width:
-                appends = self.max_row_width - len(row[0])
-                for i in range(1, appends):
-                    row[0].append("-")
+        def handle_endtag(self, tag: str) -> None:
+            if tag in ["th", "td"]:
+                stripped_content = self.last_content.strip()
+                self.last_row.append(stripped_content)
+                if self.colspan:
+                    for _ in range(1, self.colspan):
+                        self.last_row.append("")
+                    self.colspan = 0
 
-            if row[1]:
-                self.make_fields_unique(row[0])
-                table.field_names = row[0]
-            else:
-                table.add_row(row[0])
-        return table
+            if tag == "tr":
+                self.rows.append((self.last_row, self.is_last_row_header))
+                self.max_row_width = max(self.max_row_width, len(self.last_row))
+                self.last_row = []
+                self.is_last_row_header = False
+            if tag == "table":
+                table = self.generate_table(self.rows)
+                self.tables.append(table)
+                self.rows = []
+            self.last_content = " "
+            self.active = None
 
-    def make_fields_unique(self, fields: list[str]) -> None:
-        """
-        iterates over the row and make each field unique
-        """
-        for i in range(len(fields)):
-            for j in range(i + 1, len(fields)):
-                if fields[i] == fields[j]:
-                    fields[j] += "'"
+        def handle_data(self, data: str) -> None:
+            self.last_content += data
+
+        def generate_table(self, rows: list[tuple[list[str], bool]]) -> PrettyTable:
+            """
+            Generates from a list of rows a PrettyTable object.
+            """
+            table = PrettyTable(**self.kwargs)
+            for row in self.rows:
+                if len(row[0]) < self.max_row_width:
+                    appends = self.max_row_width - len(row[0])
+                    for i in range(1, appends):
+                        row[0].append("-")
+
+                if row[1]:
+                    self.make_fields_unique(row[0])
+                    table.field_names = row[0]
+                else:
+                    table.add_row(row[0])
+            return table
+
+        def make_fields_unique(self, fields: list[str]) -> None:
+            """
+            iterates over the row and make each field unique
+            """
+            for i in range(len(fields)):
+                for j in range(i + 1, len(fields)):
+                    if fields[i] == fields[j]:
+                        fields[j] += "'"
+
+    return _TableHandler
+
+
+class TableHandler:
+    """Deprecated: use from_html or from_html_one instead."""
+
+    def __init__(self, **kwargs) -> None:
+        import warnings
+
+        warnings.warn(
+            "TableHandler is deprecated and will be removed in a future release. "
+            "Use from_html() or from_html_one() instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        cls = _make_table_handler()
+        self.__class__ = cls
+        cls.__init__(self, **kwargs)
 
 
 def from_html(html_code: str, **kwargs) -> list[PrettyTable]:
@@ -3207,8 +3230,7 @@ def from_html(html_code: str, **kwargs) -> list[PrettyTable]:
     Generates a list of PrettyTables from a string of HTML code. Each <table> in
     the HTML becomes one PrettyTable object.
     """
-
-    parser = TableHandler(**kwargs)
+    parser = _make_table_handler()(**kwargs)
     parser.feed(html_code)
     return parser.tables
 

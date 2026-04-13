@@ -2077,3 +2077,9 @@ class TestDeprecations:
     ) -> None:
         with pytest.deprecated_call(match=f"the '{name}' constant is deprecated"):
             exec(f"from {module_name} import {name}")
+
+    def test_table_handler_deprecation(self) -> None:
+        with pytest.deprecated_call(match="TableHandler is deprecated"):
+            from prettytable import TableHandler
+
+            TableHandler()
