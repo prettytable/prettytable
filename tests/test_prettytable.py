@@ -46,7 +46,7 @@ class TestNoneOption:
 
     def test_none_char_invalid_option(self) -> None:
         with pytest.raises(TypeError) as exc:
-            PrettyTable(["Field 1", "Field 2", "Field 3"], none_format=2)
+            PrettyTable(["Field 1", "Field 2", "Field 3"], none_format=2)  # type: ignore[arg-type]
         assert "must be a string" in str(exc.value)
 
     def test_no_value_replace_none(self) -> None:
@@ -796,7 +796,7 @@ class TestBasic:
 
     def test_header_style_invalid(self) -> None:
         with pytest.raises(ValueError):
-            PrettyTable(header_style="FooBar")
+            PrettyTable(header_style="FooBar")  # type: ignore[arg-type]
 
     @pytest.mark.usefixtures("init_db")
     def test_no_blank_lines_from_db(self, db_cursor: sqlite3.Cursor) -> None:
@@ -1414,7 +1414,7 @@ class TestCustomFormatter:
 
     def test_init_custom_format_throw_error_is_not_callable(self) -> None:
         with pytest.raises(ValueError) as e:
-            PrettyTable(custom_format={"col1": "{:.2}"})
+            PrettyTable(custom_format={"col1": "{:.2}"})  # type: ignore[dict-item]
 
         assert "Invalid value for custom_format.col1. Must be a function." in str(
             e.value
