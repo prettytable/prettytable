@@ -27,7 +27,7 @@ updates:
       interval: monthly
       time: "03:00"
     groups:
-      actions:
+      pip:
         patterns:
           - "*"
     open-pull-requests-limit: 10
