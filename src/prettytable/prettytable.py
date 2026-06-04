@@ -34,15 +34,68 @@ from __future__ import annotations
 import io
 from enum import IntEnum
 from functools import lru_cache
-from typing import Any, Literal, TypedDict, cast
+from typing import Any, Literal, cast
 
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
-    from typing import Final, TypeAlias
+    from typing import Final, TypeAlias, TypedDict
 
     from _typeshed import SupportsRichComparison
     from typing_extensions import Self
+
+    class OptionsType(TypedDict):
+        title: str | None
+        start: int
+        end: int | None
+        fields: Sequence[str | None] | None
+        header: bool
+        use_header_width: bool
+        border: bool
+        preserve_internal_border: bool
+        sortby: str | None
+        reversesort: bool
+        sort_key: Callable[[RowType], SupportsRichComparison]
+        row_filter: Callable[[RowType], bool]
+        attributes: dict[str, str]
+        format: bool
+        hrules: HRuleStyle
+        vrules: VRuleStyle
+        int_format: str | dict[str, str] | None
+        float_format: str | dict[str, str] | None
+        custom_format: (
+            Callable[[str, Any], str] | dict[str, Callable[[str, Any], str]] | None
+        )
+        min_table_width: int | None
+        max_table_width: int | None
+        padding_width: int
+        left_padding_width: int | None
+        right_padding_width: int | None
+        vertical_char: str
+        horizontal_char: str
+        horizontal_align_char: str
+        header_horizontal_char: str | None
+        junction_char: str
+        header_style: HeaderStyleType
+        xhtml: bool
+        print_empty: bool
+        oldsortslice: bool
+        top_junction_char: str
+        bottom_junction_char: str
+        right_junction_char: str
+        left_junction_char: str
+        top_right_junction_char: str
+        top_left_junction_char: str
+        bottom_right_junction_char: str
+        bottom_left_junction_char: str
+        align: dict[str, AlignType]
+        valign: dict[str, VAlignType]
+        min_width: int | dict[str, int] | None
+        max_width: int | dict[str, int] | None
+        none_format: str | dict[str, str | None] | None
+        escape_header: bool
+        escape_data: bool
+        break_on_hyphens: bool
 
 
 class HRuleStyle(IntEnum):
@@ -126,60 +179,6 @@ class ObservableDict(dict[str, Any]):
         if self.callback is not None and old_value != value:
             self.callback(key, old_value, value)
         super().__setitem__(key, value)
-
-
-class OptionsType(TypedDict):
-    title: str | None
-    start: int
-    end: int | None
-    fields: Sequence[str | None] | None
-    header: bool
-    use_header_width: bool
-    border: bool
-    preserve_internal_border: bool
-    sortby: str | None
-    reversesort: bool
-    sort_key: Callable[[RowType], SupportsRichComparison]
-    row_filter: Callable[[RowType], bool]
-    attributes: dict[str, str]
-    format: bool
-    hrules: HRuleStyle
-    vrules: VRuleStyle
-    int_format: str | dict[str, str] | None
-    float_format: str | dict[str, str] | None
-    custom_format: (
-        Callable[[str, Any], str] | dict[str, Callable[[str, Any], str]] | None
-    )
-    min_table_width: int | None
-    max_table_width: int | None
-    padding_width: int
-    left_padding_width: int | None
-    right_padding_width: int | None
-    vertical_char: str
-    horizontal_char: str
-    horizontal_align_char: str
-    header_horizontal_char: str | None
-    junction_char: str
-    header_style: HeaderStyleType
-    xhtml: bool
-    print_empty: bool
-    oldsortslice: bool
-    top_junction_char: str
-    bottom_junction_char: str
-    right_junction_char: str
-    left_junction_char: str
-    top_right_junction_char: str
-    top_left_junction_char: str
-    bottom_right_junction_char: str
-    bottom_left_junction_char: str
-    align: dict[str, AlignType]
-    valign: dict[str, VAlignType]
-    min_width: int | dict[str, int] | None
-    max_width: int | dict[str, int] | None
-    none_format: str | dict[str, str | None] | None
-    escape_header: bool
-    escape_data: bool
-    break_on_hyphens: bool
 
 
 @lru_cache
@@ -1694,7 +1693,7 @@ class PrettyTable:
                 options[option] = kwargs[option]
             else:
                 options[option] = getattr(self, option)
-        return cast(OptionsType, options)
+        return cast("OptionsType", options)
 
     ##############################
     # PRESET STYLE LOGIC         #
@@ -3317,4 +3316,20 @@ def _warn_deprecation(name: str, module_globals: dict[str, Any]) -> Any:
 
 
 def __getattr__(name: str) -> Any:
+    if name == "OptionsType":
+        import warnings
+        from typing import TypedDict
+
+        warnings.warn(
+            "OptionsType is deprecated and will be removed in a future release",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
+        class OptionsType(TypedDict):
+            pass
+
+        globals()[name] = OptionsType
+        return OptionsType
+
     return _warn_deprecation(name, module_globals=globals())
