@@ -279,6 +279,8 @@ class PrettyTable:
         vertical_char - single character string used to draw vertical lines
         horizontal_char - single character string used to draw horizontal lines
         horizontal_align_char - single character string used to indicate alignment
+        header_horizontal_char - single character string used to draw the header
+            separator, or None to use the same as horizontal_char
         junction_char - single character string used to draw line junctions
         top_junction_char - single character string used to draw top line junctions
         bottom_junction_char -
@@ -2212,7 +2214,8 @@ class PrettyTable:
         vertical_char - single character string used to draw vertical lines
         horizontal_char - single character string used to draw horizontal lines
         horizontal_align_char - single character string used to indicate alignment
-        junction_char - single character string used to draw line junctions
+        header_horizontal_char - single character string used to draw the header
+            separator, or None to use the same as horizontal_char
         junction_char - single character string used to draw line junctions
         top_junction_char - single character string used to draw top line junctions
         bottom_junction_char -
