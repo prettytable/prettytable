@@ -389,6 +389,27 @@ class TestAlignment:
         with pytest.raises(ValueError):
             city_data.align = {"Population": "unexpected"}  # type: ignore[dict-item]
 
+    def test_rename_drops_stale_align_keys(self) -> None:
+        table = PrettyTable()
+        table.field_names = ["a", "b", "c"]
+        table.add_row([1, 2, 3])
+        table.align["a"] = "l"
+        table.field_names = ["x", "y", "z"]
+        assert set(table.field_names) == {"x", "y", "z"}
+        for old in ("a", "b", "c"):
+            assert old not in table._align
+            assert old not in table._valign
+        assert table.align["x"] == "l"
+
+    def test_rename_keeps_overlapping_align_keys(self) -> None:
+        table = PrettyTable()
+        table.field_names = ["a", "b", "c"]
+        table.add_row([1, 2, 3])
+        table.field_names = ["x", "b", "z"]
+        assert "b" in table._align
+        assert "a" not in table._align
+        assert "c" not in table._align
+
 
 class TestOptionOverride:
     """Make sure all options are properly overwritten by get_string."""

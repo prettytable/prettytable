@@ -850,8 +850,8 @@ class PrettyTable:
             for old_name, new_name in zip(old_names, val):
                 self._align[new_name] = self._align[old_name]
             for old_name in old_names:
-                if old_name not in self._align:
-                    self._align.pop(old_name)
+                if old_name not in val:
+                    self._align.pop(old_name, None)
         elif self._align:
             for field_name in self._field_names:
                 self._align[field_name] = self._align[BASE_ALIGN_VALUE]
@@ -861,8 +861,8 @@ class PrettyTable:
             for old_name, new_name in zip(old_names, val):
                 self._valign[new_name] = self._valign[old_name]
             for old_name in old_names:
-                if old_name not in self._valign:
-                    self._valign.pop(old_name)
+                if old_name not in val:
+                    self._valign.pop(old_name, None)
         else:
             self.valign = "t"
 
