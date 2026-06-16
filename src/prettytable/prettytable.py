@@ -2019,7 +2019,10 @@ class PrettyTable:
             return (f"%{self._float_format[field]}f") % value
 
         formatter = self._custom_format.get(field, (lambda f, v: str(v)))
-        return formatter(field, value)
+        # Expand tabs so the width we measure matches what a terminal renders;
+        # a raw "\t" is one character wide to wcwidth but advances to the next
+        # tab stop on display, which otherwise misaligns the column (issue #113).
+        return formatter(field, value).expandtabs()
 
     def _compute_table_width(self, options) -> int:
         if options["vrules"] == VRuleStyle.FRAME:
