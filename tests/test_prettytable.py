@@ -1611,10 +1611,7 @@ class TestWidth:
 """.strip()
 
     def test_tab_expansion_aligns_columns(self) -> None:
-        # Issue #113: a tab in a cell is one character wide to wcwidth but
-        # advances to the next tab stop when rendered, so it must be expanded
-        # for the measured width to match the rendered width. Otherwise the
-        # tab line is shorter than the rest and the column misaligns.
+        """Ensure expandtabs() is used in PrettyTable._format_value()."""
         table = PrettyTable(["code", "note"])
         table.add_row(["if x:\n\treturn 1", "tab-indented"])
         result = table.get_string()
