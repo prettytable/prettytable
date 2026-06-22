@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__lazy_modules__ = {"prettytable._version", "prettytable.prettytable"}
+
 from ._version import __version__
 from .prettytable import (  # noqa: F401
     _DEPRECATED_ALL,
