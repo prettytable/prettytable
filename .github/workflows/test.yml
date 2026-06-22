@@ -25,6 +25,11 @@ jobs:
           - "3.11"
           - "3.10"
         os: [windows-latest, macos-latest, ubuntu-latest]
+        include:
+          - python-version: "3.16"
+            os: ubuntu-latest
+          - python-version: "3.16t"
+            os: ubuntu-latest
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -33,9 +38,17 @@ jobs:
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        if: "!startsWith(matrix.python-version, '3.16')"
         with:
           python-version: ${{ matrix.python-version }}
           allow-prereleases: true
+
+      - name: Set up Python ${{ matrix.python-version }} (deadsnakes)
+        uses: deadsnakes/action@e640ac8743173a67cca4d7d77cd837e514bf98e8 # v3.2.0
+        if: startsWith(matrix.python-version, '3.16')
+        with:
+          python-version: "3.16-dev"
+          nogil: ${{ endsWith(matrix.python-version, 't') }}
 
       - name: Set PYTHON_GIL
         if: endsWith(matrix.python-version, 't')
