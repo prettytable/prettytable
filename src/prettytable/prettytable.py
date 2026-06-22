@@ -2019,7 +2019,19 @@ class PrettyTable:
             return (f"%{self._float_format[field]}f") % value
 
         formatter = self._custom_format.get(field, (lambda f, v: str(v)))
-        return formatter(field, value)
+        # PrettyTable is unaware of a terminal's tabstops, and it does not know at
+        # what specific location of the screen it will be displayed, so it also cannot
+        # calculate tabstop positions or width: A '\t' character is variable-width,
+        # depending on the location of the screen it is displayed.
+        #
+        # Although wcwidth library functions like width() do measure tab control
+        # character as a width of 8, it would require PrettyTable to display the left
+        # margin of the table's contents to begin "at the tabstop" for the table
+        # contents and dividers to line up correctly.
+        #
+        # PrettyTable is "screen unaware", so it is best to alter tabstops to a fixed
+        # width, to allow same-width display anywhere on the screen.
+        return formatter(field, value).expandtabs()
 
     def _compute_table_width(self, options) -> int:
         if options["vrules"] == VRuleStyle.FRAME:

@@ -1631,6 +1631,15 @@ class TestWidth:
 +---------+---------+
 """.strip()
 
+    def test_tab_expansion_aligns_columns(self) -> None:
+        """Ensure expandtabs() is used in PrettyTable._format_value()."""
+        table = PrettyTable(["code", "note"])
+        table.add_row(["if x:\n\treturn 1", "tab-indented"])
+        result = table.get_string()
+        assert "\t" not in result
+        line_widths = {len(line) for line in result.splitlines()}
+        assert len(line_widths) == 1
+
     @pytest.mark.parametrize(
         "loops, fields, desired_width, border, internal_border",
         [
