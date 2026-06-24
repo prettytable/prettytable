@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import io
 import sqlite3
 from collections.abc import Generator
 from math import e, pi, sqrt
@@ -16,6 +17,7 @@ from prettytable import (
     RowType,
     TableStyle,
     VRuleStyle,
+    from_csv,
     from_db_cursor,
 )
 
@@ -1342,6 +1344,23 @@ class TestCsvOutput:
             "Bob,00000,10.0,0\r\n"
             'Charlie,-0042,-2.7,"-5,678"\r\n'
         )
+
+    def test_csv_roundtrip_quoted_values(self) -> None:
+        # from_csv must correctly parse the output of get_csv_string, even when
+        # cell values contain commas or quotes (which the writer wraps in quotes).
+        # Previously, csv.Sniffer would misdetect the delimiter as a space for
+        # such input, causing from_csv to fail on its own output.
+        table = PrettyTable(["Name", "Value", "Description"])
+        table.add_row(["Alice, Jr.", 100, "Has a comma, and quoted"])
+        table.add_row(["Bob", 200, 'Has "nested" quotes'])
+
+        csv_out = table.get_csv_string()
+        table2 = from_csv(io.StringIO(csv_out))
+
+        assert table2.field_names == ["Name", "Value", "Description"]
+        assert table2._rows[0][0] == "Alice, Jr."
+        assert table2._rows[0][2] == "Has a comma, and quoted"
+        assert table2._rows[1][2] == 'Has "nested" quotes'
 
 
 def test_paginate(city_data: PrettyTable) -> None:
