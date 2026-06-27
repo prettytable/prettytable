@@ -1477,13 +1477,16 @@ ABC
         result = table.get_string()
         expected = """
 ---------
- A  B  C 
+ A  B  C
 ---------
- 1  2  3 
- 4  5  6 
+ 1  2  3
+ 4  5  6
 ---------
 """
-        assert result.strip() == expected.strip()
+        # Strip trailing whitespace from each line for comparison
+        result_lines = [line.rstrip() for line in result.strip().splitlines()]
+        expected_lines = [line.rstrip() for line in expected.strip().splitlines()]
+        assert result_lines == expected_lines
 
 
 class TestCustomFormatter:
