@@ -2388,6 +2388,8 @@ class PrettyTable:
         return "\n".join(lines)
 
     def _stringify_header(self, options: OptionsType) -> str:
+        import wcwidth
+
         bits: list[str] = []
         lpad, rpad = self._get_padding_widths(options)
         if options["border"]:
@@ -2429,7 +2431,7 @@ class PrettyTable:
             else:
                 fieldname = field
             if _str_block_width(fieldname) > width:
-                fieldname = fieldname[:width]
+                fieldname = wcwidth.clip(fieldname, 0, width)
             bits.append(
                 " " * lpad
                 + self._justify(fieldname, width, self._align[field])
