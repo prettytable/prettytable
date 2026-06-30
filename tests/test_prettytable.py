@@ -1795,6 +1795,21 @@ class TestWidth:
 
         assert table.get_string() == expected
 
+    def test_wide_char_header_truncated_by_display_width(self) -> None:
+        # With use_header_width=False, a header wider than its column is
+        # truncated to fit. Wide (e.g. CJK) characters must be truncated by
+        # display width, not character count, otherwise the header overflows
+        # the column and breaks alignment. This mirrors _stringify_row, which
+        # already wraps cell content by display width.
+        table = PrettyTable(["日本語ヘッダー", "col2"], use_header_width=False)
+        table.add_row(["abcd", "yy"])
+        expected = """+------+----+
+| 日本 | co |
++------+----+
+| abcd | yy |
++------+----+"""
+        assert table.get_string() == expected
+
     def test_table_width_on_init_wo_columns(self) -> None:
         """See also #272"""
         table = PrettyTable(max_width=10)
