@@ -22,6 +22,14 @@ class TestHtmlConstructor:
         with pytest.raises(ValueError):
             from_html_one(html_string)
 
+    def test_html_ragged_row_is_padded(self) -> None:
+        # a data row with fewer cells than the header should be padded, not rejected
+        table = from_html_one(
+            "<table><tr><th>a</th><th>b</th></tr><tr><td>1</td></tr></table>"
+        )
+        assert table.field_names == ["a", "b"]
+        assert table.rows == [["1", "-"]]
+
 
 class TestHtmlOutput:
     def test_html_output(self, helper_table: PrettyTable) -> None:
