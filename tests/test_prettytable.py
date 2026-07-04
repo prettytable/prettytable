@@ -1421,6 +1421,14 @@ g..
 """
         assert result.strip() == expected.strip()
 
+    def test_zero_left_right_padding_via_constructor(self) -> None:
+        # explicit 0 must be honoured, not coerced back to the default of 1
+        table = PrettyTable(
+            header=False, left_padding_width=0, right_padding_width=0
+        )
+        table.add_row(list("abc"))
+        assert table.get_string().strip() == "+-+-+-+\n|a|b|c|\n+-+-+-+"
+
 
 class TestCustomFormatter:
     def test_init_custom_format_is_empty(self) -> None:
