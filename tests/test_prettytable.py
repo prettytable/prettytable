@@ -284,6 +284,22 @@ class TestDelete:
             city_data.del_row(10)
 
 
+class TestFieldNames:
+    def test_append(self) -> None:
+        table = PrettyTable(["x"])
+        table.field_names.append("y")
+        table.add_row([1, 2])
+
+        assert (
+            table.get_string()
+            == """+---+---+
+| x | y |
++---+---+
+| 1 | 2 |
++---+---+"""
+        )
+
+
 class TestFieldNameLessTable:
     """Make sure that building and stringing a table with no fieldnames works fine"""
 
