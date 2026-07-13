@@ -290,14 +290,11 @@ class TestFieldNames:
         table.field_names.append("y")
         table.add_row([1, 2])
 
-        assert (
-            table.get_string()
-            == """+---+---+
+        assert table.get_string() == """+---+---+
 | x | y |
 +---+---+
 | 1 | 2 |
 +---+---+"""
-        )
 
 
 class TestFieldNameLessTable:
