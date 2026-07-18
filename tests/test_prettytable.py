@@ -858,6 +858,14 @@ Field 1  Field 2  Field 3
 class TestEmptyTable:
     """Make sure the print_empty option works"""
 
+    def test_title_without_columns(self) -> None:
+        """Zero-column tables with a title must not IndexError in width scaling."""
+        table = PrettyTable()
+        result = table.get_string(title="Hello World")
+        assert "Hello World" in result
+        table.min_table_width = 30
+        assert table.get_string().strip() != ""
+
     def test_print_empty(self) -> None:
         table = PrettyTable(print_empty=False)
         assert table.get_string().strip() == ""

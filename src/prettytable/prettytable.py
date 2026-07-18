@@ -2118,7 +2118,7 @@ class PrettyTable:
             # What is being scaled is content so we sum column widths
             content_width = sum(widths) or 1
 
-            if content_width < min_width:
+            if content_width < min_width and widths:
                 # Grow widths in proportion
                 scale = 1.0 * min_width / content_width
                 widths = [int(w * scale) for w in widths]
