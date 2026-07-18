@@ -72,3 +72,16 @@ class TestJSONConstructor:
         json_string = city_data.get_json_string()
         new_table = from_json(json_string)
         assert new_table.get_string() == city_data.get_string()
+
+    def test_from_json_empty_list(self) -> None:
+        table = from_json("[]")
+        assert table.field_names == []
+        assert table.rows == []
+
+    def test_from_json_non_list_raises(self) -> None:
+        import pytest
+
+        with pytest.raises(ValueError, match="must be a list"):
+            from_json("null")
+        with pytest.raises(ValueError, match="must be a list"):
+            from_json("{}")

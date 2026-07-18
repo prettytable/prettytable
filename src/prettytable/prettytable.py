@@ -3135,6 +3135,11 @@ def from_json(json_string: str | bytes, **kwargs) -> PrettyTable:
 
     table = PrettyTable(**kwargs)
     objects = json.loads(json_string)
+    if not isinstance(objects, list):
+        msg = "JSON data must be a list of a header row and optional data rows"
+        raise ValueError(msg)
+    if not objects:
+        return table
     table.field_names = objects[0]
     for obj in objects[1:]:
         row = [obj[key] for key in table.field_names]
