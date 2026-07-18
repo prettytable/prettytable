@@ -864,7 +864,7 @@ class TestEmptyTable:
         result = table.get_string(title="Hello World")
         assert "Hello World" in result
         table.min_table_width = 30
-        assert table.get_string().strip() != ""
+        assert table.get_string() == "++\n||\n++\n++"
 
     def test_print_empty(self) -> None:
         table = PrettyTable(print_empty=False)
