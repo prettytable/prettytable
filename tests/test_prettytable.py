@@ -389,6 +389,18 @@ class TestAlignment:
         with pytest.raises(ValueError):
             city_data.align = {"Population": "unexpected"}  # type: ignore[dict-item]
 
+    def test_align_string_invalid_without_field_names(self) -> None:
+        with pytest.raises(ValueError):
+            PrettyTable().align = "unexpected"  # type: ignore[assignment]
+
+    def test_align_validation_survives_string_set(self) -> None:
+        # Setting align to a string must not replace the validating dict.
+        table = PrettyTable()
+        table.align = "l"
+        table.field_names = ["a", "b"]
+        with pytest.raises(ValueError):
+            table.align["a"] = "unexpected"  # type: ignore[assignment]
+
     def test_rename_drops_stale_align_keys(self) -> None:
         table = PrettyTable()
         table.field_names = ["a", "b", "c"]
