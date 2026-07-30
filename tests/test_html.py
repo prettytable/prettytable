@@ -22,6 +22,23 @@ class TestHtmlConstructor:
         with pytest.raises(ValueError):
             from_html_one(html_string)
 
+    def test_html_ragged_row_padding(self) -> None:
+        """Regression for #474: rows shorter than the header are padded correctly.
+
+        The loop was range(1, appends) which ran only (n-1) iterations,
+        leaving the first missing cell un-padded.
+        """
+        html = "<table><tr><th>a</th><th>b</th><th>c</th></tr><tr><td>1</td></tr></table>"
+        tables = from_html(html)
+        assert len(tables) == 1
+        table = tables[0]
+        assert table.field_names == ["a", "b", "c"]
+        rows = table._rows
+        assert len(rows) == 1
+        assert rows[0][0] == "1"
+        assert rows[0][1] == "-"
+        assert rows[0][2] == "-"
+
 
 class TestHtmlOutput:
     def test_html_output(self, helper_table: PrettyTable) -> None:
