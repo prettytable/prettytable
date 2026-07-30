@@ -28,7 +28,9 @@ class TestHtmlConstructor:
         The loop was range(1, appends) which ran only (n-1) iterations,
         leaving the first missing cell un-padded.
         """
-        html = "<table><tr><th>a</th><th>b</th><th>c</th></tr><tr><td>1</td></tr></table>"
+        html = (
+            "<table><tr><th>a</th><th>b</th><th>c</th></tr><tr><td>1</td></tr></table>"
+        )
         tables = from_html(html)
         assert len(tables) == 1
         table = tables[0]
