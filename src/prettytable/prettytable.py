@@ -3104,9 +3104,7 @@ def from_csv(fp, field_names: Sequence[str] | None = None, **kwargs) -> PrettyTa
     if fmtparams:
         reader = csv.reader(fp, **fmtparams)
     else:
-        dialect = csv.Sniffer().sniff(fp.read(1024))
-        fp.seek(0)
-        reader = csv.reader(fp, dialect)
+        reader = csv.reader(fp)
 
     table = PrettyTable(**kwargs)
     if field_names:
