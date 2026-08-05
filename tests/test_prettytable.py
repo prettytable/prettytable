@@ -601,6 +601,22 @@ class TestBasic:
         city_data.title = "My table (75 characters wide) " + "=" * 45
         self._test_all_length_equal(city_data)
 
+    def test_all_lengths_equal_with_title_and_no_border(
+        self, city_data: PrettyTable
+    ) -> None:
+        """A title must not overhang the table when the border is disabled."""
+        city_data.title = "My table"
+        city_data.border = False
+        self._test_all_length_equal(city_data)
+
+    def test_all_lengths_equal_with_long_title_and_no_border(
+        self, city_data: PrettyTable
+    ) -> None:
+        """A long title must not overhang the table when the border is disabled."""
+        city_data.title = "My table (75 characters wide) " + "=" * 45
+        city_data.border = False
+        self._test_all_length_equal(city_data)
+
     def test_multiline_title(self, city_data: PrettyTable) -> None:
         """A title with \\n should produce multiple bordered title lines."""
         city_data.title = "Line 1\nLine 2"
