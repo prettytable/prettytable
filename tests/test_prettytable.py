@@ -1421,6 +1421,73 @@ g..
 """
         assert result.strip() == expected.strip()
 
+    def test_vrules_none_no_extra_spaces(self) -> None:
+        """Test that vrules=NONE with padding=0 produces no extra spaces.
+
+        Regression test for https://github.com/jazzband/prettytable/issues/220
+        """
+        table = PrettyTable()
+        table.field_names = ["A", "B", "C"]
+        table.add_row([1, 2, 3])
+        table.add_row([4, 5, 6])
+        table.padding_width = 0
+        table.left_padding_width = 0
+        table.right_padding_width = 0
+        table.vrules = VRuleStyle.NONE
+        table.border = False
+
+        result = table.get_string()
+        expected = """
+ABC
+123
+456
+"""
+        assert result.strip() == expected.strip()
+
+    def test_vrules_none_with_border_no_extra_spaces(self) -> None:
+        """Test that vrules=NONE with border=True and padding=0 has no extra spaces."""
+        table = PrettyTable()
+        table.field_names = ["A", "B", "C"]
+        table.add_row([1, 2, 3])
+        table.add_row([4, 5, 6])
+        table.padding_width = 0
+        table.left_padding_width = 0
+        table.right_padding_width = 0
+        table.vrules = VRuleStyle.NONE
+
+        result = table.get_string()
+        expected = """
+---
+ABC
+---
+123
+456
+---
+"""
+        assert result.strip() == expected.strip()
+
+    def test_vrules_none_with_padding(self) -> None:
+        """Test that vrules=NONE with padding=1 works correctly."""
+        table = PrettyTable()
+        table.field_names = ["A", "B", "C"]
+        table.add_row([1, 2, 3])
+        table.add_row([4, 5, 6])
+        table.vrules = VRuleStyle.NONE
+
+        result = table.get_string()
+        expected = """
+---------
+ A  B  C
+---------
+ 1  2  3
+ 4  5  6
+---------
+"""
+        # Strip trailing whitespace from each line for comparison
+        result_lines = [line.rstrip() for line in result.strip().splitlines()]
+        expected_lines = [line.rstrip() for line in expected.strip().splitlines()]
+        assert result_lines == expected_lines
+
 
 class TestCustomFormatter:
     def test_init_custom_format_is_empty(self) -> None:
@@ -1951,16 +2018,16 @@ class TestWidth:
         )
 
         assert table.get_string().strip() == """
-----------------------------------------------------
-  F   F   F   F   F             Field 6             
-----------------------------------------------------
-  0   0   0   0   0   Lorem ipsum dolor sit amet,   
-                      consetetur sadipscing elitr,  
-                         sed diam nonumy eirmod     
-                      tempor invidunt ut labore et  
-                      dolore magna aliquyam erat,   
-                           sed diam voluptua        
-----------------------------------------------------""".strip()  # noqa: W291
+---------------------------------------------
+ F  F  F  F  F            Field 6            
+---------------------------------------------
+ 0  0  0  0  0  Lorem ipsum dolor sit amet,  
+                consetetur sadipscing elitr, 
+                   sed diam nonumy eirmod    
+                tempor invidunt ut labore et 
+                dolore magna aliquyam erat,  
+                     sed diam voluptua       
+---------------------------------------------""".strip()  # noqa: W291
 
 
 class TestFields:
