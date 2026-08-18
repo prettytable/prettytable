@@ -578,6 +578,7 @@ Table-specific options are:
 | `bottom_left_junction_char`  | Single character string used to draw bottom-left line junctions. Default: `junction_char`.                                                  |
 | `bottom_right_junction_char` | Single character string used to draw bottom-right line junctions. Default: `junction_char`.                                                 |
 | `break_on_hyphens`           | Whether long lines are wrapped on hyphens. Default: `True`.                                                                                 |
+| `first_col_is_header`        | A Boolean option (must be `True` or `False`). Renders the first cell of each HTML data row as a `<th scope="row">`. Default: `False`.       |
 | `header`                     | A Boolean option (must be `True` or `False`). Controls whether the first row of the table is a header showing the names of all the fields.  |
 | `horizontal_char`            | Single character string used to draw horizontal lines. Default: `-`.                                                                        |
 | `hrules`                     | Controls printing of horizontal rules after rows. Allowed values: `FRAME`, `HEADER`, `ALL`, `NONE`.                                         |
