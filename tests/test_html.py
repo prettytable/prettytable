@@ -94,6 +94,127 @@ class TestHtmlOutput:
 </table>
 """.strip()
 
+    def test_html_output_first_col_is_header(self, helper_table: PrettyTable) -> None:
+        result = helper_table.get_html_string(first_col_is_header=True)
+        assert result.strip() == """
+<table>
+    <thead>
+        <tr>
+            <th scope="col"></th>
+            <th scope="col">Field 1</th>
+            <th scope="col">Field 2</th>
+            <th scope="col">Field 3</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th scope="row">1</th>
+            <td>value 1</td>
+            <td>value2</td>
+            <td>value3</td>
+        </tr>
+        <tr>
+            <th scope="row">4</th>
+            <td>value 4</td>
+            <td>value5</td>
+            <td>value6</td>
+        </tr>
+        <tr>
+            <th scope="row">7</th>
+            <td>value 7</td>
+            <td>value8</td>
+            <td>value9</td>
+        </tr>
+    </tbody>
+</table>
+""".strip()
+
+    def test_html_output_formatted_first_col_is_header(
+        self, helper_table: PrettyTable
+    ) -> None:
+        result = helper_table.get_html_string(first_col_is_header=True, format=True)
+        assert result.strip() == """
+<table frame="box" rules="cols">
+    <thead>
+        <tr>
+            <th scope="col" style="padding-left: 1em; padding-right: 1em; text-align: center"></th>
+            <th scope="col" style="padding-left: 1em; padding-right: 1em; text-align: center">Field 1</th>
+            <th scope="col" style="padding-left: 1em; padding-right: 1em; text-align: center">Field 2</th>
+            <th scope="col" style="padding-left: 1em; padding-right: 1em; text-align: center">Field 3</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th scope="row" style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</th>
+            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 1</td>
+            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value2</td>
+            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value3</td>
+        </tr>
+        <tr>
+            <th scope="row" style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4</th>
+            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 4</td>
+            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value5</td>
+            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value6</td>
+        </tr>
+        <tr>
+            <th scope="row" style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7</th>
+            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value 7</td>
+            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value8</td>
+            <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">value9</td>
+        </tr>
+    </tbody>
+</table>
+""".strip()
+
+    def test_html_output_first_col_is_header_respects_fields(
+        self, helper_table: PrettyTable
+    ) -> None:
+        # The row header follows the first *rendered* column, not the first
+        # column of the underlying table.
+        result = helper_table.get_html_string(
+            first_col_is_header=True, fields=["Field 1", "Field 3"]
+        )
+        assert result.strip() == """
+<table>
+    <thead>
+        <tr>
+            <th scope="col">Field 1</th>
+            <th scope="col">Field 3</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th scope="row">value 1</th>
+            <td>value3</td>
+        </tr>
+        <tr>
+            <th scope="row">value 4</th>
+            <td>value6</td>
+        </tr>
+        <tr>
+            <th scope="row">value 7</th>
+            <td>value9</td>
+        </tr>
+    </tbody>
+</table>
+""".strip()
+
+    def test_html_output_first_col_is_header_default_off(
+        self, helper_table: PrettyTable
+    ) -> None:
+        # Default output must be unchanged: no scope attributes, no <th> in body.
+        result = helper_table.get_html_string()
+        assert "scope=" not in result
+        assert '<th scope="row">' not in result
+
+    def test_first_col_is_header_setter(self, helper_table: PrettyTable) -> None:
+        assert helper_table.first_col_is_header is False
+        helper_table.first_col_is_header = True
+        assert helper_table.first_col_is_header is True
+        assert '<th scope="row">1</th>' in helper_table.get_html_string()
+        with pytest.raises(ValueError):
+            helper_table.first_col_is_header = "yes"  # type: ignore[assignment]
+
     def test_html_output_with_title(self, helper_table: PrettyTable) -> None:
         helper_table.title = "Title & Title"
         result = helper_table.get_html_string(
