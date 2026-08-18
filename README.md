@@ -844,6 +844,39 @@ when sending output to HTML. This can be disabled by setting the `escape_header`
 print(table.get_html_string(escape_header=False, escape_data=False))
 ```
 
+#### Using the first column as a row header
+
+For tables whose first column labels each row, you can pass `first_col_is_header=True`
+to `get_html_string` (or set `table.first_col_is_header = True`). PrettyTable will then
+render the first cell of every data row as a `<th scope="row">` element instead of
+`<td>`, and mark the column headers with `scope="col"`, producing more accessible
+markup. For example:
+
+```python
+print(table.get_html_string(first_col_is_header=True))
+```
+
+will print:
+
+```html
+<table>
+  <thead>
+    <tr>
+      <th scope="col">City name</th>
+      <th scope="col">Area</th>
+      ...
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Adelaide</th>
+      <td>1295</td>
+      ...
+    </tr>
+  </tbody>
+</table>
+```
+
 ### Miscellaneous things
 
 #### Copying a table
