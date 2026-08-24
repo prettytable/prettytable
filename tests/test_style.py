@@ -167,7 +167,7 @@ class TestHeaderVerticalChar:
         table = self._table()
         table.header_vertical_char = "^"
         assert table.get_string() == (
-            "+---+---+\n" "^ A ^ B ^\n" "+---+---+\n" "| 1 | 2 |\n" "+---+---+"
+            "+---+---+\n^ A ^ B ^\n+---+---+\n| 1 | 2 |\n+---+---+"
         )
 
     def test_none_matches_vertical_char(self) -> None:
