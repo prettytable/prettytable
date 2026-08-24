@@ -74,6 +74,7 @@ if TYPE_CHECKING:
         horizontal_char: str
         horizontal_align_char: str
         header_horizontal_char: str | None
+        header_vertical_char: str | None
         junction_char: str
         header_style: HeaderStyleType
         xhtml: bool
@@ -221,6 +222,7 @@ class PrettyTable:
     _horizontal_char: str
     _horizontal_align_char: str | None
     _header_horizontal_char: str | None
+    _header_vertical_char: str | None
     _junction_char: str
     _top_junction_char: str | None
     _bottom_junction_char: str | None
@@ -280,6 +282,8 @@ class PrettyTable:
         horizontal_align_char - single character string used to indicate alignment
         header_horizontal_char - single character string used to draw the header
             separator, or None to use the same as horizontal_char
+        header_vertical_char - single character string used to draw vertical lines
+            in the header row, or None to use the same as vertical_char
         junction_char - single character string used to draw line junctions
         top_junction_char - single character string used to draw top line junctions
         bottom_junction_char -
@@ -341,6 +345,7 @@ class PrettyTable:
             "horizontal_char",
             "horizontal_align_char",
             "header_horizontal_char",
+            "header_vertical_char",
             "junction_char",
             "header_style",
             "xhtml",
@@ -460,6 +465,7 @@ class PrettyTable:
         self._horizontal_char = kwargs["horizontal_char"] or "-"
         self._horizontal_align_char = kwargs["horizontal_align_char"]
         self._header_horizontal_char = kwargs["header_horizontal_char"]
+        self._header_vertical_char = kwargs["header_vertical_char"]
         self._junction_char = kwargs["junction_char"] or "+"
         self._top_junction_char = kwargs["top_junction_char"]
         self._bottom_junction_char = kwargs["bottom_junction_char"]
@@ -617,6 +623,7 @@ class PrettyTable:
             "horizontal_char",
             "horizontal_align_char",
             "header_horizontal_char",
+            "header_vertical_char",
             "junction_char",
             "top_junction_char",
             "bottom_junction_char",
@@ -1454,6 +1461,23 @@ class PrettyTable:
         self._header_horizontal_char = val
 
     @property
+    def header_vertical_char(self) -> str | None:
+        """The character used when printing vertical lines in the header row
+
+        Arguments:
+
+        header_vertical_char - single character string used to draw vertical
+        lines in the header row, or None to use the same as vertical_char"""
+        return self._header_vertical_char
+
+    @header_vertical_char.setter
+    def header_vertical_char(self, val: str | None) -> None:
+        if val is not None:
+            val = str(val)
+            self._validate_option("header_vertical_char", val)
+        self._header_vertical_char = val
+
+    @property
     def junction_char(self) -> str:
         """The character used when printing table borders to draw line junctions
 
@@ -2227,6 +2251,8 @@ class PrettyTable:
         horizontal_align_char - single character string used to indicate alignment
         header_horizontal_char - single character string used to draw the header
             separator, or None to use the same as horizontal_char
+        header_vertical_char - single character string used to draw vertical lines
+            in the header row, or None to use the same as vertical_char
         junction_char - single character string used to draw line junctions
         top_junction_char - single character string used to draw top line junctions
         bottom_junction_char -
@@ -2390,6 +2416,7 @@ class PrettyTable:
     def _stringify_header(self, options: OptionsType) -> str:
         bits: list[str] = []
         lpad, rpad = self._get_padding_widths(options)
+        vertical_char = options["header_vertical_char"] or options["vertical_char"]
         if options["border"]:
             if options["hrules"] in (HRuleStyle.ALL, HRuleStyle.FRAME):
                 bits.append(self._stringify_hrule(options, "top_"))
@@ -2406,13 +2433,13 @@ class PrettyTable:
                     )
                 bits.append("\n")
             if options["vrules"] in (VRuleStyle.ALL, VRuleStyle.FRAME):
-                bits.append(options["vertical_char"])
+                bits.append(vertical_char)
             else:
                 bits.append(" ")
         # For tables with no data or field names
         if not self._field_names:
             if options["vrules"] in (VRuleStyle.ALL, VRuleStyle.FRAME):
-                bits.append(options["vertical_char"])
+                bits.append(vertical_char)
             else:
                 bits.append(" ")
         for field, width in zip(self._field_names, self._widths):
@@ -2437,7 +2464,7 @@ class PrettyTable:
             )
             if options["border"] or options["preserve_internal_border"]:
                 if options["vrules"] == VRuleStyle.ALL:
-                    bits.append(options["vertical_char"])
+                    bits.append(vertical_char)
                 else:
                     bits.append(" ")
 
@@ -2450,7 +2477,7 @@ class PrettyTable:
         # of the last field, when we really want a vertical character
         if options["border"] and options["vrules"] == VRuleStyle.FRAME:
             bits.pop()
-            bits.append(options["vertical_char"])
+            bits.append(vertical_char)
         if (options["border"] or options["preserve_internal_border"]) and options[
             "hrules"
         ] != HRuleStyle.NONE:
