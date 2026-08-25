@@ -382,6 +382,35 @@ gives:
 +-----------+------+------------+-----------------+
 ```
 
+##### Aligning the headers separately
+
+Sometimes you want the data in a column aligned one way and the header aligned another,
+for example right aligned numbers under a centred title. The `header_align` attribute
+works just like `align`, but only affects the header row. Columns without a
+`header_align` fall back to `align`, so setting `align` on its own keeps working as
+before.
+
+```python
+table = PrettyTable()
+table.field_names = ["x", "y"]
+table.add_row([12346.657, 42])
+table.add_row([9.1, 7000])
+table.align = "r"
+table.header_align = "c"
+print(table)
+```
+
+gives:
+
+```
++-----------+------+
+|     x     |  y   |
++-----------+------+
+| 12346.657 |   42 |
+|       9.1 | 7000 |
++-----------+------+
+```
+
 ##### Sorting your table by a field
 
 You can make sure that your ASCII tables are produced with the data sorted by one
@@ -597,16 +626,17 @@ Table-specific options are:
 | `vertical_char`              | Single character string used to draw vertical lines. Default: `\|`.                                                                         |
 | `vrules`                     | Controls printing of vertical rules between columns. Allowed values: `FRAME`, `ALL`, `NONE`.                                                |
 
-For options that can be set individually for each column (`align`, `valign`,
-`custom_format`, `max_width`, `min_width`, `int_format`, `float_format`, `none_format`)
-you can either set a value, that applies to all columns or set a dict with column names
-and individual values.
+For options that can be set individually for each column (`align`, `header_align`,
+`valign`, `custom_format`, `max_width`, `min_width`, `int_format`, `float_format`,
+`none_format`) you can either set a value, that applies to all columns or set a dict
+with column names and individual values.
 
 Column-specific options are:
 
 | Option          | Details                                                                                                                                                                                                                                                                                                    |
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `align`         | Controls alignment of fields, one of "l", "c", or "r" or a dictionary with column and value.                                                                                                                                                                                                               |
+| `header_align`  | Controls alignment of column headers, one of "l", "c", or "r" or a dictionary with column and value. Columns without a value fall back to `align`.                                                                                                                                                         |
 | `custom_format` | Set any format, by setting a function that gets the original value,the formatted representation and returns the new string. E.g. `pf.custom_format["my_col_int"] = lambda f, v: f"{v:,}"`. The type of the callable is `Callable[[str, Any], str]`. This also takes a dictionary with column and function. |
 | `float_format`  | A string which controls the way floating point data is printed or a dictionary with column and value. This works like: `print("%<float_format>f" % data)`.                                                                                                                                                 |
 | `int_format`    | A string which controls the way integer data is printed or a dictionary with column and value. This works like: `print("%<int_format>d" % data)`.                                                                                                                                                          |

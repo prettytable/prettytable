@@ -88,6 +88,7 @@ if TYPE_CHECKING:
         bottom_right_junction_char: str
         bottom_left_junction_char: str
         align: dict[str, AlignType]
+        header_align: dict[str, AlignType]
         valign: dict[str, VAlignType]
         min_width: int | dict[str, int] | None
         max_width: int | dict[str, int] | None
@@ -191,6 +192,7 @@ def _get_size(text: str) -> tuple[int, int]:
 class PrettyTable:
     _xhtml: bool
     _align: dict[str, AlignType]
+    _header_align: dict[str, AlignType]
     _valign: dict[str, VAlignType]
     _min_width: dict[str, int]
     _max_width: dict[str, int]
@@ -298,6 +300,8 @@ class PrettyTable:
         sort_key - sorting key function, applied to data points before sorting
         row_filter - filter function applied on rows
         align - default align for each column (None, "l", "c" or "r")
+        header_align - align for each column header, falling back to align when unset
+            (None, "l", "c" or "r")
         valign - default valign for each row (None, "t", "m" or "b")
         reversesort - True or False to sort in descending or ascending order
         oldsortslice - Slice rows before sorting in the "old style"
@@ -355,6 +359,7 @@ class PrettyTable:
             "bottom_right_junction_char",
             "bottom_left_junction_char",
             "align",
+            "header_align",
             "valign",
             "max_width",
             "min_width",
@@ -379,6 +384,11 @@ class PrettyTable:
         self._align: dict[str, str | None] = ObservableDict()
         self._align[BASE_ALIGN_VALUE] = "c"
         self._align.callback = self._align_callback
+
+        # Header alignment is sparse on purpose: a field only appears here when
+        # the user sets it, otherwise the header falls back to _align.
+        self._header_align: dict[str, str | None] = ObservableDict()
+        self._header_align.callback = self._header_align_callback
 
         self._valign: dict[str, str | None] = ObservableDict()
         self._valign.callback = self._valign_callback
@@ -446,6 +456,7 @@ class PrettyTable:
             self._escape_header = True
 
         self._column_specific_args()
+        self.header_align = kwargs["header_align"]
 
         self._min_table_width = kwargs["min_table_width"] or None
         self._max_table_width = kwargs["max_table_width"] or None
@@ -856,6 +867,19 @@ class PrettyTable:
                 self._align[field_name] = self._align[BASE_ALIGN_VALUE]
         else:
             self.align = "c"
+
+        if self._header_align and old_names:
+            for old_name, new_name in zip(old_names, val):
+                if old_name in self._header_align:
+                    self._header_align[new_name] = self._header_align[old_name]
+            for old_name in old_names:
+                if old_name not in val:
+                    self._header_align.pop(old_name, None)
+        elif self._header_align.get(BASE_ALIGN_VALUE) is not None:
+            base = self._header_align[BASE_ALIGN_VALUE]
+            for field_name in self._field_names:
+                self._header_align[field_name] = base
+
         if self._valign and old_names:
             for old_name, new_name in zip(old_names, val):
                 self._valign[new_name] = self._valign[old_name]
@@ -903,6 +927,33 @@ class PrettyTable:
                 self._align[field] = "c"
         else:
             self._align = {BASE_ALIGN_VALUE: "c"}
+
+    def _header_align_callback(self, field_name, old_value, new_value):
+        """Callback to validate header alignment when the dict is modified."""
+        self._validate_align(new_value)
+
+    @property
+    def header_align(self) -> dict[str, AlignType]:
+        """Controls alignment of column headers
+
+        header_align - alignment, one of "l", "c", or "r". Columns without a
+        header alignment fall back to the value of ``align``."""
+        return self._header_align
+
+    @header_align.setter
+    def header_align(self, val: AlignType | dict[str, AlignType] | None) -> None:
+        if val is None:
+            # Clear back to the align fallback.
+            self._header_align.clear()
+        elif isinstance(val, str):
+            if not self._field_names:
+                self._header_align[BASE_ALIGN_VALUE] = val
+            else:
+                for field in self._field_names:
+                    self._header_align[field] = val
+        elif isinstance(val, dict):
+            for field, fval in val.items():
+                self._header_align[field] = fval
 
     def _valign_callback(self, field_name, old_value, new_value):
         """Callback to call validators if dict attrs are modified.
@@ -2430,10 +2481,9 @@ class PrettyTable:
                 fieldname = field
             if _str_block_width(fieldname) > width:
                 fieldname = fieldname[:width]
+            header_align = self._header_align.get(field) or self._align[field]
             bits.append(
-                " " * lpad
-                + self._justify(fieldname, width, self._align[field])
-                + " " * rpad
+                " " * lpad + self._justify(fieldname, width, header_align) + " " * rpad
             )
             if options["border"] or options["preserve_internal_border"]:
                 if options["vrules"] == VRuleStyle.ALL:
