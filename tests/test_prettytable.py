@@ -601,6 +601,15 @@ class TestBasic:
         city_data.title = "My table (75 characters wide) " + "=" * 45
         self._test_all_length_equal(city_data)
 
+    def test_all_lengths_equal_with_long_title_no_vrules(
+        self, city_data: PrettyTable
+    ) -> None:
+        """A long title must not overflow the table when vrules=NONE."""
+        city_data.title = "My table (75 characters wide) " + "=" * 45
+        string = city_data.get_string(vrules=VRuleStyle.NONE)
+        lengths = {len(line) for line in string.split("\n")}
+        assert len(lengths) == 1
+
     def test_multiline_title(self, city_data: PrettyTable) -> None:
         """A title with \\n should produce multiple bordered title lines."""
         city_data.title = "Line 1\nLine 2"
