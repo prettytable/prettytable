@@ -526,10 +526,10 @@ class PrettyTable:
         for attr in self._options:
             setattr(new, f"_{attr}", getattr(self, f"_{attr}"))
         if isinstance(index, slice):
-            for row in self._rows[index]:
-                new.add_row(row)
+            for row, divider in zip(self._rows[index], self._dividers[index]):
+                new.add_row(row, divider=divider)
         elif isinstance(index, int):
-            new.add_row(self._rows[index])
+            new.add_row(self._rows[index], divider=self._dividers[index])
         else:
             msg = f"Index {index} is invalid, must be an integer or slice"
             raise IndexError(msg)
