@@ -22,6 +22,18 @@ class TestHtmlConstructor:
         with pytest.raises(ValueError):
             from_html_one(html_string)
 
+    def test_html_ragged_row(self) -> None:
+        """from_html() must not raise when a data row has fewer cells than the header."""
+        html = "<table><tr><th>a</th><th>b</th></tr><tr><td>1</td></tr></table>"
+        tables = from_html(html)
+        assert len(tables) == 1
+        table = tables[0]
+        assert table.field_names == ["a", "b"]
+        rows = table._rows
+        assert len(rows) == 1
+        assert rows[0][0] == "1"
+        assert rows[0][1] == "-"
+
 
 class TestHtmlOutput:
     def test_html_output(self, helper_table: PrettyTable) -> None:
