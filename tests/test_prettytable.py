@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import io
 import sqlite3
 from collections.abc import Generator
 from math import e, pi, sqrt
@@ -16,6 +17,7 @@ from prettytable import (
     RowType,
     TableStyle,
     VRuleStyle,
+    from_csv,
     from_db_cursor,
 )
 
@@ -1342,6 +1344,39 @@ class TestCsvOutput:
             "Bob,00000,10.0,0\r\n"
             'Charlie,-0042,-2.7,"-5,678"\r\n'
         )
+
+    @pytest.mark.parametrize(
+        ("field_name", "values"),
+        [
+            # csv.Sniffer raises "Could not determine delimiter" here...
+            ("Area", ["1295", "5386"]),
+            # ...and here it silently settles on "i", because that letter
+            # happens to occur once on every line.
+            ("City name", ["Adelaide", "Brisbane"]),
+        ],
+    )
+    def test_csv_round_trip_single_column(
+        self, field_name: str, values: list[str]
+    ) -> None:
+        # A one-column CSV holds no delimiter for csv.Sniffer to find, and it
+        # is exactly what get_csv_string() writes for a one-column table.
+        table = PrettyTable()
+        table.field_names = [field_name]
+        for value in values:
+            table.add_row([value])
+
+        csv_string = table.get_csv_string()
+        assert from_csv(io.StringIO(csv_string)).get_csv_string() == csv_string
+
+    def test_from_csv_still_sniffs_the_delimiter(self) -> None:
+        # The fallback must not replace sniffing: a non-comma delimiter is
+        # still detected when there is one to detect.
+        table = PrettyTable()
+        table.field_names = ["City name", "Area"]
+        table.add_row(["Adelaide", "1295"])
+
+        semicolons = table.get_csv_string(delimiter=";")
+        assert from_csv(io.StringIO(semicolons)).field_names == ["City name", "Area"]
 
 
 def test_paginate(city_data: PrettyTable) -> None:
