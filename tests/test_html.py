@@ -22,6 +22,123 @@ class TestHtmlConstructor:
         with pytest.raises(ValueError):
             from_html_one(html_string)
 
+    @pytest.mark.parametrize(
+        ("html_code", "expected_field_names", "expected_rows"),
+        [
+            (
+                "<table><tr><th>a</th><th>b</th></tr><tr><td>1</td></tr></table>",
+                ["a", "b"],
+                [["1", "-"]],
+            ),
+            (
+                "<table><tr><th>a</th><th>b</th><th>c</th></tr><tr><td>1</td><td>2</td></tr></table>",
+                ["a", "b", "c"],
+                [["1", "2", "-"]],
+            ),
+            (
+                "<table><tr><th>a</th><th>b</th><th>c</th></tr><tr><td>1</td></tr></table>",
+                ["a", "b", "c"],
+                [["1", "-", "-"]],
+            ),
+            (
+                (
+                    "<table><tr><th>a</th><th>b</th><th>c</th><th>d</th></tr>"
+                    "<tr><td>1</td><td>2</td><td>3</td></tr>"
+                    "<tr><td>1</td><td>2</td></tr>"
+                    "<tr><td>1</td></tr></table>"
+                ),
+                ["a", "b", "c", "d"],
+                [
+                    ["1", "2", "3", "-"],
+                    ["1", "2", "-", "-"],
+                    ["1", "-", "-", "-"],
+                ],
+            ),
+            (
+                (
+                    "<table><tr><th>a</th><th>b</th><th>c</th></tr>"
+                    "<tr><td>1</td><td>2</td><td>3</td></tr>"
+                    "<tr><td>4</td></tr>"
+                    "<tr><td>5</td><td>6</td></tr>"
+                    "<tr><td>7</td><td>8</td><td>9</td></tr></table>"
+                ),
+                ["a", "b", "c"],
+                [
+                    ["1", "2", "3"],
+                    ["4", "-", "-"],
+                    ["5", "6", "-"],
+                    ["7", "8", "9"],
+                ],
+            ),
+            (
+                "<table><tr><th>a</th><th>b</th></tr><tr></tr></table>",
+                ["a", "b"],
+                [["-", "-"]],
+            ),
+            (
+                (
+                    "<table><tr><th>a</th><th>b</th></tr>"
+                    "<tr><td>1</td><td>2</td></tr>"
+                    "<tr><td>3</td><td>4</td></tr></table>"
+                ),
+                ["a", "b"],
+                [["1", "2"], ["3", "4"]],
+            ),
+        ],
+    )
+    def test_from_html_ragged_tables(
+        self,
+        html_code: str,
+        expected_field_names: list[str],
+        expected_rows: list[list[str]],
+    ) -> None:
+        """Issue #474: from_html should pad short rows with '-' up to max table width."""
+        tables = from_html(html_code)
+        assert len(tables) == 1
+        table = tables[0]
+        assert table.field_names == expected_field_names
+        assert table.rows == expected_rows
+
+    def test_from_html_one_ragged_table(self) -> None:
+        """Issue #474: from_html_one should work transparently on ragged tables."""
+        html_code = "<table><tr><th>a</th><th>b</th></tr><tr><td>1</td></tr></table>"
+        table = from_html_one(html_code)
+        assert table.field_names == ["a", "b"]
+        assert table.rows == [["1", "-"]]
+
+    def test_from_html_ragged_table_rendered_ascii(self) -> None:
+        """Ensure padded cells render correctly in ASCII output."""
+        html_code = (
+            "<table><tr><th>Col 1</th><th>Col 2</th><th>Col 3</th></tr>"
+            "<tr><td>val1</td><td>val2</td></tr>"
+            "<tr><td>val3</td></tr></table>"
+        )
+        table = from_html_one(html_code)
+        expected_ascii = (
+            "+-------+-------+-------+\n"
+            "| Col 1 | Col 2 | Col 3 |\n"
+            "+-------+-------+-------+\n"
+            "|  val1 |  val2 |   -   |\n"
+            "|  val3 |   -   |   -   |\n"
+            "+-------+-------+-------+"
+        )
+        assert table.get_string() == expected_ascii
+
+    def test_from_html_multiple_tables_different_widths(self) -> None:
+        """Ensure max_row_width resets between tables in the same HTML string."""
+        html_code = (
+            "<table><tr><th>a</th><th>b</th><th>c</th><th>d</th></tr>"
+            "<tr><td>1</td><td>2</td><td>3</td><td>4</td></tr></table>"
+            "<table><tr><th>x</th><th>y</th></tr>"
+            "<tr><td>9</td><td>8</td></tr></table>"
+        )
+        tables = from_html(html_code)
+        assert len(tables) == 2
+        assert tables[0].field_names == ["a", "b", "c", "d"]
+        assert tables[0].rows == [["1", "2", "3", "4"]]
+        assert tables[1].field_names == ["x", "y"]
+        assert tables[1].rows == [["9", "8"]]
+
 
 class TestHtmlOutput:
     def test_html_output(self, helper_table: PrettyTable) -> None:
