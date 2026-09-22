@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from prettytable import PrettyTable, TableStyle
 
 
@@ -46,6 +48,30 @@ class TestRowEndSection:
         table.add_rows(self.TEST_ROWS[0:2], divider=True)
         table.add_rows(self.TEST_ROWS[2:])
         assert table.get_string().strip() == self.EXPECTED_RESULT
+
+    @pytest.mark.parametrize("divider", [False, True])
+    @pytest.mark.parametrize("row_count", [0, 1, 3])
+    def test_add_rows_generator(self, divider: bool, row_count: int) -> None:
+        table = PrettyTable(["Value"])
+        table.add_row(["first"], divider=True)
+        table.add_row(["second"])
+
+        table.add_rows(([i] for i in range(row_count)), divider=divider)
+
+        assert table.rows == [["first"], ["second"]] + [[i] for i in range(row_count)]
+        expected_dividers = [True, False] + [False] * row_count
+        if row_count:
+            expected_dividers[-1] = divider
+        assert table.dividers == expected_dividers
+
+    def test_add_rows_generator_invalid_row(self) -> None:
+        table = PrettyTable(["Value"])
+
+        with pytest.raises(ValueError, match="Row has incorrect number of values"):
+            table.add_rows(iter([[1], [2, 3]]), divider=True)
+
+        assert table.rows == [[1]]
+        assert table.dividers == [False]
 
 
 class TestClearing:
