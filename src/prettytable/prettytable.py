@@ -37,7 +37,7 @@ from typing import Any, Literal, cast
 
 TYPE_CHECKING = False
 if TYPE_CHECKING:
-    from collections.abc import Callable, Mapping, Sequence
+    from collections.abc import Callable, Iterable, Mapping, Sequence
     from typing import Final, TypeAlias, TypedDict
 
     from _typeshed import SupportsRichComparison
@@ -1833,7 +1833,7 @@ class PrettyTable:
     # DATA INPUT METHODS         #
     ##############################
 
-    def add_rows(self, rows: Sequence[RowType], *, divider: bool = False) -> None:
+    def add_rows(self, rows: Iterable[RowType], *, divider: bool = False) -> None:
         """Add rows to the table
 
         Arguments:
@@ -1843,11 +1843,12 @@ class PrettyTable:
 
         divider - add row divider after the row block
         """
-        for row in rows[:-1]:
+        start = len(self._rows)
+        for row in rows:
             self.add_row(row)
 
-        if len(rows) > 0:
-            self.add_row(rows[-1], divider=divider)
+        if divider and len(self._rows) > start:
+            self.add_divider()
 
     def add_row(self, row: RowType, *, divider: bool = False) -> None:
         """Add a row to the table
