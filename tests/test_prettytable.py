@@ -893,6 +893,131 @@ class TestEmptyTable:
 
 
 class TestSlicing:
+    @pytest.mark.parametrize("index", [0, slice(None, 1)])
+    def test_options_are_independent(self, index: int | slice) -> None:
+        table = PrettyTable(["name", "count"])
+        table.add_row(["alpha", 7])
+        table.align["name"] = "l"
+        table.attributes = {"class": "original"}
+        table.fields = ["name", "count"]
+        subset = table[index]
+
+        subset.align["name"] = "r"
+        subset.attributes["class"] = "subset"
+        assert isinstance(subset.fields, list)
+        subset.fields.pop()
+
+        assert table.align["name"] == "l"
+        assert table.attributes == {"class": "original"}
+        assert table.fields == ["name", "count"]
+
+        table.align["name"] = "c"
+        table.attributes["class"] = "changed"
+        assert isinstance(table.fields, list)
+        table.fields.reverse()
+
+        assert subset.align["name"] == "r"
+        assert subset.attributes == {"class": "subset"}
+        assert subset.fields == ["name"]
+
+    @pytest.mark.parametrize("index", [0, slice(None, 1)])
+    def test_renaming_subset_does_not_break_source(self, index: int | slice) -> None:
+        table = PrettyTable(["name", "count"])
+        table.add_row(["alpha", 7])
+        original = table.get_string()
+        subset = table[index]
+
+        subset.field_names = ["label", "count"]
+
+        assert "label" in subset.get_string()
+        assert table.get_string() == original
+
+    @pytest.mark.parametrize("index", [0, slice(None, 1)])
+    @pytest.mark.parametrize(
+        ("option", "format_value", "value", "expected"),
+        [
+            ("int_format", "04", 7, "0007"),
+            ("float_format", ".2", 7.5, "7.50"),
+            ("none_format", "missing", None, "missing"),
+        ],
+    )
+    def test_format_callbacks_belong_to_subset(
+        self,
+        index: int | slice,
+        option: str,
+        format_value: str,
+        value: Any,
+        expected: str,
+    ) -> None:
+        table = PrettyTable(["count"])
+        table.add_row([value])
+        table.custom_format["count"] = lambda field, value: f"custom:{value}"
+        subset = table[index]
+
+        getattr(subset, option)["count"] = format_value
+
+        assert f"custom:{value}" in table.get_string()
+        assert expected in subset.get_string()
+        assert "count" not in subset.custom_format
+
+    def test_subset_keeps_callable_identity(self) -> None:
+        table = PrettyTable(["count"])
+        table.add_row([7])
+
+        def formatter(field: str, value: Any) -> str:
+            return f"custom:{value}"
+
+        table.custom_format["count"] = formatter
+        subset = table[:]
+
+        assert subset.custom_format["count"] is formatter
+        assert subset.get_string() == table.get_string()
+
+    @pytest.mark.parametrize("option", ["align", "valign", "max_width", "min_width"])
+    def test_subset_validates_column_options(self, option: str) -> None:
+        table = PrettyTable(["name"])
+        table.add_row(["alpha"])
+        subset = table[:]
+
+        with pytest.raises(ValueError):
+            getattr(subset, option)["name"] = "invalid"
+
+        assert subset.get_string() == table.get_string()
+
+    def test_subset_keeps_border_fallbacks(self) -> None:
+        table = PrettyTable(["name"])
+        table.add_row(["alpha"])
+        subset = table[:]
+
+        subset.junction_char = "*"
+        subset.horizontal_char = "="
+
+        assert subset.top_junction_char == "*"
+        assert subset.horizontal_align_char == "*"
+        assert subset.header_horizontal_char is None
+        assert subset.get_string().splitlines()[2].startswith("*=")
+        assert table.top_junction_char == "+"
+        assert table.get_string().splitlines()[2].startswith("+-")
+
+    @pytest.mark.parametrize("remove_column", [False, True])
+    def test_subset_without_columns_keeps_options(self, remove_column: bool) -> None:
+        table = PrettyTable(["name"])
+        table.add_row(["alpha"])
+        table.align["name"] = "l"
+        if remove_column:
+            table.del_column("name")
+        else:
+            table.clear()
+        original_align = table.align.copy()
+        subset = table[:]
+
+        assert subset.align == original_align
+        assert table.align == original_align
+        with pytest.raises(ValueError):
+            subset.align["name"] = "invalid"  # type: ignore[assignment]
+        subset.align["name"] = "r"
+        assert table.align == original_align
+
     def test_slice_all(self, city_data: PrettyTable) -> None:
         table = city_data[:]
         assert city_data.get_string() == table.get_string()
