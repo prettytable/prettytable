@@ -1081,6 +1081,22 @@ class TestColumnFormattingfromDict:
 +---------+----------------------+---------+------------+---------+------------+
 """.strip()
 
+    def test_max_width_rejects_bool_and_non_int(self) -> None:
+        """bool/float were previously accepted as widths (True -> wrap every char)."""
+        table = PrettyTable(["A"])
+        table.add_row(["hello"])
+        with pytest.raises(ValueError):
+            table.max_width = True
+        with pytest.raises(ValueError):
+            table.max_width = False
+        with pytest.raises(ValueError):
+            table.max_width = {"A": True}
+        with pytest.raises(ValueError):
+            table.min_table_width = True
+        # Positive int still works
+        table.max_width = 3
+        assert "h" in table.get_string()
+
     def test_min_width(self, city_data: PrettyTable) -> None:
         city_data.min_width = {
             "City name": 20,
