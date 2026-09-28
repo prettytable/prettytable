@@ -579,6 +579,7 @@ Table-specific options are:
 | `bottom_right_junction_char` | Single character string used to draw bottom-right line junctions. Default: `junction_char`.                                                 |
 | `break_on_hyphens`           | Whether long lines are wrapped on hyphens. Default: `True`.                                                                                 |
 | `header`                     | A Boolean option (must be `True` or `False`). Controls whether the first row of the table is a header showing the names of all the fields.  |
+| `header_vertical_char`       | Single character string used to draw vertical lines in the header row. Default: `vertical_char`.                                            |
 | `horizontal_char`            | Single character string used to draw horizontal lines. Default: `-`.                                                                        |
 | `hrules`                     | Controls printing of horizontal rules after rows. Allowed values: `FRAME`, `HEADER`, `ALL`, `NONE`.                                         |
 | `junction_char`              | Single character string used to draw line junctions. Default: `+`.                                                                          |
