@@ -47,6 +47,32 @@ class TestRowEndSection:
         table.add_rows(self.TEST_ROWS[2:])
         assert table.get_string().strip() == self.EXPECTED_RESULT
 
+    def test_slice_preserves_dividers(self) -> None:
+        """Slicing a table keeps each row's divider flag (issue: __getitem__
+        re-added rows with the default divider=False, silently dropping section
+        dividers)."""
+        table = PrettyTable()
+        table.field_names = ["value"]
+        table.add_row(["a"])
+        table.add_row(["b"], divider=True)
+        table.add_row(["c"])
+        table.add_row(["d"], divider=True)
+        table.add_row(["e"])
+
+        sliced = table[1:4]
+        assert sliced.rows == [["b"], ["c"], ["d"]]
+        assert sliced.dividers == [True, False, True]
+
+    def test_index_preserves_divider(self) -> None:
+        """Indexing a single row keeps that row's divider flag."""
+        table = PrettyTable()
+        table.field_names = ["value"]
+        table.add_row(["a"])
+        table.add_row(["b"], divider=True)
+
+        assert table[1].dividers == [True]
+        assert table[0].dividers == [False]
+
 
 class TestClearing:
     def test_clear_rows(self, helper_table: PrettyTable) -> None:
