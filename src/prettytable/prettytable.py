@@ -2100,7 +2100,7 @@ class PrettyTable:
                     max(_str_block_width(line) for line in options["title"].split("\n"))
                     + per_col_padding
                 )
-                if options["vrules"] in (VRuleStyle.FRAME, VRuleStyle.ALL):
+                if options["border"]:
                     title_width += 2
             else:
                 title_width = 0
