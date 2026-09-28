@@ -180,6 +180,20 @@ class ObservableDict(dict[str, Any]):
         super().__setitem__(key, value)
 
 
+class ObservableFieldNames(list[str]):
+    """A field-name list that initializes column options when a name is appended."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.callback: Callable[[str], None] | None = None
+
+    def append(self, value: str) -> None:
+        super().append(value)
+        callback = getattr(self, "callback", None)
+        if callback is not None:
+            callback(value)
+
+
 @lru_cache
 def _get_size(text: str) -> tuple[int, int]:
     lines = text.split("\n")
@@ -306,7 +320,7 @@ class PrettyTable:
         self.encoding = kwargs.get("encoding", "UTF-8")
 
         # Data
-        self._field_names: list[str] = []
+        self._field_names: list[str] = ObservableFieldNames()
         self._rows: list[RowType] = []
         self._dividers: list[bool] = []
         self._style = None
@@ -382,6 +396,7 @@ class PrettyTable:
 
         self._valign: dict[str, str | None] = ObservableDict()
         self._valign.callback = self._valign_callback
+        self._field_names.callback = self._field_name_append_callback
 
         self._max_width: dict[str, int | None] = ObservableDict()
         self._max_width.callback = self._max_width_callback
@@ -841,7 +856,7 @@ class PrettyTable:
         old_names = None
         if self._field_names:
             old_names = self._field_names[:]
-        self._field_names = val
+        self._field_names[:] = val
 
         self._column_specific_args()
 
@@ -864,6 +879,12 @@ class PrettyTable:
                     self._valign.pop(old_name, None)
         else:
             self.valign = "t"
+
+    def _field_name_append_callback(self, field_name: str) -> None:
+        if not hasattr(self, "_align"):
+            return
+        self._align[field_name] = "c"
+        self._valign[field_name] = "t"
 
     def _align_callback(self, field_name, old_value, new_value):
         """Callback to call validators if dict attrs are modified.
@@ -1969,7 +1990,7 @@ class PrettyTable:
 
         self._rows = []
         self._dividers = []
-        self._field_names = []
+        self._field_names.clear()
         self._widths = []
 
     ##############################
