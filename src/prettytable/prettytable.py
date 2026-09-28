@@ -95,6 +95,7 @@ if TYPE_CHECKING:
         escape_header: bool
         escape_data: bool
         break_on_hyphens: bool
+        first_col_is_header: bool
 
 
 class HRuleStyle(IntEnum):
@@ -236,6 +237,7 @@ class PrettyTable:
     _attributes: dict[str, str]
     _escape_header: bool
     _escape_data: bool
+    _first_col_is_header: bool
     _style: TableStyle | None
     orgmode: bool
     _widths: list[int]
@@ -362,6 +364,7 @@ class PrettyTable:
             "escape_header",
             "escape_data",
             "break_on_hyphens",
+            "first_col_is_header",
         ]
 
         self._none_format: dict[str, str | None] = ObservableDict()
@@ -444,6 +447,10 @@ class PrettyTable:
             self._escape_header = kwargs["escape_header"]
         else:
             self._escape_header = True
+        if kwargs["first_col_is_header"] in (True, False):
+            self._first_col_is_header = kwargs["first_col_is_header"]
+        else:
+            self._first_col_is_header = False
 
         self._column_specific_args()
 
@@ -601,6 +608,7 @@ class PrettyTable:
             "escape_header",
             "escape_data",
             "break_on_hyphens",
+            "first_col_is_header",
         ):
             self._validate_true_or_false(option, val)
         elif option == "header_style":
@@ -1682,6 +1690,21 @@ class PrettyTable:
         self._validate_option("break_on_hyphens", val)
         self._break_on_hyphens = val
 
+    @property
+    def first_col_is_header(self) -> bool:
+        """Render the first column of each row as a row header in HTML output
+
+        When True, ``get_html_string`` emits the first (leftmost) cell of every
+        data row as a ``<th scope="row">`` element instead of ``<td>``, and marks
+        the column headers with ``scope="col"``. This is useful for tables whose
+        first column labels each row. Only affects HTML output (True or False)."""
+        return self._first_col_is_header
+
+    @first_col_is_header.setter
+    def first_col_is_header(self, val: bool) -> None:
+        self._validate_option("first_col_is_header", val)
+        self._first_col_is_header = val
+
     ##############################
     # OPTION MIXER               #
     ##############################
@@ -2698,6 +2721,9 @@ class PrettyTable:
         format - Controls whether or not HTML tables are formatted to match
             styling options (True or False)
         escape_data - escapes the text within a data field (True or False)
+        first_col_is_header - render the first column of each row as a row header,
+            emitting <th scope="row"> instead of <td> and marking column headers
+            with scope="col" (True or False)
         xhtml - print <br/> tags if True, <br> tags if False
         break_on_hyphens - Whether long lines are broken on hyphens or not, default: True
         """
@@ -2743,8 +2769,11 @@ class PrettyTable:
                 if options["escape_header"]:
                     field = escape(field)
 
+                th_attrs = ' scope="col"' if options["first_col_is_header"] else ""
                 lines.append(
-                    "            <th>{}</th>".format(field.replace("\n", linebreak))
+                    "            <th{}>{}</th>".format(
+                        th_attrs, field.replace("\n", linebreak)
+                    )
                 )
 
             lines.append("        </tr>")
@@ -2756,15 +2785,19 @@ class PrettyTable:
         formatted_rows = self._format_rows(rows)
         for row in formatted_rows:
             lines.append("        <tr>")
+            first_col = True
             for field, datum in zip(self._field_names, row):
                 if options["fields"] and field not in options["fields"]:
                     continue
                 if options["escape_data"]:
                     datum = escape(datum)
 
-                lines.append(
-                    "            <td>{}</td>".format(datum.replace("\n", linebreak))
-                )
+                content = datum.replace("\n", linebreak)
+                if first_col and options["first_col_is_header"]:
+                    lines.append(f'            <th scope="row">{content}</th>')
+                else:
+                    lines.append(f"            <td>{content}</td>")
+                first_col = False
             lines.append("        </tr>")
         lines.append("    </tbody>")
         lines.append("</table>")
@@ -2831,8 +2864,10 @@ class PrettyTable:
                     field = escape(field)
 
                 content = field.replace("\n", linebreak)
+                th_attrs = ' scope="col"' if options["first_col_is_header"] else ""
                 lines.append(
-                    f'            <th style="'
+                    f"            <th{th_attrs} "
+                    f'style="'
                     f"padding-left: {lpad}em; "
                     f"padding-right: {rpad}em; "
                     f'text-align: center">{content}</th>'
@@ -2854,6 +2889,7 @@ class PrettyTable:
         ]
         for row in formatted_rows:
             lines.append("        <tr>")
+            first_col = True
             for field, datum, align, valign in zip(
                 self._field_names, row, aligns, valigns
             ):
@@ -2863,13 +2899,19 @@ class PrettyTable:
                     datum = escape(datum)
 
                 content = datum.replace("\n", linebreak)
+                if first_col and options["first_col_is_header"]:
+                    tag, tag_attrs = "th", ' scope="row"'
+                else:
+                    tag, tag_attrs = "td", ""
                 lines.append(
-                    f'            <td style="'
+                    f"            <{tag}{tag_attrs} "
+                    f'style="'
                     f"padding-left: {lpad}em; "
                     f"padding-right: {rpad}em; "
                     f"text-align: {align}; "
-                    f'vertical-align: {valign}">{content}</td>'
+                    f'vertical-align: {valign}">{content}</{tag}>'
                 )
+                first_col = False
             lines.append("        </tr>")
         lines.append("    </tbody>")
         lines.append("</table>")
