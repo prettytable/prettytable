@@ -411,6 +411,90 @@ class TestAlignment:
         assert "c" not in table._align
 
 
+def numbers_table() -> PrettyTable:
+    table = PrettyTable()
+    table.field_names = ["x", "y"]
+    table.add_row([12346.657, 42])
+    table.add_row([9.1, 7000])
+    return table
+
+
+class TestHeaderAlignment:
+    """Header alignment can be set independently of the body alignment."""
+
+    def test_header_follows_align_by_default(self) -> None:
+        table = numbers_table()
+        table.align = "r"
+        assert table.get_string() == """
++-----------+------+
+|         x |    y |
++-----------+------+
+| 12346.657 |   42 |
+|       9.1 | 7000 |
++-----------+------+""".strip()
+
+    def test_header_align_independent_of_align(self) -> None:
+        table = numbers_table()
+        table.align = "r"
+        table.header_align = "c"
+        assert table.get_string() == """
++-----------+------+
+|     x     |  y   |
++-----------+------+
+| 12346.657 |   42 |
+|       9.1 | 7000 |
++-----------+------+""".strip()
+
+    def test_header_align_one_column(self) -> None:
+        table = numbers_table()
+        table.align = "r"
+        table.header_align["x"] = "l"
+        assert table.get_string() == """
++-----------+------+
+| x         |    y |
++-----------+------+
+| 12346.657 |   42 |
+|       9.1 | 7000 |
++-----------+------+""".strip()
+
+    def test_header_align_via_init(self) -> None:
+        by_init = PrettyTable(["x", "y"], align="r", header_align="c")
+        by_attr = PrettyTable(["x", "y"])
+        by_attr.align = "r"
+        by_attr.header_align = "c"
+        for table in (by_init, by_attr):
+            table.add_row([12346.657, 42])
+        assert by_init.get_string() == by_attr.get_string()
+
+    def test_header_align_reset_to_none(self) -> None:
+        table = numbers_table()
+        table.align = "r"
+        table.header_align = "l"
+        table.header_align = None
+        assert table._header_align == {}
+        # Falls back to align, so it matches a table that only set align.
+        plain = numbers_table()
+        plain.align = "r"
+        assert table.get_string() == plain.get_string()
+
+    def test_header_align_invalid(self) -> None:
+        table = numbers_table()
+        with pytest.raises(ValueError):
+            table.header_align["x"] = "unexpected"  # type: ignore[assignment]
+
+    def test_header_align_invalid_dict(self) -> None:
+        table = numbers_table()
+        with pytest.raises(ValueError):
+            table.header_align = {"x": "unexpected"}  # type: ignore[dict-item]
+
+    def test_rename_keeps_header_align(self) -> None:
+        table = numbers_table()
+        table.header_align["x"] = "l"
+        table.field_names = ["a", "y"]
+        assert table.header_align["a"] == "l"
+        assert "x" not in table._header_align
+
+
 class TestOptionOverride:
     """Make sure all options are properly overwritten by get_string."""
 
