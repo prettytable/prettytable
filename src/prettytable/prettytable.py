@@ -2559,7 +2559,7 @@ class PrettyTable:
 
         Arguments:
 
-        page_length - number of rows per page (default: 58)
+        page_length - positive number of rows per page (default: 58)
         line_break - string used to separate pages (default: "\f" form feed)
         **kwargs - additional keyword arguments passed to get_string() method,
             such as title, fields, header, border, etc.
@@ -2567,6 +2567,10 @@ class PrettyTable:
         The table is split into pages of the specified length, with each page
         separated by the line_break character. All formatting options available
         in get_string() can be used via kwargs."""
+        if page_length <= 0:
+            msg = "page_length must be greater than zero"
+            raise ValueError(msg)
+
         pages: list[str] = []
         kwargs["start"] = kwargs.get("start", 0)
         true_end = kwargs.get("end", self.rowcount)
