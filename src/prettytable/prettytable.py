@@ -3104,8 +3104,21 @@ def from_csv(fp, field_names: Sequence[str] | None = None, **kwargs) -> PrettyTa
     if fmtparams:
         reader = csv.reader(fp, **fmtparams)
     else:
-        dialect = csv.Sniffer().sniff(fp.read(1024))
+        sample = fp.read(1024)
         fp.seek(0)
+        try:
+            dialect = csv.Sniffer().sniff(sample)
+        except csv.Error:
+            # No delimiter to find: a one-column CSV, which is what
+            # get_csv_string() writes for a one-column table.
+            dialect = csv.excel
+        else:
+            if dialect.delimiter.isalnum():
+                # csv.Sniffer widens its search to every character when the
+                # usual delimiters do not fit, so a one-column CSV can be
+                # split on a letter or digit that happens to occur the same
+                # number of times on every line.
+                dialect = csv.excel
         reader = csv.reader(fp, dialect)
 
     table = PrettyTable(**kwargs)
