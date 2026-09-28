@@ -3200,7 +3200,7 @@ def _make_table_handler():
             for row in self.rows:
                 if len(row[0]) < self.max_row_width:
                     appends = self.max_row_width - len(row[0])
-                    for i in range(1, appends):
+                    for i in range(appends):
                         row[0].append("-")
 
                 if row[1]:
