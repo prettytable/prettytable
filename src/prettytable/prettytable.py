@@ -2379,12 +2379,18 @@ class PrettyTable:
             else " "
         )
         lpad, rpad = self._get_padding_widths(options)
-        sum_widths = sum([n + lpad + rpad + 1 for n in self._widths])
+        if options["border"]:
+            # Every column is followed by a vertical separator, and the line is
+            # wrapped in the frame characters added as endpoints below.
+            inner_width = sum(n + lpad + rpad + 1 for n in self._widths) - 1
+        else:
+            # Without a border no separators are drawn, so the title only spans
+            # the columns themselves, less the two endpoints added below.
+            inner_width = sum(n + lpad + rpad for n in self._widths) - 2
+        inner_width = max(inner_width, 0)
         for title_line in title.split("\n"):
             padded = " " * lpad + title_line + " " * rpad
-            lines.append(
-                endpoint + self._justify(padded, sum_widths - 1, "c") + endpoint
-            )
+            lines.append(endpoint + self._justify(padded, inner_width, "c") + endpoint)
         return "\n".join(lines)
 
     def _stringify_header(self, options: OptionsType) -> str:
