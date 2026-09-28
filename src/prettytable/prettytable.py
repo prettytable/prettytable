@@ -3165,8 +3165,15 @@ def _make_table_handler():
             if tag == "th":
                 self.is_last_row_header = True
             for key, value in attrs:
-                if key == "colspan":
-                    self.colspan = int(value)  # type: ignore[arg-type]
+                if key == "colspan" and value:
+                    try:
+                        span = int(value)
+                    except ValueError:
+                        msg = f"Invalid colspan value: {value!r}"
+                        raise ValueError(msg)
+                    # Clamp to HTML spec valid range [1, 1000] to prevent
+                    # memory exhaustion from malicious large values (CWE-409)
+                    self.colspan = max(1, min(span, 1000))
 
         def handle_endtag(self, tag: str) -> None:
             if tag in ["th", "td"]:

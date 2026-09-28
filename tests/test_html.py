@@ -575,3 +575,33 @@ class TestHtmlOutput:
     </tbody>
 </table>
 """.strip()
+
+
+class TestFromHtmlColspan:
+    """Tests for colspan bounds checking in from_html()."""
+
+    def test_colspan_clamped_to_max(self) -> None:
+        """Large colspan values are clamped to prevent memory exhaustion (CWE-409)."""
+        html = '<table><tr><th colspan="100000000">A</th></tr><tr><td colspan="100000000">data</td></tr></table>'
+        table = from_html_one(html)
+        assert len(table.rows) == 1
+        # colspan clamped to 1000, so row has at most 1000 cells
+        assert len(table.rows[0]) <= 1000
+
+    def test_colspan_invalid_value_raises(self) -> None:
+        """Non-integer colspan raises ValueError instead of crashing."""
+        html = '<table><tr><th>A</th></tr><tr><td colspan="abc">data</td></tr></table>'
+        with pytest.raises(ValueError, match="Invalid colspan"):
+            from_html_one(html)
+
+    def test_colspan_negative_clamped(self) -> None:
+        """Negative colspan is clamped to 1 (no extra cells)."""
+        html = '<table><tr><th>A</th></tr><tr><td colspan="-5">data</td></tr></table>'
+        table = from_html_one(html)
+        assert len(table.rows[0]) == 1
+
+    def test_colspan_within_bounds(self) -> None:
+        """Normal colspan values work correctly."""
+        html = '<table><tr><th>A</th><th>B</th><th>C</th></tr><tr><td colspan="2">merged</td><td>x</td></tr></table>'
+        table = from_html_one(html)
+        assert table.rows[0] == ["merged", "", "x"]
