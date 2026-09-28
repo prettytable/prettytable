@@ -453,8 +453,8 @@ class PrettyTable:
             self._padding_width = 1
         else:
             self._padding_width = kwargs["padding_width"]
-        self._left_padding_width = kwargs["left_padding_width"] or None
-        self._right_padding_width = kwargs["right_padding_width"] or None
+        self._left_padding_width = kwargs["left_padding_width"]
+        self._right_padding_width = kwargs["right_padding_width"]
 
         self._vertical_char = kwargs["vertical_char"] or "|"
         self._horizontal_char = kwargs["horizontal_char"] or "-"
