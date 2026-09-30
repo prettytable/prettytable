@@ -2725,7 +2725,9 @@ class PrettyTable:
             for attr_name, attr_value in options["attributes"].items():
                 # Attribute values are not restricted to strings, e.g. `border=1`
                 # is a natural way to write an HTML attribute.
-                open_tag.append(f' {escape(str(attr_name))}="{escape(str(attr_value))}"')
+                open_tag.append(
+                    f' {escape(str(attr_name))}="{escape(str(attr_value))}"'
+                )
         open_tag.append(">")
         lines.append("".join(open_tag))
 
