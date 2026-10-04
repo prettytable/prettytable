@@ -23,7 +23,6 @@ jobs:
           - "3.13"
           - "3.12"
           - "3.11"
-          - "3.10"
         os: [windows-latest, macos-latest, ubuntu-latest]
         include:
           - python-version: "3.16"
@@ -69,9 +68,12 @@ jobs:
           name: ${{ matrix.os }} Python ${{ matrix.python-version }}
 
   success:
+    if: always()
     needs: test
     runs-on: ubuntu-latest
     name: Test successful
     steps:
       - name: Success
-        run: echo Test successful
+        env:
+          TEST_RESULT: ${{ needs.test.result }}
+        run: test "$TEST_RESULT" = "success"
