@@ -38,10 +38,9 @@ from typing import Any, Literal, cast
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
-    from typing import Final, TypeAlias, TypedDict
+    from typing import Final, Self, TypeAlias, TypedDict
 
     from _typeshed import SupportsRichComparison
-    from typing_extensions import Self
 
     class OptionsType(TypedDict):
         title: str | None

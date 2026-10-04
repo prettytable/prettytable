@@ -13,11 +13,10 @@ license = "BSD-3-Clause"
 license-files = [ "LICENSE" ]
 maintainers = [ { name = "Hugo van Kemenade" } ]
 authors = [ { name = "Luke Maurits", email = "luke@maurits.id.au" } ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 classifiers = [
   "Programming Language :: Python",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
@@ -57,7 +56,7 @@ lint.extend-select = [
   "ICN",    # flake8-import-conventions
   "ISC",    # flake8-implicit-str-concat
   "LOG",    # flake8-logging
-  "PERF",   # Perflint
+  "PERF",   # perflint
   "PGH",    # pygrep-hooks
   "PIE",    # flake8-pie
   "PYI",    # flake8-pyi
@@ -80,7 +79,7 @@ max_supported_python = "3.16"
 
 [tool.mypy]
 follow_imports = "silent"
-python_version = "3.10"
+python_version = "3.11"
 disallow_any_generics = true
 warn_redundant_casts = true
 warn_unused_ignores = true
