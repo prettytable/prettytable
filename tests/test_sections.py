@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import ClassVar
+
 from prettytable import PrettyTable, TableStyle
 
 
@@ -15,7 +17,7 @@ class TestRowEndSection:
 └──────────┴──────────┴──────────┘
 """.strip()
 
-    TEST_ROWS = [
+    TEST_ROWS: ClassVar[list[list[str]]] = [
         ["value 4", "value 5", "value 6"],
         ["value 7", "value 8", "value 9"],
         ["value 10", "value 11", "value 12"],
