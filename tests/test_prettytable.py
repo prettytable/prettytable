@@ -1561,8 +1561,10 @@ class TestRepr:
 
 class TestBreakOnHyphens:
     row = [
-        "bluedevil breeze breeze-gtk eos-bash-shared glib2 "
-        "kactivitymanagerd kde-cli-tools kde-gtk-config kdecoration"
+        (
+            "bluedevil breeze breeze-gtk eos-bash-shared glib2 "
+            "kactivitymanagerd kde-cli-tools kde-gtk-config kdecoration"
+        )
     ]
     EXPECTED_TRUE = """+------------------------------------------+
 |                 Field 1                  |
@@ -1720,9 +1722,11 @@ class TestWidth:
                 0,
                 0,
                 0,
-                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam "
-                "nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam "
-                "erat, sed diam voluptua",
+                (
+                    "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam "
+                    "nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam "
+                    "erat, sed diam voluptua"
+                ),
             ]
         )
 
@@ -1915,9 +1919,11 @@ class TestWidth:
                 0,
                 0,
                 0,
-                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam "
-                "nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam "
-                "erat, sed diam voluptua",
+                (
+                    "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam "
+                    "nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam "
+                    "erat, sed diam voluptua"
+                ),
             ]
         )
 
@@ -1944,9 +1950,11 @@ class TestWidth:
                 0,
                 0,
                 0,
-                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam "
-                "nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam "
-                "erat, sed diam voluptua",
+                (
+                    "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam "
+                    "nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam "
+                    "erat, sed diam voluptua"
+                ),
             ]
         )
 
