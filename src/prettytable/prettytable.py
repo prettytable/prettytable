@@ -890,7 +890,7 @@ class PrettyTable:
     def align(self, val: AlignType | dict[str, AlignType] | None) -> None:
         if isinstance(val, str):
             if not self._field_names:
-                self._align = {BASE_ALIGN_VALUE: val}
+                self._align[BASE_ALIGN_VALUE] = val
             else:
                 for field in self._field_names:
                     self._align[field] = val
@@ -901,7 +901,7 @@ class PrettyTable:
             for field in self._field_names:
                 self._align[field] = "c"
         else:
-            self._align = {BASE_ALIGN_VALUE: "c"}
+            self._align[BASE_ALIGN_VALUE] = "c"
 
     def _valign_callback(self, field_name, old_value, new_value):
         """Callback to call validators if dict attrs are modified.
