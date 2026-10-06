@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import importlib
 import sqlite3
 from collections.abc import Generator
 from math import e, pi, sqrt
@@ -2088,7 +2089,7 @@ class TestDeprecations:
     )
     def test_hrule_constant_deprecations(self, module_name: str, name: str) -> None:
         with pytest.deprecated_call(match=f"the '{name}' constant is deprecated"):
-            exec(f"from {module_name} import {name}")
+            getattr(importlib.import_module(module_name), name)
 
     @pytest.mark.parametrize(
         "module_name",
@@ -2114,7 +2115,7 @@ class TestDeprecations:
         self, module_name: str, name: str
     ) -> None:
         with pytest.deprecated_call(match=f"the '{name}' constant is deprecated"):
-            exec(f"from {module_name} import {name}")
+            getattr(importlib.import_module(module_name), name)
 
     def test_options_type_deprecation(self) -> None:
         with pytest.deprecated_call(match="OptionsType"):
