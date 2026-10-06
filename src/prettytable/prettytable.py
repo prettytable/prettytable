@@ -520,10 +520,7 @@ class PrettyTable:
             raise AttributeError(name)
 
     def __getitem__(self, index: int | slice) -> PrettyTable:
-        new = PrettyTable()
-        new.field_names = self.field_names
-        for attr in self._options:
-            setattr(new, f"_{attr}", getattr(self, f"_{attr}"))
+        new = PrettyTable(self.field_names)
         if isinstance(index, slice):
             for row in self._rows[index]:
                 new.add_row(row)
@@ -532,6 +529,20 @@ class PrettyTable:
         else:
             msg = f"Index {index} is invalid, must be an integer or slice"
             raise IndexError(msg)
+
+        if not isinstance(new._align, ObservableDict):
+            new._align = ObservableDict()
+            new._align.callback = new._align_callback
+        for attr in self._options:
+            value = getattr(self, f"_{attr}")
+            target = getattr(new, f"_{attr}")
+            if isinstance(target, ObservableDict):
+                target.clear()
+                target.update(value)
+            else:
+                if isinstance(value, (dict, list)):
+                    value = value.copy()
+                setattr(new, f"_{attr}", value)
         return new
 
     def __str__(self) -> str:
