@@ -22,6 +22,26 @@ class TestHtmlConstructor:
         with pytest.raises(ValueError):
             from_html_one(html_string)
 
+    def test_from_html_ragged_rows_padded(self) -> None:
+        html = "<table><tr><th>a</th><th>b</th></tr><tr><td>1</td></tr></table>"
+        table = from_html_one(html)
+        assert table.field_names == ["a", "b"]
+        assert table.rows == [["1", "-"]]
+
+        html_multi_missing = (
+            "<table><tr><th>a</th><th>b</th><th>c</th></tr><tr><td>1</td></tr></table>"
+        )
+        table_multi = from_html_one(html_multi_missing)
+        assert table_multi.field_names == ["a", "b", "c"]
+        assert table_multi.rows == [["1", "-", "-"]]
+
+        html_short_header = (
+            "<table><tr><th>a</th></tr><tr><td>1</td><td>2</td></tr></table>"
+        )
+        table_short_header = from_html_one(html_short_header)
+        assert table_short_header.field_names == ["a", "-"]
+        assert table_short_header.rows == [["1", "2"]]
+
 
 class TestHtmlOutput:
     def test_html_output(self, helper_table: PrettyTable) -> None:
