@@ -2955,9 +2955,12 @@ class PrettyTable:
             wanted_fields = self._field_names
 
         wanted_alignments = [self._align[field] for field in wanted_fields]
-        if options["border"] and options["vrules"] == VRuleStyle.ALL:
-            alignment_str = "|".join(wanted_alignments)
-        elif not options["border"] and options["preserve_internal_border"]:
+        if (
+            options["border"]
+            and options["vrules"] == VRuleStyle.ALL
+            or not options["border"]
+            and options["preserve_internal_border"]
+        ):
             alignment_str = "|".join(wanted_alignments)
         else:
             alignment_str = "".join(wanted_alignments)

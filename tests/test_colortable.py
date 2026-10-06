@@ -96,7 +96,6 @@ class TestColorTableRendering:
             (False, True),  # the default
             (True, True),  # titled
             (True, False),  # titled, no header
-            (True, True),  # both title and header
         ],
     )
     def test_color_table_rendering(self, with_title: bool, with_header: bool) -> None:

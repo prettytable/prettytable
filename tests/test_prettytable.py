@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import datetime as dt
+import importlib
 import sqlite3
 from collections.abc import Generator
 from math import e, pi, sqrt
-from typing import Any
+from typing import Any, ClassVar
 
 import pytest
 from pytest_lazy_fixtures import lf
@@ -1560,9 +1561,11 @@ class TestRepr:
 
 
 class TestBreakOnHyphens:
-    row = [
-        "bluedevil breeze breeze-gtk eos-bash-shared glib2 "
-        "kactivitymanagerd kde-cli-tools kde-gtk-config kdecoration"
+    row: ClassVar[list[str]] = [
+        (
+            "bluedevil breeze breeze-gtk eos-bash-shared glib2 "
+            "kactivitymanagerd kde-cli-tools kde-gtk-config kdecoration"
+        )
     ]
     EXPECTED_TRUE = """+------------------------------------------+
 |                 Field 1                  |
@@ -1720,9 +1723,11 @@ class TestWidth:
                 0,
                 0,
                 0,
-                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam "
-                "nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam "
-                "erat, sed diam voluptua",
+                (
+                    "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam "
+                    "nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam "
+                    "erat, sed diam voluptua"
+                ),
             ]
         )
 
@@ -1915,9 +1920,11 @@ class TestWidth:
                 0,
                 0,
                 0,
-                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam "
-                "nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam "
-                "erat, sed diam voluptua",
+                (
+                    "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam "
+                    "nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam "
+                    "erat, sed diam voluptua"
+                ),
             ]
         )
 
@@ -1944,9 +1951,11 @@ class TestWidth:
                 0,
                 0,
                 0,
-                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam "
-                "nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam "
-                "erat, sed diam voluptua",
+                (
+                    "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam "
+                    "nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam "
+                    "erat, sed diam voluptua"
+                ),
             ]
         )
 
@@ -2080,7 +2089,7 @@ class TestDeprecations:
     )
     def test_hrule_constant_deprecations(self, module_name: str, name: str) -> None:
         with pytest.deprecated_call(match=f"the '{name}' constant is deprecated"):
-            exec(f"from {module_name} import {name}")
+            getattr(importlib.import_module(module_name), name)
 
     @pytest.mark.parametrize(
         "module_name",
@@ -2106,7 +2115,7 @@ class TestDeprecations:
         self, module_name: str, name: str
     ) -> None:
         with pytest.deprecated_call(match=f"the '{name}' constant is deprecated"):
-            exec(f"from {module_name} import {name}")
+            getattr(importlib.import_module(module_name), name)
 
     def test_options_type_deprecation(self) -> None:
         with pytest.deprecated_call(match="OptionsType"):
