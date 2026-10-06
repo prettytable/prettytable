@@ -172,6 +172,12 @@ class TestHtmlOutput:
 </table>
 """.strip()
 
+    def test_html_output_with_non_string_attribute_value(
+        self, helper_table: PrettyTable
+    ) -> None:
+        result = helper_table.get_html_string(attributes={"border": 1})
+        assert result.strip().startswith('<table border="1">')
+
     def test_html_output_without_escaped_header(
         self, empty_helper_table: PrettyTable
     ) -> None:
