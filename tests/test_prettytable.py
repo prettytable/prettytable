@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime as dt
 import importlib
+import json
 import sqlite3
 from collections.abc import Generator
 from math import e, pi, sqrt
@@ -2128,3 +2129,26 @@ class TestDeprecations:
             from prettytable import TableHandler
 
             TableHandler()
+
+
+def test_delete_active_sort_column() -> None:
+    table = PrettyTable(["rank", "name"], sortby="rank")
+    table.add_rows([[2, "second"], [1, "first"]])
+    table.del_column("rank")
+
+    assert json.loads(table.get_json_string(header=False)) == [
+        {"name": "second"},
+        {"name": "first"},
+    ]
+    assert table.sortby is None
+    assert "second" in table.get_string()
+    assert "first" in table.get_html_string()
+
+
+def test_delete_other_column_keeps_sort() -> None:
+    table = PrettyTable(["rank", "name"], sortby="rank")
+    table.add_rows([[2, "second"], [1, "first"]])
+    table.del_column("name")
+
+    assert table.sortby == "rank"
+    assert json.loads(table.get_json_string(header=False)) == [{"rank": 1}, {"rank": 2}]
