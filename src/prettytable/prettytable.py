@@ -1930,8 +1930,14 @@ class PrettyTable:
         Arguments:
         fieldname - name of the field to contain the new column of data"""
         self._field_names.insert(0, fieldname)
-        self._align[fieldname] = self._kwargs["align"] or "c"
-        self._valign[fieldname] = self._kwargs["valign"] or "t"
+        align: AlignType | dict[str, AlignType] = self._kwargs["align"] or "c"
+        valign: VAlignType | dict[str, VAlignType] = self._kwargs["valign"] or "t"
+        self._align[fieldname] = (
+            align.get(fieldname, "c") if isinstance(align, dict) else align
+        )
+        self._valign[fieldname] = (
+            valign.get(fieldname, "t") if isinstance(valign, dict) else valign
+        )
         for i, row in enumerate(self._rows):
             row.insert(0, i + 1)
 

@@ -1390,6 +1390,55 @@ def test_autoindex(city_data: PrettyTable) -> None:
     assert str(city_data) == str(table2)
 
 
+@pytest.mark.parametrize(
+    "align, valign, expected_align, expected_valign",
+    [
+        ({"name": "l"}, None, "c", "t"),
+        (None, {"name": "b"}, "c", "t"),
+        ({"name": "l"}, {"name": "b"}, "c", "t"),
+        ({"name": "l", "Index": "r"}, {"name": "b", "Index": "m"}, "r", "m"),
+        ("r", "b", "r", "b"),
+        ({}, {}, "c", "t"),
+        (None, None, "c", "t"),
+    ],
+)
+def test_autoindex_column_alignment(
+    align, valign, expected_align, expected_valign
+) -> None:
+    table = PrettyTable(["name"], align=align, valign=valign)
+    table.add_rows([["alpha"], ["beta"]])
+    original_align = table.align["name"]
+    original_valign = table.valign["name"]
+
+    table.add_autoindex()
+
+    assert table.field_names == ["Index", "name"]
+    assert table.rows == [[1, "alpha"], [2, "beta"]]
+    assert table.align["Index"] == expected_align
+    assert table.valign["Index"] == expected_valign
+    assert table.align["name"] == original_align
+    assert table.valign["name"] == original_valign
+    assert "alpha" in table.get_string()
+    assert "beta" in table.get_html_string(format=True)
+
+
+def test_autoindex_custom_name_alignment() -> None:
+    table = PrettyTable(
+        ["name"],
+        align={"name": "l", "Row": "r"},
+        valign={"name": "b", "Row": "m"},
+    )
+    table.add_row(["alpha"])
+
+    table.add_autoindex("Row")
+
+    assert table.field_names == ["Row", "name"]
+    assert table.rows == [[1, "alpha"]]
+    assert table.align["Row"] == "r"
+    assert table.valign["Row"] == "m"
+    assert "alpha" in table.get_html_string(format=True)
+
+
 @pytest.fixture(scope="function")
 def unpadded_pt() -> PrettyTable:
     table = PrettyTable(header=False, padding_width=0)
