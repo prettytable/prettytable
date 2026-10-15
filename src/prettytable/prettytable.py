@@ -3188,6 +3188,7 @@ def _make_table_handler():
                 table = self.generate_table(self.rows)
                 self.tables.append(table)
                 self.rows = []
+                self.max_row_width = 0
             self.last_content = " "
             self.active = None
 

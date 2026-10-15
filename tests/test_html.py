@@ -22,6 +22,31 @@ class TestHtmlConstructor:
         with pytest.raises(ValueError):
             from_html_one(html_string)
 
+    @pytest.mark.parametrize(
+        "widths", [(4, 1), (3, 1), (3, 2), (2, 3), (2, 2), (4, 0, 1), (1, 4, 1)]
+    )
+    @pytest.mark.parametrize("header", [True, False])
+    def test_html_multiple_tables_independent_widths(
+        self, widths: tuple[int, ...], header: bool
+    ) -> None:
+        html_tables = []
+        expected = []
+        for index, width in enumerate(widths):
+            fields = [f"Column {column}" for column in range(width)]
+            row = [f"{index}.{column}" for column in range(width)]
+            html = "<table>"
+            if width:
+                if header:
+                    html += "<tr>" + "".join(f"<th>{f}</th>" for f in fields) + "</tr>"
+                else:
+                    fields = [f"Field {column + 1}" for column in range(width)]
+                html += "<tr>" + "".join(f"<td>{v}</td>" for v in row) + "</tr>"
+            html_tables.append(html + "</table>")
+            expected.append((fields, [row] if width else []))
+
+        tables = from_html("".join(html_tables))
+        assert [(table.field_names, table.rows) for table in tables] == expected
+
 
 class TestHtmlOutput:
     def test_html_output(self, helper_table: PrettyTable) -> None:
