@@ -3188,6 +3188,7 @@ def _make_table_handler():
                 table = self.generate_table(self.rows)
                 self.tables.append(table)
                 self.rows = []
+                self.max_row_width = 0
             self.last_content = " "
             self.active = None
 
@@ -3199,10 +3200,10 @@ def _make_table_handler():
             Generates from a list of rows a PrettyTable object.
             """
             table = PrettyTable(**self.kwargs)
-            for row in self.rows:
+            for row in rows:
                 if len(row[0]) < self.max_row_width:
                     appends = self.max_row_width - len(row[0])
-                    for i in range(1, appends):
+                    for _ in range(appends):
                         row[0].append("-")
 
                 if row[1]:

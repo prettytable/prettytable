@@ -22,6 +22,35 @@ class TestHtmlConstructor:
         with pytest.raises(ValueError):
             from_html_one(html_string)
 
+    def test_html_ragged_row_padding(self) -> None:
+        """Test that data rows with fewer cells than header are properly padded (#474)."""
+        html = "<table><tr><th>a</th><th>b</th></tr><tr><td>1</td></tr></table>"
+        table = from_html_one(html)
+        assert table.field_names == ["a", "b"]
+        assert table.rows == [["1", "-"]]
+
+    def test_html_ragged_row_multiple_missing(self) -> None:
+        """Test that data rows missing multiple cells are padded to match header."""
+        html = (
+            "<table><tr><th>a</th><th>b</th><th>c</th></tr><tr><td>1</td></tr></table>"
+        )
+        table = from_html_one(html)
+        assert table.field_names == ["a", "b", "c"]
+        assert table.rows == [["1", "-", "-"]]
+
+    def test_html_multiple_tables_differing_columns(self) -> None:
+        """Test that multiple tables in the same HTML string maintain independent widths."""
+        html = (
+            "<table><tr><th>a</th><th>b</th><th>c</th></tr><tr><td>1</td><td>2</td><td>3</td></tr></table>"
+            "<table><tr><th>x</th><th>y</th></tr><tr><td>9</td><td>8</td></tr></table>"
+        )
+        tables = from_html(html)
+        assert len(tables) == 2
+        assert tables[0].field_names == ["a", "b", "c"]
+        assert tables[0].rows == [["1", "2", "3"]]
+        assert tables[1].field_names == ["x", "y"]
+        assert tables[1].rows == [["9", "8"]]
+
 
 class TestHtmlOutput:
     def test_html_output(self, helper_table: PrettyTable) -> None:
