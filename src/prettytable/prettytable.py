@@ -178,6 +178,11 @@ class ObservableDict(dict[str, Any]):
             self.callback(key, old_value, value)
         super().__setitem__(key, value)
 
+    def update(self, *args, **kwargs) -> None:
+        """Update items through the same callbacks as individual assignments."""
+        for key, value in dict(*args, **kwargs).items():
+            self[key] = value
+
 
 @lru_cache
 def _get_size(text: str) -> tuple[int, int]:
