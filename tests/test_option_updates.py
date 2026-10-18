@@ -27,7 +27,11 @@ def test_alignment_update_validates_values() -> None:
     assert table.align["value"] == "c"
 
 
-def test_alignment_update_accepts_keywords() -> None:
-    table = PrettyTable(["value"])
-    table.align.update(value="l")
-    assert table.align["value"] == "l"
+@pytest.mark.parametrize("field", ["value", "self"])
+def test_alignment_update_accepts_keywords(field: str) -> None:
+    table = PrettyTable([field])
+    if field == "self":
+        table.align.update(self="l")
+    else:
+        table.align.update(value="l")
+    assert table.align[field] == "l"
