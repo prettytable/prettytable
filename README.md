@@ -731,8 +731,8 @@ table.set_style(TableStyle.DOUBLE_BORDER)
 print(table)
 ```
 
-The preset supplies the border characters, and the theme supplies their colors.
-Without a preset, the theme's custom border characters are used as before.
+The preset supplies the border characters, and the theme supplies their colors. Without
+a preset, the theme's custom border characters are used as before.
 
 #### Creating a custom theme
 
