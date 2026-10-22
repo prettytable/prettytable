@@ -2339,14 +2339,17 @@ class PrettyTable:
             if options["fields"] and field not in options["fields"]:
                 continue
 
-            line = (width + lpad + rpad) * options["horizontal_char"]
-
             # If necessary, add column alignment characters (e.g. ":" for Markdown)
             if self._horizontal_align_char:
+                # A border character may contain ANSI codes; keep it intact.
+                parts = [options["horizontal_char"]] * (width + lpad + rpad)
                 if self._align[field] in ("l", "c"):
-                    line = " " + self._horizontal_align_char + line[2:]
+                    parts[:2] = [" ", self._horizontal_align_char]
                 if self._align[field] in ("c", "r"):
-                    line = line[:-2] + self._horizontal_align_char + " "
+                    parts[-2:] = [self._horizontal_align_char, " "]
+                line = "".join(parts)
+            else:
+                line = (width + lpad + rpad) * options["horizontal_char"]
 
             bits.append(line)
             if options["vrules"] == VRuleStyle.ALL:
