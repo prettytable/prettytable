@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import json
+import subprocess
+import sys
+
 import pytest
 
 from prettytable import HRuleStyle, PrettyTable, from_html, from_html_one
@@ -21,6 +25,35 @@ class TestHtmlConstructor:
         html_string += city_data.get_html_string()
         with pytest.raises(ValueError):
             from_html_one(html_string)
+
+    @pytest.mark.parametrize("count", [0, 1, 2])
+    @pytest.mark.parametrize("optimize", [False, True])
+    def test_html_one_table_count(self, count: int, optimize: bool) -> None:
+        html = "<table><tr><th>value</th></tr><tr><td>one</td></tr></table>" * count
+        script = """
+import json
+import sys
+from prettytable import from_html_one
+
+try:
+    table = from_html_one(sys.argv[1])
+except ValueError:
+    print(json.dumps("invalid table count"))
+else:
+    print(json.dumps(table.rows))
+"""
+        command = [sys.executable]
+        if optimize:
+            command.append("-O")
+        result = subprocess.run(
+            [*command, "-c", script, html],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        expected = [["one"]] if count == 1 else "invalid table count"
+        assert json.loads(result.stdout) == expected
 
 
 class TestHtmlOutput:
