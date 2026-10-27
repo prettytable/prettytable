@@ -3258,9 +3258,7 @@ def from_html_one(html_code: str, **kwargs) -> PrettyTable:
     """
 
     tables = from_html(html_code, **kwargs)
-    try:
-        assert len(tables) == 1
-    except AssertionError:
+    if len(tables) != 1:
         msg = "More than one <table> in provided HTML code. Use from_html instead."
         raise ValueError(msg)
     return tables[0]
