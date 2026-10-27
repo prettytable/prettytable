@@ -521,9 +521,25 @@ class PrettyTable:
 
     def __getitem__(self, index: int | slice) -> PrettyTable:
         new = PrettyTable()
-        new.field_names = self.field_names
+        new.field_names = list(self.field_names)
         for attr in self._options:
-            setattr(new, f"_{attr}", getattr(self, f"_{attr}"))
+            value = getattr(self, f"_{attr}")
+            if isinstance(value, ObservableDict):
+                setattr(new, f"_{attr}", ObservableDict(value))
+            elif isinstance(value, dict):
+                setattr(new, f"_{attr}", value.copy())
+            elif isinstance(value, list):
+                setattr(new, f"_{attr}", list(value))
+            else:
+                setattr(new, f"_{attr}", value)
+        new._none_format.callback = new._remove_custom_format_callback
+        new._int_format.callback = new._remove_custom_format_callback
+        new._float_format.callback = new._remove_custom_format_callback
+        new._custom_format.callback = new._custom_format_callback
+        new._align.callback = new._align_callback
+        new._valign.callback = new._valign_callback
+        new._max_width.callback = new._max_width_callback
+        new._min_width.callback = new._min_width_callback
         if isinstance(index, slice):
             for row in self._rows[index]:
                 new.add_row(row)

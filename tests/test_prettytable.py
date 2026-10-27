@@ -464,6 +464,16 @@ class TestOptionAttribute:
         city_data.attributes = {"class": "prettytable"}
         assert city_data.get_string() == city_data[:].get_string()
 
+    def test_slice_copies_options(self) -> None:
+        table = PrettyTable(["name", "count"])
+        table.add_row(["alpha", 7])
+        table.align["name"] = "l"
+        subset = table[:1]
+        subset.align["name"] = "r"
+        assert table.align["name"] == "l"
+        subset.field_names = ["label", "count"]
+        assert table.get_string()
+
     def test_set_for_one_column(self, city_data: PrettyTable) -> None:
         city_data.min_width["City name"] = 15
         city_data.int_format["Area"] = "6"
