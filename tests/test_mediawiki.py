@@ -13,7 +13,6 @@ class TestMediaWikiOutput:
         table.add_row(["if x:\n\treturn 1", "tab-indented"])
         assert "| if x:\n\treturn 1 || tab-indented" in table.get_mediawiki_string()
 
-
     def test_mediawiki_output(self, helper_table: PrettyTable) -> None:
         assert helper_table.get_mediawiki_string(header=True).strip() == """
 {| class="wikitable"
