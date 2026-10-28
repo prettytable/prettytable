@@ -11,7 +11,6 @@ class TestLatexOutput:
         table.add_row(["if x:\n\treturn 1", "tab-indented"])
         assert "if x:\n\treturn 1 & tab-indented" in table.get_latex_string()
 
-
     def test_latex_output(self, helper_table: PrettyTable) -> None:
         assert helper_table.get_latex_string() == (
             "\\begin{tabular}{cccc}\r\n"
