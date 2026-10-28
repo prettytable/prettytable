@@ -24,6 +24,14 @@ class TestHtmlConstructor:
 
 
 class TestHtmlOutput:
+    def test_html_preserves_tab_in_cell_value(self) -> None:
+        # Tabs in cell data must survive HTML export untouched.
+        table = PrettyTable()
+        table.field_names = ["code", "note"]
+        table.add_row(["if x:\n\treturn 1", "tab-indented"])
+        assert "<td>if x:<br>\treturn 1</td>" in table.get_html_string()
+
+
     def test_html_output(self, helper_table: PrettyTable) -> None:
         result = helper_table.get_html_string()
         assert result.strip() == """

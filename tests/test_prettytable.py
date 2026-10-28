@@ -1345,6 +1345,31 @@ class TestCsvOutput:
         )
 
 
+    def test_csv_preserves_tab_in_cell_value(self) -> None:
+        # Tabs in cell data must survive CSV export untouched (they used to
+        # be silently expanded to spaces in every renderer, corrupting data).
+        table = PrettyTable()
+        table.field_names = ["code", "note"]
+        table.add_row(["if x:\n\treturn 1", "tab-indented"])
+        assert table.get_csv_string() == (
+            "code,note\r\n\"if x:\n\treturn 1\",tab-indented\r\n"
+        )
+
+    def test_text_still_expands_tabs_for_alignment(self) -> None:
+        # The plain-text renderer keeps expanding tabs so columns stay aligned.
+        table = PrettyTable()
+        table.field_names = ["code", "note"]
+        table.add_row(["if x:\n\treturn 1", "tab-indented"])
+        assert table.get_string() == (
+            "+------------------+--------------+\n"
+            "|       code       |     note     |\n"
+            "+------------------+--------------+\n"
+            "|      if x:       | tab-indented |\n"
+            "|         return 1 |              |\n"
+            "+------------------+--------------+"
+        )
+
+
 def test_paginate(city_data: PrettyTable) -> None:
     expected_page_1 = """
 +-----------+------+------------+-----------------+
