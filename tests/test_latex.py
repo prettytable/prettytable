@@ -4,6 +4,14 @@ from prettytable import HRuleStyle, PrettyTable, VRuleStyle
 
 
 class TestLatexOutput:
+    def test_latex_preserves_tab_in_cell_value(self) -> None:
+        # Tabs in cell data must survive LaTeX export untouched.
+        table = PrettyTable()
+        table.field_names = ["code", "note"]
+        table.add_row(["if x:\n\treturn 1", "tab-indented"])
+        assert "if x:\n\treturn 1 & tab-indented" in table.get_latex_string()
+
+
     def test_latex_output(self, helper_table: PrettyTable) -> None:
         assert helper_table.get_latex_string() == (
             "\\begin{tabular}{cccc}\r\n"
