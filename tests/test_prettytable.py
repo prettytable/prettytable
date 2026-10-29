@@ -924,6 +924,56 @@ class TestSlicing:
             assert isinstance(city, str)
             assert city in string
 
+    def test_slice_options_independence(self) -> None:
+        table = PrettyTable(["name", "count"])
+        table.add_row(["alpha", 7])
+        table.align["name"] = "l"
+
+        subset = table[:1]
+        subset.align["name"] = "r"
+        assert table.align["name"] == "l"
+        assert subset.align["name"] == "r"
+
+        subset.field_names = ["label", "count"]
+        # Rendering the original table must succeed and not raise KeyError
+        rendered = table.get_string()
+        assert "name" in rendered
+        assert "alpha" in rendered
+
+    def test_index_single_row(self) -> None:
+        table = PrettyTable(["name", "count"])
+        table.add_row(["alpha", 7])
+        table.add_row(["beta", 9])
+        table.align["name"] = "l"
+
+        row = table[0]
+        assert row.rowcount == 1
+        row.align["name"] = "r"
+        assert table.align["name"] == "l"
+        assert row.align["name"] == "r"
+
+        row.field_names = ["label", "count"]
+        rendered = table.get_string()
+        assert "name" in rendered
+
+        last_row = table[-1]
+        assert last_row.rowcount == 1
+        assert "beta" in last_row.get_string()
+
+        with pytest.raises(IndexError):
+            _ = table[10]
+
+    def test_slice_preserves_dividers(self) -> None:
+        table = PrettyTable(["name", "count"])
+        table.add_row(["alpha", 1], divider=True)
+        table.add_row(["beta", 2], divider=False)
+        table.add_row(["gamma", 3], divider=True)
+
+        subset = table[:2]
+        assert subset.dividers == [True, False]
+        single = table[0]
+        assert single.dividers == [True]
+
 
 class TestRowFilter:
     EXPECTED_RESULT = """+-----------+------+------------+-----------------+
