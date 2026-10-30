@@ -22,6 +22,18 @@ class TestHtmlConstructor:
         with pytest.raises(ValueError):
             from_html_one(html_string)
 
+    def test_from_html_ragged_rows(self) -> None:
+        html_string = """
+        <table>
+            <tr><th>A</th><th>B</th><th>C</th></tr>
+            <tr><td>1</td><td>2</td></tr>
+            <tr><td>3</td></tr>
+        </table>
+        """
+        tables = from_html(html_string)
+        assert len(tables) == 1
+        assert tables[0].rows == [["1", "2", "-"], ["3", "-", "-"]]
+
 
 class TestHtmlOutput:
     def test_html_output(self, helper_table: PrettyTable) -> None:
