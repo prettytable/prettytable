@@ -6,6 +6,42 @@ from prettytable import HRuleStyle, PrettyTable, from_html, from_html_one
 
 
 class TestHtmlConstructor:
+    @pytest.mark.parametrize("tag", ["th", "td"])
+    @pytest.mark.parametrize(
+        ("content", "expected"),
+        [
+            ("  plain  ", "plain"),
+            ("<strong>Alice</strong>", "Alice"),
+            ("before <em>middle</em> after", "before middle after"),
+            ("<span>Al</span><b>ice</b>", "Alice"),
+            ("<b>A<em>li</em>ce</b>", "Alice"),
+            ('<a href="/example">A&amp;B</a>', "A&B"),
+            ("<span>中文</span> café", "中文 café"),
+            ("<b></b>", ""),
+        ],
+    )
+    def test_html_inline_cell_text(self, tag: str, content: str, expected: str) -> None:
+        header = content if tag == "th" else "Field"
+        value = content if tag == "td" else "value"
+        html = f"<table><tr><th>{header}</th></tr><tr><td>{value}</td></tr></table>"
+
+        table = from_html_one(html)
+
+        assert table.field_names == [expected if tag == "th" else "Field"]
+        assert table.rows == [[expected if tag == "td" else "value"]]
+
+    def test_html_inline_text_outside_cells(self) -> None:
+        html = (
+            "<p>Outside <em>text</em></p>"
+            "<table><caption>Table <b>caption</b></caption>"
+            "<tr><th>Field</th></tr><tr><td>value</td></tr></table>"
+        )
+
+        table = from_html_one(html)
+
+        assert table.field_names == ["Field"]
+        assert table.rows == [["value"]]
+
     def test_html_and_back(self, city_data: PrettyTable) -> None:
         html_string = city_data.get_html_string()
         new_table = from_html(html_string)[0]
