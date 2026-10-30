@@ -151,6 +151,37 @@ class TestPositionalJunctions:
 ╚═════════════════════════════════════════════════╝""".strip()
 
 
+class TestHeaderVerticalChar:
+    """Verify header_vertical_char overrides vertical_char in the header row only"""
+
+    def _table(self) -> PrettyTable:
+        table = PrettyTable()
+        table.field_names = ["A", "B"]
+        table.add_row([1, 2])
+        return table
+
+    def test_default_is_none(self) -> None:
+        assert self._table().header_vertical_char is None
+
+    def test_header_uses_own_char(self) -> None:
+        table = self._table()
+        table.header_vertical_char = "^"
+        assert table.get_string() == (
+            "+---+---+\n^ A ^ B ^\n+---+---+\n| 1 | 2 |\n+---+---+"
+        )
+
+    def test_none_matches_vertical_char(self) -> None:
+        without = self._table().get_string()
+        table = self._table()
+        table.header_vertical_char = None
+        assert table.get_string() == without
+
+    def test_invalid_length(self) -> None:
+        table = self._table()
+        with pytest.raises(ValueError):
+            table.header_vertical_char = "too long"
+
+
 class TestStyle:
     @pytest.mark.parametrize(
         "style, expected",
