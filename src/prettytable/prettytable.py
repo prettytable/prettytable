@@ -2031,6 +2031,13 @@ class PrettyTable:
         # width, to allow same-width display anywhere on the screen.
         return formatter(field, value).expandtabs()
 
+    def _escape_markdown(self, text: str) -> str:
+        # A bare "|" inside a cell would end the cell early in Markdown,
+        # so it must be escaped as "\|"
+        if self._style == TableStyle.MARKDOWN:
+            return text.replace("|", "\\|")
+        return text
+
     def _compute_table_width(self, options) -> int:
         if options["vrules"] == VRuleStyle.FRAME:
             table_width = 2
@@ -2048,7 +2055,10 @@ class PrettyTable:
 
     def _compute_widths(self, rows: list[list[str]], options: OptionsType) -> None:
         if options["header"] and options["use_header_width"]:
-            widths = [_get_size(field)[0] for field in self._field_names]
+            widths = [
+                _get_size(self._escape_markdown(field))[0]
+                for field in self._field_names
+            ]
         else:
             widths = len(self.field_names) * [0]
 
@@ -2262,6 +2272,11 @@ class PrettyTable:
 
         # Turn all data in all rows into Unicode, formatted as desired
         formatted_rows = self._format_rows(rows)
+        if self._style == TableStyle.MARKDOWN:
+            formatted_rows = [
+                [self._escape_markdown(value) for value in row]
+                for row in formatted_rows
+            ]
 
         # Compute column widths
         self._compute_widths(formatted_rows, options)
@@ -2427,6 +2442,7 @@ class PrettyTable:
                 fieldname = field.lower()
             else:
                 fieldname = field
+            fieldname = self._escape_markdown(fieldname)
             if _str_block_width(fieldname) > width:
                 fieldname = fieldname[:width]
             bits.append(

@@ -472,6 +472,25 @@ Table Caption
         table.align["r"] = table.align["Align right"] = "r"
         assert table.get_string().strip() == expected.strip()
 
+    def test_style_markdown_escapes_pipes(self) -> None:
+        table = PrettyTable(["Operator", "a|b"])
+        table.add_row(["or", "x|y"])
+        table.add_row(["pipe", "|"])
+        table.set_style(TableStyle.MARKDOWN)
+        assert table.get_string().strip() == r"""
+| Operator | a\|b |
+| :------: | :--: |
+|    or    | x\|y |
+|   pipe   |  \|  |
+""".strip()
+
+        # Other output formats are unaffected
+        assert table.get_csv_string().splitlines() == [
+            "Operator,a|b",
+            "or,x|y",
+            "pipe,|",
+        ]
+
 
 @pytest.fixture
 def japanese_pretty_table() -> PrettyTable:
