@@ -687,9 +687,12 @@ class PrettyTable:
             raise ValueError(msg)
 
     def _validate_nonnegative_int(self, name, val):
-        try:
-            assert int(val) >= 0
-        except AssertionError:
+        # Reject bool (int subclass) and non-ints. Previously True/False were
+        # accepted via int(True)==1 / int(False)==0 and treated as column widths.
+        if isinstance(val, bool) or not isinstance(val, int):
+            msg = f"Invalid value for {name}: {val}"
+            raise ValueError(msg)
+        if val < 0:
             msg = f"Invalid value for {name}: {val}"
             raise ValueError(msg)
 
