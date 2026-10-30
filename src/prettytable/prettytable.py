@@ -2934,9 +2934,17 @@ class PrettyTable:
         # Data
         rows = self._get_rows(options)
         formatted_rows = self._format_rows(rows)
+        wanted_field_lookup: list[str] | set[str] = wanted_fields
+        if (
+            len(wanted_fields) > 4
+            and formatted_rows
+            and all(type(field) is str for field in wanted_fields)
+            and all(type(field) is str for field in self._field_names)
+        ):
+            wanted_field_lookup = set(wanted_fields)
         for row in formatted_rows:
             wanted_data = [
-                d for f, d in zip(self._field_names, row) if f in wanted_fields
+                d for f, d in zip(self._field_names, row) if f in wanted_field_lookup
             ]
             lines.append(" & ".join(wanted_data) + r" \\")
 
@@ -2990,9 +2998,17 @@ class PrettyTable:
         # Data
         rows = self._get_rows(options)
         formatted_rows = self._format_rows(rows)
+        wanted_field_lookup: list[str] | set[str] = wanted_fields
+        if (
+            len(wanted_fields) > 4
+            and formatted_rows
+            and all(type(field) is str for field in wanted_fields)
+            and all(type(field) is str for field in self._field_names)
+        ):
+            wanted_field_lookup = set(wanted_fields)
         for row in formatted_rows:
             wanted_data = [
-                d for f, d in zip(self._field_names, row) if f in wanted_fields
+                d for f, d in zip(self._field_names, row) if f in wanted_field_lookup
             ]
             lines.append(" & ".join(wanted_data) + r" \\")
             if options["border"] and options["hrules"] == HRuleStyle.ALL:
