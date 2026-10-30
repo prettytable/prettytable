@@ -2144,12 +2144,27 @@ class PrettyTable:
 
         options - dictionary of option settings."""
 
-        if options["oldsortslice"]:
-            rows = self._rows[options["start"] : options["end"]]
-        else:
-            rows = self._rows
+        rows, _ = self._get_rows_and_dividers(options)
+        return rows
 
-        rows = [row for row in rows if options["row_filter"](row)]
+    def _get_rows_and_dividers(
+        self, options: OptionsType
+    ) -> tuple[list[RowType], list[bool]]:
+        """Select rows and their divider flags together."""
+        if options["oldsortslice"]:
+            row_pairs = zip(
+                self._rows[options["start"] : options["end"]],
+                self._dividers[options["start"] : options["end"]],
+            )
+        else:
+            row_pairs = zip(self._rows, self._dividers)
+
+        rows: list[RowType] = []
+        dividers: list[bool] = []
+        for row, divider in row_pairs:
+            if options["row_filter"](row):
+                rows.append(row)
+                dividers.append(divider)
 
         # Sort
         if options["sortby"]:
@@ -2160,12 +2175,14 @@ class PrettyTable:
             rows.sort(reverse=options["reversesort"], key=options["sort_key"])
             # Undecorate
             rows = [row[1:] for row in rows]
+            dividers = [False] * len(rows)
 
         # Slice if necessary
         if not options["oldsortslice"]:
             rows = rows[options["start"] : options["end"]]
+            dividers = dividers[options["start"] : options["end"]]
 
-        return rows
+        return rows, dividers
 
     def _get_dividers(self, options: OptionsType) -> list[bool]:
         """Return only those dividers that should be printed, based on slicing.
@@ -2257,8 +2274,7 @@ class PrettyTable:
             return ""
 
         # Get the rows we need to print, taking into account slicing, sorting, etc.
-        rows = self._get_rows(options)
-        dividers = self._get_dividers(options)
+        rows, dividers = self._get_rows_and_dividers(options)
 
         # Turn all data in all rows into Unicode, formatted as desired
         formatted_rows = self._format_rows(rows)
