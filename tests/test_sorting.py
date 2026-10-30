@@ -1,11 +1,44 @@
 from __future__ import annotations
 
+import pytest
 from test_prettytable import CITY_DATA, CITY_DATA_HEADER
 
 from prettytable import PrettyTable, RowType
 
 
 class TestSorting:
+    @pytest.mark.parametrize("entrypoint", ["constructor", "attribute", "render"])
+    @pytest.mark.parametrize(
+        ("reverse", "expected_rows"),
+        [
+            (False, [[1, "first"], [2, "second"]]),
+            (True, [[2, "second"], [1, "first"]]),
+        ],
+    )
+    def test_sort_by_empty_field_name(
+        self, entrypoint: str, reverse: bool, expected_rows: list[RowType]
+    ) -> None:
+        if entrypoint == "constructor":
+            table = PrettyTable(["", "name"], sortby="", reversesort=reverse)
+            assert table.sortby == ""
+        else:
+            table = PrettyTable(["", "name"])
+        table.add_row([2, "second"], divider=True)
+        table.add_row([1, "first"])
+
+        if entrypoint == "attribute":
+            table.sortby = ""
+            table.reversesort = reverse
+
+        if entrypoint == "render":
+            actual = table.get_string(sortby="", reversesort=reverse)
+        else:
+            actual = table.get_string()
+
+        expected = PrettyTable(["", "name"])
+        expected.add_rows(expected_rows)
+        assert actual == expected.get_string()
+
     def test_sort_by_different_per_columns(self, city_data: PrettyTable) -> None:
         city_data.sortby = city_data.field_names[0]
         old = city_data.get_string()
