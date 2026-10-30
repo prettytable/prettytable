@@ -2138,7 +2138,9 @@ def test_add_column_rejects_missing_existing_cells(clear_rows: bool) -> None:
         table.clear_rows()
     before = table.get_string()
 
-    with pytest.raises(ValueError, match="Column length 1 does not match number of rows 0"):
+    with pytest.raises(
+        ValueError, match="Column length 1 does not match number of rows 0"
+    ):
         table.add_column("new", [1])
 
     assert table.field_names == ["existing"]
