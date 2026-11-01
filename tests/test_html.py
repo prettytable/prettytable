@@ -56,6 +56,21 @@ else:
         assert json.loads(result.stdout) == expected
 
 
+    def test_html_ragged_row(self) -> None:
+        """from_html() must not raise when a row has fewer cells than the header."""
+        # Arrange
+        html = "<table><tr><th>a</th><th>b</th></tr><tr><td>1</td></tr></table>"
+
+        # Act
+        tables = from_html(html)
+
+        # Assert
+        assert len(tables) == 1
+        table = tables[0]
+        assert table.field_names == ["a", "b"]
+        assert table.rows == [["1", "-"]]
+
+
 class TestHtmlOutput:
     def test_html_output(self, helper_table: PrettyTable) -> None:
         result = helper_table.get_html_string()
