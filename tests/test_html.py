@@ -55,7 +55,6 @@ else:
         expected = [["one"]] if count == 1 else "invalid table count"
         assert json.loads(result.stdout) == expected
 
-
     def test_html_ragged_row(self) -> None:
         """from_html() must not raise when a row has fewer cells than the header."""
         # Arrange
