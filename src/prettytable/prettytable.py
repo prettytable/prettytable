@@ -2017,19 +2017,7 @@ class PrettyTable:
             return (f"%{self._float_format[field]}f") % value
 
         formatter = self._custom_format.get(field, (lambda f, v: str(v)))
-        # PrettyTable is unaware of a terminal's tabstops, and it does not know at
-        # what specific location of the screen it will be displayed, so it also cannot
-        # calculate tabstop positions or width: A '\t' character is variable-width,
-        # depending on the location of the screen it is displayed.
-        #
-        # Although wcwidth library functions like width() do measure tab control
-        # character as a width of 8, it would require PrettyTable to display the left
-        # margin of the table's contents to begin "at the tabstop" for the table
-        # contents and dividers to line up correctly.
-        #
-        # PrettyTable is "screen unaware", so it is best to alter tabstops to a fixed
-        # width, to allow same-width display anywhere on the screen.
-        return formatter(field, value).expandtabs()
+        return formatter(field, value)
 
     def _compute_table_width(self, options) -> int:
         if options["vrules"] == VRuleStyle.FRAME:
@@ -2262,6 +2250,23 @@ class PrettyTable:
 
         # Turn all data in all rows into Unicode, formatted as desired
         formatted_rows = self._format_rows(rows)
+
+        # Expand tabs in cell values for display purposes only. PrettyTable is
+        # unaware of a terminal's tabstops, and it does not know at what specific
+        # location of the screen it will be displayed, so it also cannot calculate
+        # tabstop positions or width: A '\t' character is variable-width, depending
+        # on the location of the screen it is displayed.
+        #
+        # Although wcwidth library functions like width() do measure tab control
+        # character as a width of 8, it would require PrettyTable to display the left
+        # margin of the table's contents to begin "at the tabstop" for the table
+        # contents and dividers to line up correctly.
+        #
+        # PrettyTable is "screen unaware", so it is best to alter tabstops to a fixed
+        # width, to allow same-width display anywhere on the screen. Tab expansion is
+        # deliberately limited to this plain-text renderer: data-oriented exports
+        # (CSV, JSON, HTML, LaTeX, MediaWiki) must not silently modify cell values.
+        formatted_rows = [[cell.expandtabs() for cell in row] for row in formatted_rows]
 
         # Compute column widths
         self._compute_widths(formatted_rows, options)
