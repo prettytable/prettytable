@@ -719,6 +719,21 @@ table = ColorTable(theme=Themes.OCEAN)
 print(table)
 ```
 
+You can combine a color theme with a preset border style, in either order:
+
+```python
+from prettytable import TableStyle
+from prettytable.colortable import ColorTable, Themes
+
+table = ColorTable(["Name", "Count"], theme=Themes.OCEAN)
+table.add_row(["Alpha", 7])
+table.set_style(TableStyle.DOUBLE_BORDER)
+print(table)
+```
+
+The preset supplies the border characters, and the theme supplies their colors. Without
+a preset, the theme's custom border characters are used as before.
+
 #### Creating a custom theme
 
 The `Theme` class allows you to customize both the characters and colors used in your
