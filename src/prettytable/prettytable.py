@@ -1907,7 +1907,7 @@ class PrettyTable:
         valign - desired vertical alignment for new columns - "t" for top,
             "m" for middle and "b" for bottom"""
 
-        if len(self._rows) in (0, len(column)):
+        if len(self._rows) == len(column) or (not self._rows and not self._field_names):
             self._validate_align(align)
             self._validate_valign(valign)
             self._field_names.append(fieldname)

@@ -2128,3 +2128,28 @@ class TestDeprecations:
             from prettytable import TableHandler
 
             TableHandler()
+
+
+@pytest.mark.parametrize("clear_rows", [False, True])
+def test_add_column_rejects_missing_existing_cells(clear_rows: bool) -> None:
+    table = PrettyTable(["existing"])
+    if clear_rows:
+        table.add_row(["old"])
+        table.clear_rows()
+    before = table.get_string()
+
+    with pytest.raises(
+        ValueError, match="Column length 1 does not match number of rows 0"
+    ):
+        table.add_column("new", [1])
+
+    assert table.field_names == ["existing"]
+    assert table.rows == []
+    assert table.get_string() == before
+
+
+def test_add_column_populates_new_table() -> None:
+    table = PrettyTable()
+    table.add_column("first", [1, 2])
+    table.add_column("second", [3, 4])
+    assert table.rows == [[1, 3], [2, 4]]
