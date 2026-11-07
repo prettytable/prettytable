@@ -657,6 +657,11 @@ class PrettyTable:
             msg = "Field names must be unique"
             raise ValueError(msg)
 
+    def _validate_new_field_name(self, fieldname: str) -> None:
+        if fieldname in self._field_names:
+            msg = "Field names must be unique"
+            raise ValueError(msg)
+
     def _validate_none_format(self, val):
         try:
             if val is not None:
@@ -1899,7 +1904,7 @@ class PrettyTable:
 
         Arguments:
 
-        fieldname - name of the field to contain the new column of data
+        fieldname - unique name of the field to contain the new column of data
         column - column of data, should be a list with as many elements as the
         table has rows
         align - desired alignment for this column - "l" for left, "c" for centre and
@@ -1908,6 +1913,7 @@ class PrettyTable:
             "m" for middle and "b" for bottom"""
 
         if len(self._rows) in (0, len(column)):
+            self._validate_new_field_name(fieldname)
             self._validate_align(align)
             self._validate_valign(valign)
             self._field_names.append(fieldname)
@@ -1928,7 +1934,8 @@ class PrettyTable:
     def add_autoindex(self, fieldname: str = "Index") -> None:
         """Add an auto-incrementing index column to the table.
         Arguments:
-        fieldname - name of the field to contain the new column of data"""
+        fieldname - unique name of the field to contain the new column of data"""
+        self._validate_new_field_name(fieldname)
         self._field_names.insert(0, fieldname)
         self._align[fieldname] = self._kwargs["align"] or "c"
         self._valign[fieldname] = self._kwargs["valign"] or "t"
