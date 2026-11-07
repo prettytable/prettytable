@@ -1,8 +1,8 @@
 # Release checklist
 
 - [ ] Get `main` to the appropriate code release state.
-      [GitHub Actions](https://github.com/prettytable/prettytable/actions) should be running
-      cleanly for all merges to `main`.
+      [GitHub Actions](https://github.com/prettytable/prettytable/actions) should be
+      running cleanly for all merges to `main`.
       [![GitHub Actions status](https://github.com/prettytable/prettytable/workflows/Test/badge.svg)](https://github.com/prettytable/prettytable/actions)
 
 - [ ] Edit release draft, adjust text if needed:
