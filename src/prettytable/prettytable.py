@@ -1951,6 +1951,8 @@ class PrettyTable:
             )
             raise ValueError(msg)
 
+        if self._sortby == fieldname:
+            self.sortby = None
         col_index = self._field_names.index(fieldname)
         del self._field_names[col_index]
         for row in self._rows:
