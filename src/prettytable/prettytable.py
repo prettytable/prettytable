@@ -3110,14 +3110,19 @@ def from_csv(fp, field_names: Sequence[str] | None = None, **kwargs) -> PrettyTa
         fp.seek(0)
         reader = csv.reader(fp, dialect)
 
+    # Some quoting modes make csv.reader return numbers or None.
+    rows = (
+        [value.strip() if isinstance(value, str) else value for value in row]
+        for row in reader
+    )
     table = PrettyTable(**kwargs)
     if field_names:
         table.field_names = field_names
     else:
-        table.field_names = [x.strip() for x in next(reader)]
+        table.field_names = next(rows)
 
-    for row in reader:
-        table.add_row([x.strip() for x in row])
+    for row in rows:
+        table.add_row(row)
 
     return table
 
