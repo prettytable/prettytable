@@ -31,6 +31,8 @@
 
 from __future__ import annotations
 
+import html
+import re
 from enum import IntEnum
 from functools import lru_cache
 from typing import Any, Literal, cast
@@ -185,6 +187,21 @@ def _get_size(text: str) -> tuple[int, int]:
     height = len(lines)
     width = max(_str_block_width(line) for line in lines)
     return width, height
+
+
+_MEDIAWIKI_SPECIALS = {
+    "|": "&#124;",
+    "!": "&#33;",
+    "\n": "<br />",
+}
+_MEDIAWIKI_SPECIALS_RE = re.compile(r"[|!\n]")
+
+
+def _mediawiki_escape(value: str) -> str:
+    """Escape characters that MediaWiki would parse as table markup."""
+    return _MEDIAWIKI_SPECIALS_RE.sub(
+        lambda m: _MEDIAWIKI_SPECIALS[m.group(0)], value
+    )
 
 
 class PrettyTable:
@@ -3036,7 +3053,7 @@ class PrettyTable:
 
         caption = options.get("title", self._title)
         if caption:
-            lines.append(f"|+ {caption}")
+            lines.append(f"|+ {_mediawiki_escape(caption)}")
 
         fields_option = options.get("fields")
         if options.get("header"):
@@ -3048,7 +3065,7 @@ class PrettyTable:
                     field for field in self._field_names if field in fields_option
                 ]
             if headers:
-                header_line = " !! ".join(headers)
+                header_line = " !! ".join(_mediawiki_escape(h) for h in headers)
                 lines.append(f"! {header_line}")
 
         rows = self._get_rows(options)
@@ -3064,7 +3081,7 @@ class PrettyTable:
                     if field in fields_option
                 ]
             if cells:
-                lines.append("| " + " || ".join(cells))
+                lines.append("| " + " || ".join(_mediawiki_escape(c) for c in cells))
 
         lines.append("|}")
         return "\n".join(lines)
@@ -3292,11 +3309,15 @@ def from_mediawiki(wiki_text: str, **kwargs) -> PrettyTable:
         if line.startswith("|+"):
             continue
         if line.startswith("!"):
-            header = [cell.strip() for cell in line[1:].split("!!")]
+            header = [
+                html.unescape(cell.strip()) for cell in line[1:].split("!!")
+            ]
             table.field_names = header
             continue
         if line.startswith("|"):
-            row_data = [cell.strip() for cell in line[1:].split("||")]
+            row_data = [
+                html.unescape(cell.strip()) for cell in line[1:].split("||")
+            ]
             rows.append(row_data)
             continue
 
