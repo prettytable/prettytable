@@ -199,9 +199,7 @@ _MEDIAWIKI_SPECIALS_RE = re.compile(r"[|!\n]")
 
 def _mediawiki_escape(value: str) -> str:
     """Escape characters that MediaWiki would parse as table markup."""
-    return _MEDIAWIKI_SPECIALS_RE.sub(
-        lambda m: _MEDIAWIKI_SPECIALS[m.group(0)], value
-    )
+    return _MEDIAWIKI_SPECIALS_RE.sub(lambda m: _MEDIAWIKI_SPECIALS[m.group(0)], value)
 
 
 class PrettyTable:
@@ -3309,15 +3307,11 @@ def from_mediawiki(wiki_text: str, **kwargs) -> PrettyTable:
         if line.startswith("|+"):
             continue
         if line.startswith("!"):
-            header = [
-                html.unescape(cell.strip()) for cell in line[1:].split("!!")
-            ]
+            header = [html.unescape(cell.strip()) for cell in line[1:].split("!!")]
             table.field_names = header
             continue
         if line.startswith("|"):
-            row_data = [
-                html.unescape(cell.strip()) for cell in line[1:].split("||")
-            ]
+            row_data = [html.unescape(cell.strip()) for cell in line[1:].split("||")]
             rows.append(row_data)
             continue
 
