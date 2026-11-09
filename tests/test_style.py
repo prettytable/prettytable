@@ -118,17 +118,17 @@ class TestPositionalJunctions:
         city_data.vrules = VRuleStyle.NONE
         assert (
             city_data.get_string().strip()
-            == "═══════════════════════════════════════════════════\n"
-            "  City name   Area   Population   Annual Rainfall  \n"
-            "═══════════════════════════════════════════════════\n"
-            "   Adelaide   1295    1158259          600.5       \n"
-            "   Brisbane   5905    1857594          1146.4      \n"
-            "    Darwin    112      120900          1714.7      \n"
-            "    Hobart    1357     205556          619.5       \n"
-            "    Sydney    2058    4336374          1214.8      \n"
-            "  Melbourne   1566    3806092          646.9       \n"
-            "    Perth     5386    1554769          869.4       \n"
-            "═══════════════════════════════════════════════════".strip()
+            == "══════════════════════════════════════════════\n"
+            " City name  Area  Population  Annual Rainfall \n"
+            "══════════════════════════════════════════════\n"
+            "  Adelaide  1295   1158259         600.5      \n"
+            "  Brisbane  5905   1857594         1146.4     \n"
+            "   Darwin   112     120900         1714.7     \n"
+            "   Hobart   1357    205556         619.5      \n"
+            "   Sydney   2058   4336374         1214.8     \n"
+            " Melbourne  1566   3806092         646.9      \n"
+            "   Perth    5386   1554769         869.4      \n"
+            "══════════════════════════════════════════════".strip()
         )
 
     def test_vrules_frame_with_title(self, city_data: PrettyTable) -> None:

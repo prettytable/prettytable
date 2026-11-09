@@ -2329,10 +2329,14 @@ class PrettyTable:
         lpad, rpad = self._get_padding_widths(options)
         if options["vrules"] in (VRuleStyle.ALL, VRuleStyle.FRAME):
             bits = [options[f"{where}left_junction_char"]]  # type: ignore[literal-required]
+        elif options["vrules"] == VRuleStyle.NONE:
+            bits = []
         else:
             bits = [options["horizontal_char"]]
         # For tables with no data or fieldnames
         if not self._field_names:
+            if options["vrules"] == VRuleStyle.NONE:
+                return ""
             bits.append(options[f"{where}right_junction_char"])  # type: ignore[literal-required]
             return "".join(bits)
         for field, width in zip(self._field_names, self._widths):
@@ -2351,7 +2355,7 @@ class PrettyTable:
             bits.append(line)
             if options["vrules"] == VRuleStyle.ALL:
                 bits.append(options[f"{where}junction_char"])  # type: ignore[literal-required]
-            else:
+            elif options["vrules"] != VRuleStyle.NONE:
                 bits.append(options["horizontal_char"])
         if options["vrules"] in (VRuleStyle.ALL, VRuleStyle.FRAME):
             bits.pop()
@@ -2406,13 +2410,13 @@ class PrettyTable:
                 bits.append("\n")
             if options["vrules"] in (VRuleStyle.ALL, VRuleStyle.FRAME):
                 bits.append(options["vertical_char"])
-            else:
+            elif options["vrules"] != VRuleStyle.NONE:
                 bits.append(" ")
         # For tables with no data or field names
         if not self._field_names:
             if options["vrules"] in (VRuleStyle.ALL, VRuleStyle.FRAME):
                 bits.append(options["vertical_char"])
-            else:
+            elif options["vrules"] != VRuleStyle.NONE:
                 bits.append(" ")
         for field, width in zip(self._field_names, self._widths):
             if options["fields"] and field not in options["fields"]:
@@ -2437,14 +2441,15 @@ class PrettyTable:
             if options["border"] or options["preserve_internal_border"]:
                 if options["vrules"] == VRuleStyle.ALL:
                     bits.append(options["vertical_char"])
-                else:
+                elif options["vrules"] != VRuleStyle.NONE:
                     bits.append(" ")
 
         # If only preserve_internal_border is true, then we just appended
         # a vertical character at the end when we wanted a space
         if not options["border"] and options["preserve_internal_border"]:
-            bits.pop()
-            bits.append(" ")
+            if options["vrules"] != VRuleStyle.NONE:
+                bits.pop()
+                bits.append(" ")
         # If vrules is FRAME, then we just appended a space at the end
         # of the last field, when we really want a vertical character
         if options["border"] and options["vrules"] == VRuleStyle.FRAME:
@@ -2499,7 +2504,7 @@ class PrettyTable:
             if options["border"]:
                 if options["vrules"] in (VRuleStyle.ALL, VRuleStyle.FRAME):
                     bits[y].append(self.vertical_char)
-                else:
+                elif options["vrules"] != VRuleStyle.NONE:
                     bits[y].append(" ")
 
         for field, value, width in zip(self._field_names, row, self._widths):
@@ -2530,14 +2535,15 @@ class PrettyTable:
                 if options["border"] or options["preserve_internal_border"]:
                     if options["vrules"] == VRuleStyle.ALL:
                         bits[y].append(self.vertical_char)
-                    else:
+                    elif options["vrules"] != VRuleStyle.NONE:
                         bits[y].append(" ")
 
         # If only preserve_internal_border is true, then we just appended
         # a vertical character at the end when we wanted a space
         if not options["border"] and options["preserve_internal_border"]:
-            bits[-1].pop()
-            bits[-1].append(" ")
+            if options["vrules"] != VRuleStyle.NONE:
+                bits[-1].pop()
+                bits[-1].append(" ")
 
         # If vrules is FRAME, then we just appended a space at the end
         # of the last field, when we really want a vertical character
