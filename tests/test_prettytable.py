@@ -2128,3 +2128,21 @@ class TestDeprecations:
             from prettytable import TableHandler
 
             TableHandler()
+
+
+@pytest.mark.parametrize("end", [0, 1, 2])
+def test_constructor_end_matches_property_and_render_option(end: int) -> None:
+    constructor = PrettyTable(["item"], end=end)
+    property_table = PrettyTable(["item"])
+    property_table.end = end
+    render_table = PrettyTable(["item"])
+    for table in (constructor, property_table, render_table):
+        table.add_rows([["first"], ["second"]])
+
+    assert constructor.end == end
+    assert constructor.rowcount == 2
+    assert constructor.get_string() == property_table.get_string()
+    assert constructor.get_string() == render_table.get_string(end=end)
+    assert constructor.get_html_string() == render_table.get_html_string(end=end)
+    assert constructor.get_csv_string() == render_table.get_csv_string(end=end)
+    assert constructor.get_json_string() == render_table.get_json_string(end=end)
