@@ -31,6 +31,7 @@
 
 from __future__ import annotations
 
+import re
 from enum import IntEnum
 from functools import lru_cache
 from typing import Any, Literal, cast
@@ -185,6 +186,26 @@ def _get_size(text: str) -> tuple[int, int]:
     height = len(lines)
     width = max(_str_block_width(line) for line in lines)
     return width, height
+
+
+_LATEX_SPECIALS = {
+    "\\": r"\textbackslash{}",
+    "&": r"\&",
+    "%": r"\%",
+    "$": r"\$",
+    "#": r"\#",
+    "_": r"\_",
+    "{": r"\{",
+    "}": r"\}",
+    "~": r"\textasciitilde{}",
+    "^": r"\textasciicircum{}",
+}
+_LATEX_SPECIALS_RE = re.compile("|".join(re.escape(k) for k in _LATEX_SPECIALS))
+
+
+def _latex_escape(value: str) -> str:
+    """Escape LaTeX special characters so arbitrary cell text still compiles."""
+    return _LATEX_SPECIALS_RE.sub(lambda m: _LATEX_SPECIALS[m.group(0)], value)
 
 
 class PrettyTable:
@@ -2929,7 +2950,9 @@ class PrettyTable:
 
         # Headers
         if options["header"]:
-            lines.append(" & ".join(wanted_fields) + r" \\")
+            lines.append(
+                " & ".join(_latex_escape(field) for field in wanted_fields) + r" \\"
+            )
 
         # Data
         rows = self._get_rows(options)
@@ -2938,7 +2961,7 @@ class PrettyTable:
             wanted_data = [
                 d for f, d in zip(self._field_names, row) if f in wanted_fields
             ]
-            lines.append(" & ".join(wanted_data) + r" \\")
+            lines.append(" & ".join(_latex_escape(d) for d in wanted_data) + r" \\")
 
         lines.append(r"\end{tabular}")
 
@@ -2981,7 +3004,7 @@ class PrettyTable:
 
         # Headers
         if options["header"]:
-            lines.append(" & ".join(wanted_fields) + r" \\")
+            lines.append(" & ".join(_latex_escape(f) for f in wanted_fields) + r" \\")
         if (options["border"] or options["preserve_internal_border"]) and options[
             "hrules"
         ] in [HRuleStyle.ALL, HRuleStyle.HEADER]:
@@ -2994,7 +3017,7 @@ class PrettyTable:
             wanted_data = [
                 d for f, d in zip(self._field_names, row) if f in wanted_fields
             ]
-            lines.append(" & ".join(wanted_data) + r" \\")
+            lines.append(" & ".join(_latex_escape(d) for d in wanted_data) + r" \\")
             if options["border"] and options["hrules"] == HRuleStyle.ALL:
                 lines.append(r"\hline")
 
