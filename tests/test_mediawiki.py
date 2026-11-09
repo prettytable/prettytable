@@ -163,3 +163,40 @@ class TestMediaWikiConstructor:
             ValueError, match="Row length mismatch between header and body."
         ):
             from_mediawiki(wiki_text)
+
+    def test_mediawiki_escapes_cell_and_header_markup(
+        self, helper_table: PrettyTable
+    ) -> None:
+        """Pipes, exclamation marks and newlines must not leak as markup (issue #541)."""
+        table = PrettyTable()
+        table.field_names = ["Wow!", "A|B"]
+        table.add_row(["a || b", "x\ny"])
+
+        assert table.get_mediawiki_string() == (
+            '{| class="wikitable"\n'
+            "|-\n"
+            "! Wow&#33; !! A&#124;B\n"
+            "|-\n"
+            "| a &#124;&#124; b || x<br />y\n"
+            "|}"
+        )
+
+    def test_mediawiki_escapes_caption(self) -> None:
+        """A pipe in the caption must not break out of the caption line."""
+        table = PrettyTable()
+        table.field_names = ["col"]
+        table.add_row(["data"])
+        table.title = "Ti|tle"
+
+        assert "|+ Ti&#124;tle" in table.get_mediawiki_string()
+
+    def test_mediawiki_escaped_output_round_trips(self) -> None:
+        """from_mediawiki() unescapes entity-encoded cell/header text."""
+        table = PrettyTable()
+        table.field_names = ["A|B", "C!D"]
+        table.add_row(["a || b", "plain"])
+
+        parsed = from_mediawiki(table.get_mediawiki_string())
+
+        assert parsed.field_names == ["A|B", "C!D"]
+        assert parsed.rows[0] == ["a || b", "plain"]
