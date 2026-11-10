@@ -31,6 +31,7 @@
 
 from __future__ import annotations
 
+import copy
 from enum import IntEnum
 from functools import lru_cache
 from typing import Any, Literal, cast
@@ -177,6 +178,20 @@ class ObservableDict(dict[str, Any]):
         if self.callback is not None and old_value != value:
             self.callback(key, old_value, value)
         super().__setitem__(key, value)
+
+    def __copy__(self) -> ObservableDict:
+        new = ObservableDict()
+        new.callback = self.callback
+        dict.update(new, self)
+        return new
+
+    def __deepcopy__(self, memo: dict[int, Any]) -> ObservableDict:
+        new = ObservableDict()
+        memo[id(self)] = new
+        new.callback = copy.deepcopy(self.callback, memo)
+        for k, v in self.items():
+            dict.__setitem__(new, copy.deepcopy(k, memo), copy.deepcopy(v, memo))
+        return new
 
 
 @lru_cache
@@ -520,15 +535,20 @@ class PrettyTable:
             raise AttributeError(name)
 
     def __getitem__(self, index: int | slice) -> PrettyTable:
-        new = PrettyTable()
-        new.field_names = self.field_names
-        for attr in self._options:
-            setattr(new, f"_{attr}", getattr(self, f"_{attr}"))
+        rows = self._rows
+        dividers = self._dividers
+        try:
+            self._rows = []
+            self._dividers = []
+            new = self.copy()
+        finally:
+            self._rows = rows
+            self._dividers = dividers
         if isinstance(index, slice):
-            for row in self._rows[index]:
-                new.add_row(row)
+            for row, divider in zip(rows[index], dividers[index]):
+                new.add_row(row, divider=divider)
         elif isinstance(index, int):
-            new.add_row(self._rows[index])
+            new.add_row(rows[index], divider=dividers[index])
         else:
             msg = f"Index {index} is invalid, must be an integer or slice"
             raise IndexError(msg)
@@ -1976,8 +1996,6 @@ class PrettyTable:
     ##############################
 
     def copy(self) -> Self:
-        import copy
-
         return copy.deepcopy(self)
 
     def get_formatted_string(self, out_format: str = "text", **kwargs) -> str:

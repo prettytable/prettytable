@@ -924,6 +924,34 @@ class TestSlicing:
             assert isinstance(city, str)
             assert city in string
 
+    def test_slice_does_not_share_mutable_options(self) -> None:
+        table = PrettyTable(["name", "count"])
+        table.add_row(["alpha", 7])
+        table.align["name"] = "l"
+
+        subset = table[:1]
+        subset.align["name"] = "r"
+        assert table.align["name"] == "l"
+        assert subset.align["name"] == "r"
+
+        subset.field_names = ["label", "count"]
+        assert "name" in table.get_string()
+        assert "label" in subset.get_string()
+
+    def test_index_does_not_share_mutable_options(self) -> None:
+        table = PrettyTable(["name", "count"])
+        table.add_row(["alpha", 7])
+        table.align["name"] = "l"
+
+        row = table[0]
+        row.align["name"] = "r"
+        assert table.align["name"] == "l"
+        assert row.align["name"] == "r"
+
+        row.field_names = ["label", "count"]
+        assert "name" in table.get_string()
+        assert "label" in row.get_string()
+
 
 class TestRowFilter:
     EXPECTED_RESULT = """+-----------+------+------------+-----------------+
