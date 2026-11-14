@@ -31,6 +31,7 @@
 
 from __future__ import annotations
 
+import re
 from enum import IntEnum
 from functools import lru_cache
 from typing import Any, Literal, cast
@@ -2912,6 +2913,22 @@ class PrettyTable:
             string = self._get_simple_latex_string(options)
         return string
 
+    @staticmethod
+    def _escape_latex(val: object) -> str:
+        replacements = {
+            "\\": r"\textbackslash{}",
+            "&": r"\&",
+            "%": r"\%",
+            "$": r"\$",
+            "#": r"\#",
+            "_": r"\_",
+            "{": r"\{",
+            "}": r"\}",
+            "~": r"\textasciitilde{}",
+            "^": r"\textasciicircum{}",
+        }
+        return re.sub(r"[\\&%$#_{}~^]", lambda m: replacements[m.group(0)], str(val))
+
     def _get_simple_latex_string(self, options: OptionsType) -> str:
         lines: list[str] = []
 
@@ -2929,14 +2946,20 @@ class PrettyTable:
 
         # Headers
         if options["header"]:
-            lines.append(" & ".join(wanted_fields) + r" \\")
+            header_fields = [
+                self._escape_latex(field) if options["escape_header"] else field
+                for field in wanted_fields
+            ]
+            lines.append(" & ".join(header_fields) + r" \\")
 
         # Data
         rows = self._get_rows(options)
         formatted_rows = self._format_rows(rows)
         for row in formatted_rows:
             wanted_data = [
-                d for f, d in zip(self._field_names, row) if f in wanted_fields
+                self._escape_latex(d) if options["escape_data"] else d
+                for f, d in zip(self._field_names, row)
+                if f in wanted_fields
             ]
             lines.append(" & ".join(wanted_data) + r" \\")
 
@@ -2981,7 +3004,11 @@ class PrettyTable:
 
         # Headers
         if options["header"]:
-            lines.append(" & ".join(wanted_fields) + r" \\")
+            header_fields = [
+                self._escape_latex(field) if options["escape_header"] else field
+                for field in wanted_fields
+            ]
+            lines.append(" & ".join(header_fields) + r" \\")
         if (options["border"] or options["preserve_internal_border"]) and options[
             "hrules"
         ] in [HRuleStyle.ALL, HRuleStyle.HEADER]:
@@ -2992,7 +3019,9 @@ class PrettyTable:
         formatted_rows = self._format_rows(rows)
         for row in formatted_rows:
             wanted_data = [
-                d for f, d in zip(self._field_names, row) if f in wanted_fields
+                self._escape_latex(d) if options["escape_data"] else d
+                for f, d in zip(self._field_names, row)
+                if f in wanted_fields
             ]
             lines.append(" & ".join(wanted_data) + r" \\")
             if options["border"] and options["hrules"] == HRuleStyle.ALL:
