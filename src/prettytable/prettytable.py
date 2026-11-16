@@ -3133,12 +3133,24 @@ def from_db_cursor(cursor: Any, **kwargs) -> PrettyTable | None:
 
 
 def from_json(json_string: str | bytes, **kwargs) -> PrettyTable:
+    """Build a table from JSON produced by :meth:`PrettyTable.get_json_string`.
+
+    If no header row is present, take the field names in the order of the
+    keys in the first data row. Export with ``sort_keys=False`` to preserve
+    the original field order when omitting the header.
+    """
     import json
 
     table = PrettyTable(**kwargs)
     objects = json.loads(json_string)
-    table.field_names = objects[0]
-    for obj in objects[1:]:
+    first = objects[0]
+    if isinstance(first, dict):
+        table.field_names = list(first)
+        rows = objects
+    else:
+        table.field_names = first
+        rows = objects[1:]
+    for obj in rows:
         row = [obj[key] for key in table.field_names]
         table.add_row(row)
     return table
