@@ -2128,3 +2128,28 @@ class TestDeprecations:
             from prettytable import TableHandler
 
             TableHandler()
+
+
+@pytest.mark.parametrize("autoindex", [False, True])
+def test_adding_duplicate_column_keeps_table_intact(autoindex: bool) -> None:
+    table = PrettyTable(["name", "value"], align="l")
+    table.add_rows([["first", 1], ["second", 2]], divider=True)
+    original = table.get_string()
+    with pytest.raises(ValueError, match="Field names must be unique"):
+        if autoindex:
+            table.add_autoindex("name")
+        else:
+            table.add_column("name", [3, 4], align="r")
+    assert table.get_string() == original
+    assert table.field_names == ["name", "value"]
+    assert table.rows == [["first", 1], ["second", 2]]
+    assert table.align["name"] == "l"
+
+
+def test_adding_distinct_columns() -> None:
+    table = PrettyTable()
+    table.add_column("name", ["first", "second"])
+    table.add_column("value", [1, 2])
+    table.add_autoindex()
+    assert table.field_names == ["Index", "name", "value"]
+    assert table.rows == [[1, "first", 1], [2, "second", 2]]
