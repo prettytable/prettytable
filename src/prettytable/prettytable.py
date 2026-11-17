@@ -3041,7 +3041,7 @@ class PrettyTable:
         fields_option = options.get("fields")
         if options.get("header"):
             lines.append("|-")
-            if fields_option is None:
+            if not fields_option:
                 headers = self._field_names
             else:
                 headers = [
@@ -3055,7 +3055,7 @@ class PrettyTable:
         formatted_rows = self._format_rows(rows)
         for row in formatted_rows:
             lines.append("|-")
-            if fields_option is None:
+            if not fields_option:
                 cells = row
             else:
                 cells = [

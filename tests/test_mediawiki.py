@@ -6,6 +6,21 @@ from prettytable import PrettyTable, from_mediawiki
 
 
 class TestMediaWikiOutput:
+    @pytest.mark.parametrize("header", [True, False])
+    @pytest.mark.parametrize("fields", [[], ()])
+    def test_empty_fields_include_all_columns(
+        self,
+        helper_table: PrettyTable,
+        header: bool,
+        fields: list[str] | tuple[str, ...],
+    ) -> None:
+        expected = helper_table.get_mediawiki_string(header=header)
+        assert (
+            helper_table.get_mediawiki_string(header=header, fields=fields) == expected
+        )
+        helper_table.fields = fields
+        assert helper_table.get_mediawiki_string(header=header) == expected
+
     def test_mediawiki_output(self, helper_table: PrettyTable) -> None:
         assert helper_table.get_mediawiki_string(header=True).strip() == """
 {| class="wikitable"
