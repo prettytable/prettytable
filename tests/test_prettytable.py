@@ -2016,6 +2016,31 @@ class TestGeneralOutput:
         t_copy = helper_table.copy()
         assert helper_table.get_string() == t_copy.get_string()
 
+    @pytest.mark.parametrize(
+        "attribute, value",
+        [
+            ("custom_format", {"Field 2": lambda field, value: f"[{value}]"}),
+            ("float_format", {"Field 2": ".2"}),
+            ("int_format", {"Field 2": "03"}),
+            ("none_format", {"Field 2": "-"}),
+        ],
+    )
+    def test_copy_with_format_option(
+        self, helper_table: PrettyTable, attribute: str, value: dict[str, Any]
+    ) -> None:
+        setattr(helper_table, attribute, value)
+        t_copy = helper_table.copy()
+        assert getattr(t_copy, attribute) == value
+        assert helper_table.get_string() == t_copy.get_string()
+
+        # The copy's callbacks update the copy, not the original
+        t_copy.custom_format["Field 2"] = lambda field, value: "changed"
+        assert "changed" in t_copy.get_string()
+        assert "changed" not in helper_table.get_string()
+        assert getattr(helper_table, attribute) == value
+        for name in ("float_format", "int_format", "none_format"):
+            assert "Field 2" not in getattr(t_copy, name)
+
     def test_text(self, helper_table: PrettyTable) -> None:
         assert helper_table.get_formatted_string("text") == helper_table.get_string()
         # test with default arg, too
