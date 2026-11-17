@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import csv
 import datetime as dt
 import importlib
+import io
 import sqlite3
 from collections.abc import Generator
 from math import e, pi, sqrt
@@ -17,6 +19,7 @@ from prettytable import (
     RowType,
     TableStyle,
     VRuleStyle,
+    from_csv,
     from_db_cursor,
 )
 
@@ -706,6 +709,16 @@ class TestBasic:
     def test_all_lengths_equal_from_csv(self, city_data_from_csv: PrettyTable) -> None:
         """All lines in a table should be of the same length."""
         self._test_all_length_equal(city_data_from_csv)
+
+    @pytest.mark.parametrize(
+        ("header", "expected"), [('" Count "', "Count"), ("2026", "2026.0")]
+    )
+    def test_from_csv_quote_nonnumeric(self, header: str, expected: str) -> None:
+        data = io.StringIO(f'" Name ",{header}\n" Ada ",42.5\n')
+        table = from_csv(data, quoting=csv.QUOTE_NONNUMERIC)
+
+        assert table.field_names == ["Name", expected]
+        assert table.rows == [["Ada", 42.5]]
 
     def test_no_blank_lines_from_mediawiki(
         self, city_data_from_mediawiki: PrettyTable
