@@ -3163,7 +3163,8 @@ def _make_table_handler():
         def handle_starttag(
             self, tag: str, attrs: list[tuple[str, str | None]]
         ) -> None:
-            self.active = tag
+            if tag in ["th", "td"]:
+                self.active = tag
             if tag == "th":
                 self.is_last_row_header = True
             for key, value in attrs:
@@ -3178,6 +3179,8 @@ def _make_table_handler():
                     for _ in range(1, self.colspan):
                         self.last_row.append("")
                     self.colspan = 0
+                self.last_content = " "
+                self.active = None
 
             if tag == "tr":
                 self.rows.append((self.last_row, self.is_last_row_header))
@@ -3188,11 +3191,10 @@ def _make_table_handler():
                 table = self.generate_table(self.rows)
                 self.tables.append(table)
                 self.rows = []
-            self.last_content = " "
-            self.active = None
 
         def handle_data(self, data: str) -> None:
-            self.last_content += data
+            if self.active in ["th", "td"]:
+                self.last_content += data
 
         def generate_table(self, rows: list[tuple[list[str], bool]]) -> PrettyTable:
             """
