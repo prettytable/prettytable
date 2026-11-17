@@ -502,6 +502,35 @@ class TestOptionAttribute:
 |      Perth      |   5386 |    1554769 | 869.40          |
 +-----------------+--------+------------+-----------------+""".strip()
 
+    @pytest.mark.parametrize("min_width", [5, {"x": 5}])
+    @pytest.mark.parametrize("use_header_width", [True, False])
+    @pytest.mark.parametrize("row_state", ["empty", "cleared", "filtered"])
+    def test_min_width_without_rows(
+        self,
+        min_width: int | dict[str, int],
+        use_header_width: bool,
+        row_state: str,
+    ) -> None:
+        table = PrettyTable(["x"])
+        table.min_width = min_width
+        if row_state != "empty":
+            table.add_row(["x"])
+        if row_state == "cleared":
+            table.clear_rows()
+
+        start = 1 if row_state == "filtered" else 0
+        assert table.get_string(start=start, use_header_width=use_header_width) == """
++-------+
+|   x   |
++-------+
++-------+""".strip()
+
+    def test_min_width_without_rows_for_individual_columns(self) -> None:
+        table = PrettyTable(["x", "long_header"])
+        table.min_width = {"x": 5, "long_header": 3}
+
+        assert table.get_string().splitlines()[1] == "|   x   | long_header |"
+
     def test_preserve_internal_border(self) -> None:
         table = PrettyTable(preserve_internal_border=True)
         assert table.preserve_internal_border is True
