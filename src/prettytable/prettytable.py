@@ -178,6 +178,22 @@ class ObservableDict(dict[str, Any]):
             self.callback(key, old_value, value)
         super().__setitem__(key, value)
 
+    def __copy__(self) -> Self:
+        new = self.__class__()
+        new.callback = self.callback
+        dict.update(new, self)
+        return new
+
+    def __deepcopy__(self, memo: dict[int, Any]) -> Self:
+        import copy
+
+        new = self.__class__()
+        memo[id(self)] = new
+        new.callback = copy.deepcopy(self.callback, memo)
+        for k, v in self.items():
+            dict.__setitem__(new, copy.deepcopy(k, memo), copy.deepcopy(v, memo))
+        return new
+
 
 @lru_cache
 def _get_size(text: str) -> tuple[int, int]:
@@ -519,20 +535,21 @@ class PrettyTable:
         else:
             raise AttributeError(name)
 
-    def __getitem__(self, index: int | slice) -> PrettyTable:
-        new = PrettyTable()
-        new.field_names = self.field_names
-        for attr in self._options:
-            setattr(new, f"_{attr}", getattr(self, f"_{attr}"))
+    def __getitem__(self, index: int | slice) -> Self:
         if isinstance(index, slice):
-            for row in self._rows[index]:
-                new.add_row(row)
+            new = self.copy()
+            new._rows = new._rows[index]
+            new._dividers = new._dividers[index]
+            return new
         elif isinstance(index, int):
-            new.add_row(self._rows[index])
+            self._rows[index]
+            new = self.copy()
+            new._rows = [new._rows[index]]
+            new._dividers = [new._dividers[index]]
+            return new
         else:
             msg = f"Index {index} is invalid, must be an integer or slice"
             raise IndexError(msg)
-        return new
 
     def __str__(self) -> str:
         return self.get_string()
