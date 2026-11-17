@@ -1,61 +1,86 @@
+priorities:
+  fix: 0
+  fix-py: 10
+  fix-eol: 20
+  fix-whitespace: 30
+  check: 40
+
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.17.5
     hooks:
       - id: ruff-check
         args: [--exit-non-zero-on-fix]
+        priority: fix
 
   - repo: https://github.com/psf/black-pre-commit-mirror
     rev: 26.10.1
     hooks:
       - id: black
+        priority: fix-py
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
       - id: check-added-large-files
+        priority: check
       - id: check-case-conflict
+        priority: check
       - id: check-merge-conflict
+        priority: check
       - id: check-toml
+        priority: check
       - id: check-yaml
+        priority: check
       - id: debug-statements
+        priority: check
       - id: end-of-file-fixer
+        priority: fix-eol
       - id: forbid-submodules
+        priority: check
       - id: requirements-txt-fixer
+        priority: fix
       - id: trailing-whitespace
         exclude: .github/ISSUE_TEMPLATE/bug_report.md|tests/test_style.py|tests/test_prettytable.py
+        priority: fix-whitespace
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.39.0
     hooks:
       - id: check-dependabot
+        priority: check
       - id: check-github-workflows
+        priority: check
 
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.12
     hooks:
       - id: actionlint
+        priority: check
 
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
     rev: v1.32.0
     hooks:
       - id: zizmor
+        priority: check
 
   - repo: https://github.com/tox-dev/pyproject-fmt
     rev: v2.30.6
     hooks:
       - id: pyproject-fmt
+        priority: fix
 
   - repo: https://github.com/abravalheri/validate-pyproject
     rev: "v0.27"
     hooks:
       - id: validate-pyproject
-        additional_dependencies: ["trove-classifiers>=2026.6.1.19"]
+        priority: check
 
   - repo: https://github.com/tox-dev/tox-ini-fmt
     rev: 1.10.2
     hooks:
       - id: tox-ini-fmt
+        priority: fix
 
   - repo: https://github.com/rbubley/mirrors-prettier
     rev: v3.10.1
@@ -63,11 +88,14 @@ repos:
       - id: prettier
         args: [--prose-wrap=always, --print-width=88]
         exclude: ^.github/ISSUE_TEMPLATE/bug_report.md$
+        priority: fix
 
   - repo: meta
     hooks:
       - id: check-hooks-apply
+        priority: check
       - id: check-useless-excludes
+        priority: check
 
 ci:
   autoupdate_schedule: quarterly
