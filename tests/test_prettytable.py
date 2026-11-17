@@ -2060,6 +2060,27 @@ class TestGeneralOutput:
             "latex", border=False
         ) == helper_table.get_latex_string(border=False)
 
+    def test_latex_special_characters_escaping(self) -> None:
+        t = PrettyTable()
+        t.field_names = ["name_a", "b%"]
+        t.add_row(["x_y & z", r"#1 $5 \ 100{c}"])
+        latex = t.get_latex_string()
+
+        assert r"name\_a & b\%" in latex
+        assert r"x\_y \& z & \#1 \$5 \textbackslash{} 100\{c\}" in latex
+
+        # Test escape_header=False and escape_data=False
+        unescaped_header = t.get_latex_string(escape_header=False)
+        assert r"name_a & b%" in unescaped_header
+
+        unescaped_data = t.get_latex_string(escape_data=False)
+        assert r"x_y & z & #1 $5 \ 100{c}" in unescaped_data
+
+        # Formatted latex table (format=True)
+        formatted_latex = t.get_latex_string(format=True)
+        assert r"name\_a & b\%" in formatted_latex
+        assert r"x\_y \& z & \#1 \$5 \textbackslash{} 100\{c\}" in formatted_latex
+
     def test_mediawiki(self, helper_table: PrettyTable) -> None:
         assert helper_table.get_formatted_string(
             "mediawiki", border=False
