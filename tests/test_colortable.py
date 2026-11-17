@@ -1,13 +1,13 @@
 from __future__ import annotations
 
+import re
+from typing import Literal
+
 import pytest
 from test_prettytable import CITY_DATA, CITY_DATA_HEADER
 
+from prettytable import PrettyTable, TableStyle
 from prettytable.colortable import RESET_CODE, ColorTable, Theme, Themes
-
-TYPE_CHECKING = False
-if TYPE_CHECKING:
-    from prettytable import PrettyTable
 
 
 @pytest.fixture
@@ -174,3 +174,177 @@ class TestColorTableRendering:
                 table.theme = theme
                 result = str(table)
                 assert result  # Simple check to ensure rendering doesn't fail
+
+    @pytest.mark.parametrize(
+        "style", [TableStyle.DOUBLE_BORDER, TableStyle.SINGLE_BORDER]
+    )
+    @pytest.mark.parametrize("theme_first", [True, False])
+    @pytest.mark.parametrize("with_title", [True, False])
+    def test_border_style_and_theme_order(
+        self, style: TableStyle, theme_first: bool, with_title: bool
+    ) -> None:
+        plain = PrettyTable(["name", "count"])
+        plain.add_row(["alpha", 7])
+        plain.set_style(style)
+        table = ColorTable(["name", "count"])
+        table.add_row(["alpha", 7])
+        if theme_first:
+            table.theme = Themes.OCEAN
+            table.set_style(style)
+        else:
+            table.set_style(style)
+            table.theme = Themes.OCEAN
+        if with_title:
+            plain.title = table.title = "Colors and borders"
+
+        result = table.get_string()
+        assert re.sub(r"\x1b\[[0-9;]*m", "", result) == plain.get_string()
+        assert Themes.OCEAN.vertical_color in result
+        assert Themes.OCEAN.junction_color in result
+        assert table.top_left_junction_char.startswith(Themes.OCEAN.junction_color)
+
+    @pytest.mark.parametrize(
+        "style", [style for style in TableStyle if style != TableStyle.RANDOM]
+    )
+    @pytest.mark.parametrize("with_header", [True, False])
+    @pytest.mark.parametrize("with_title", [True, False])
+    def test_theme_updates_preserve_preset_style(
+        self, style: TableStyle, with_header: bool, with_title: bool
+    ) -> None:
+        plain = PrettyTable(["name", "count"])
+        table = ColorTable(["name", "count"])
+        for item in (plain, table):
+            item.add_row(["alpha", 7])
+            item.set_style(style)
+            item.padding_width = 3
+            item.left_padding_width = 3
+            item.right_padding_width = 3
+            item.header = with_header
+            if with_title:
+                item.title = "Colors and borders"
+
+        table.theme = Themes.OCEAN
+        table.theme = Themes.HIGH_CONTRAST
+        rendered = table.get_string()
+        table.update_theme()
+        table.update_theme()
+
+        assert table.get_string() == rendered
+        assert re.sub(r"\x1b\[[0-9;]*m", "", rendered) == plain.get_string()
+        assert table.padding_width == table.left_padding_width == 3
+        assert table.right_padding_width == 3
+        assert table.header is with_header
+
+    def test_switch_border_styles(self) -> None:
+        table = ColorTable(["name", "count"], theme=Themes.OCEAN)
+        table.add_row(["alpha", 7])
+        plain = PrettyTable(["name", "count"])
+        plain.add_row(["alpha", 7])
+        for style in (
+            TableStyle.DOUBLE_BORDER,
+            TableStyle.SINGLE_BORDER,
+            TableStyle.DEFAULT,
+        ):
+            table.set_style(style)
+            plain.set_style(style)
+            result = table.get_string()
+            assert re.sub(r"\x1b\[[0-9;]*m", "", result) == plain.get_string()
+            assert Themes.OCEAN.vertical_color in result
+
+    def test_custom_theme_characters_without_preset(self) -> None:
+        theme = Theme(vertical_char="!", horizontal_char="=", junction_char="*")
+        table = ColorTable(["a"], theme=theme)
+        table.add_row([1])
+        assert table.get_string().replace(RESET_CODE, "") == (
+            "*===*\n! a !\n*===*\n! 1 !\n*===*"
+        )
+
+    @pytest.mark.parametrize("theme_first", [True, False])
+    def test_preset_characters_override_custom_theme_characters(
+        self, theme_first: bool
+    ) -> None:
+        theme = Theme(
+            vertical_char="!",
+            horizontal_char="=",
+            junction_char="*",
+            vertical_color="31",
+            horizontal_color="32",
+            junction_color="33",
+        )
+        table = ColorTable(["a"])
+        table.add_row([1])
+        if theme_first:
+            table.theme = theme
+            table.set_style(TableStyle.DOUBLE_BORDER)
+        else:
+            table.set_style(TableStyle.DOUBLE_BORDER)
+            table.theme = theme
+        plain = PrettyTable(["a"])
+        plain.add_row([1])
+        plain.set_style(TableStyle.DOUBLE_BORDER)
+
+        result = table.get_string()
+        assert re.sub(r"\x1b\[[0-9;]*m", "", result) == plain.get_string()
+        assert theme.vertical_color in result
+
+    @pytest.mark.parametrize("theme", [Themes.DEFAULT, Themes.OCEAN])
+    @pytest.mark.parametrize("theme_first", [True, False])
+    @pytest.mark.parametrize("align", ["l", "c", "r"])
+    @pytest.mark.parametrize("width", range(4))
+    def test_markdown_header_with_narrow_columns(
+        self,
+        theme: Theme,
+        theme_first: bool,
+        align: Literal["l", "c", "r"],
+        width: int,
+    ) -> None:
+        field = "x" * width
+        plain = PrettyTable([field])
+        table = ColorTable([field])
+        for item in (plain, table):
+            item.add_row(["y" * width])
+        if theme_first:
+            table.theme = theme
+            table.set_style(TableStyle.MARKDOWN)
+        else:
+            table.set_style(TableStyle.MARKDOWN)
+            table.theme = theme
+        plain.set_style(TableStyle.MARKDOWN)
+        for item in (plain, table):
+            item.align = align
+            item.padding_width = 0
+            item.left_padding_width = 0
+            item.right_padding_width = 0
+
+        result = re.sub(r"\x1b\[[0-9;]*m", "", table.get_string())
+        assert table.header is True
+        assert result == plain.get_string()
+        assert "\x1b" not in result
+        separators = {
+            "l": " :-" if width == 3 else " :",
+            "c": " : ",
+            "r": "-: " if width == 3 else ": ",
+        }
+        assert result.splitlines()[1] == f"|{separators[align]}|"
+
+    @pytest.mark.parametrize("theme", [Themes.DEFAULT, Themes.OCEAN])
+    @pytest.mark.parametrize("align", ["l", "c", "r"])
+    @pytest.mark.parametrize("width", range(4))
+    def test_markdown_rule_preserves_narrow_glyph_slices(
+        self, theme: Theme, align: Literal["l", "c", "r"], width: int
+    ) -> None:
+        table = ColorTable(["x"], theme=theme)
+        table.set_style(TableStyle.MARKDOWN)
+        table.align = align
+        table.left_padding_width = table.right_padding_width = 0
+        # Cover the rule builder's boundary widths before Markdown's renderer
+        # applies its minimum centered-column width.
+        table._widths = [width]
+
+        result = table._stringify_hrule(table._get_options({}))
+        expected = {
+            "l": " :-" if width == 3 else " :",
+            "c": " : " if width == 3 else ": ",
+            "r": "-: " if width == 3 else ": ",
+        }
+        assert re.sub(r"\x1b\[[0-9;]*m", "", result) == f"|{expected[align]}|"

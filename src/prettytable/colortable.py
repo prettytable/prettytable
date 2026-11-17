@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .prettytable import PrettyTable
+from .prettytable import PrettyTable, TableStyle
 
 TYPE_CHECKING = False
 if TYPE_CHECKING:
@@ -124,29 +124,53 @@ class ColorTable(PrettyTable):
         self._theme = value
         self.update_theme()
 
+    def set_style(self, style: TableStyle) -> None:
+        super().set_style(style)
+        # Keep the uncolored preset characters for later theme changes.
+        self._style_chars = {
+            attribute: getattr(self, "_" + attribute)
+            for attribute in (
+                "vertical_char",
+                "horizontal_char",
+                "header_horizontal_char",
+                "junction_char",
+                "top_junction_char",
+                "bottom_junction_char",
+                "right_junction_char",
+                "left_junction_char",
+                "top_right_junction_char",
+                "top_left_junction_char",
+                "bottom_right_junction_char",
+                "bottom_left_junction_char",
+            )
+        }
+        self.update_theme()
+
     def update_theme(self) -> None:
         theme = self._theme
-
-        self._vertical_char = (
-            theme.vertical_color
-            + theme.vertical_char
-            + RESET_CODE
-            + theme.default_color
+        characters = getattr(
+            self,
+            "_style_chars",
+            {
+                "vertical_char": theme.vertical_char,
+                "horizontal_char": theme.horizontal_char,
+                "junction_char": theme.junction_char,
+            },
         )
-
-        self._horizontal_char = (
-            theme.horizontal_color
-            + theme.horizontal_char
-            + RESET_CODE
-            + theme.default_color
-        )
-
-        self._junction_char = (
-            theme.junction_color
-            + theme.junction_char
-            + RESET_CODE
-            + theme.default_color
-        )
+        for attribute, character in characters.items():
+            if character is None:
+                continue
+            if attribute == "vertical_char":
+                color = theme.vertical_color
+            elif attribute in ("horizontal_char", "header_horizontal_char"):
+                color = theme.horizontal_color
+            else:
+                color = theme.junction_color
+            setattr(
+                self,
+                "_" + attribute,
+                color + character + RESET_CODE + theme.default_color,
+            )
 
     def get_string(self, **kwargs) -> str:
         return super().get_string(**kwargs) + RESET_CODE
