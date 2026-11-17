@@ -6,6 +6,13 @@ from prettytable import PrettyTable, from_mediawiki
 
 
 class TestMediaWikiOutput:
+    def test_mediawiki_preserves_tab_in_cell_value(self) -> None:
+        # Tabs in cell data must survive MediaWiki export untouched.
+        table = PrettyTable()
+        table.field_names = ["code", "note"]
+        table.add_row(["if x:\n\treturn 1", "tab-indented"])
+        assert "| if x:\n\treturn 1 || tab-indented" in table.get_mediawiki_string()
+
     def test_mediawiki_output(self, helper_table: PrettyTable) -> None:
         assert helper_table.get_mediawiki_string(header=True).strip() == """
 {| class="wikitable"
