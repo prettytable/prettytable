@@ -2568,7 +2568,7 @@ class PrettyTable:
         in get_string() can be used via kwargs."""
         pages: list[str] = []
         kwargs["start"] = kwargs.get("start", 0)
-        true_end = kwargs.get("end", self.rowcount)
+        true_end = min(kwargs.get("end", self.rowcount), self.rowcount)
         while True:
             kwargs["end"] = min(kwargs["start"] + page_length, true_end)
             pages.append(self.get_string(**kwargs))

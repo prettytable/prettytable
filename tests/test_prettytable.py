@@ -1374,6 +1374,23 @@ def test_paginate(city_data: PrettyTable) -> None:
     assert "\n" in paginated
 
 
+@pytest.mark.parametrize("start, end", [(0, 20), (1, 20)])
+def test_paginate_does_not_add_pages_beyond_rows(start: int, end: int) -> None:
+    table = PrettyTable(["value"])
+    table.add_rows([[value] for value in range(3)])
+    actual = table.paginate(page_length=2, start=start, end=end)
+    expected = table.paginate(page_length=2, start=start, end=table.rowcount)
+    assert actual == expected
+
+
+def test_paginate_empty_slice_has_one_page() -> None:
+    table = PrettyTable(["value"])
+    table.add_rows([[value] for value in range(3)])
+    assert table.paginate(page_length=2, start=5, end=20) == table.get_string(
+        start=5, end=20
+    )
+
+
 def test_autoindex(city_data: PrettyTable) -> None:
     """Testing that a table with a custom index row is
     equal to the one produced by the function
