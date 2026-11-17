@@ -178,6 +178,25 @@ class ObservableDict(dict[str, Any]):
             self.callback(key, old_value, value)
         super().__setitem__(key, value)
 
+    def __deepcopy__(self, memo: dict[int, Any]) -> Self:
+        """Return a deep copy without triggering the callback.
+
+        The default deepcopy sets the callback before restoring the items, so
+        each item would trigger the callback on a table that is only partly
+        copied.
+
+        Arguments:
+            memo: The memo dictionary passed by copy.deepcopy
+        """
+        import copy
+
+        new = type(self)()
+        memo[id(self)] = new
+        for key, value in self.items():
+            dict.__setitem__(new, copy.deepcopy(key, memo), copy.deepcopy(value, memo))
+        new.callback = copy.deepcopy(self.callback, memo)
+        return new
+
 
 @lru_cache
 def _get_size(text: str) -> tuple[int, int]:
