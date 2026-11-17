@@ -1374,6 +1374,17 @@ def test_paginate(city_data: PrettyTable) -> None:
     assert "\n" in paginated
 
 
+@pytest.mark.parametrize("page_length", [0, -1])
+@pytest.mark.parametrize("row_count", [0, 1])
+def test_paginate_nonpositive_page_length(page_length: int, row_count: int) -> None:
+    table = PrettyTable(["value"])
+    for value in range(row_count):
+        table.add_row([value])
+
+    with pytest.raises(ValueError, match="page_length must be greater than zero"):
+        table.paginate(page_length=page_length)
+
+
 def test_autoindex(city_data: PrettyTable) -> None:
     """Testing that a table with a custom index row is
     equal to the one produced by the function
