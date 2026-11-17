@@ -404,7 +404,7 @@ class PrettyTable:
 
         self._title = kwargs["title"] or None
         self._start = kwargs["start"] or 0
-        self._end = kwargs["end"] or None
+        self._end = kwargs["end"]
         self._fields = kwargs["fields"] or None
 
         if kwargs["header"] in (True, False):
