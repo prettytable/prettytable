@@ -427,7 +427,7 @@ class PrettyTable:
         self._hrules = kwargs["hrules"] or HRuleStyle.FRAME
         self._vrules = kwargs["vrules"] or VRuleStyle.ALL
 
-        self._sortby = kwargs["sortby"] or None
+        self._sortby = kwargs["sortby"]
         if kwargs["reversesort"] in (True, False):
             self._reversesort = kwargs["reversesort"]
         else:
@@ -2152,7 +2152,7 @@ class PrettyTable:
         rows = [row for row in rows if options["row_filter"](row)]
 
         # Sort
-        if options["sortby"]:
+        if options["sortby"] is not None:
             sortindex = self._field_names.index(options["sortby"])
             # Decorate
             rows = [[row[sortindex]] + row for row in rows]
@@ -2178,7 +2178,7 @@ class PrettyTable:
         else:
             dividers = self._dividers
 
-        if options["sortby"]:
+        if options["sortby"] is not None:
             dividers = [False for divider in dividers]
 
         return dividers
