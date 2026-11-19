@@ -1422,6 +1422,40 @@ g..
 """
         assert result.strip() == expected.strip()
 
+    def test_init_zero_padding_widths(self) -> None:
+        table = PrettyTable(
+            header=False,
+            padding_width=2,
+            left_padding_width=0,
+            right_padding_width=0,
+            border=False,
+        )
+        table.add_row(["abc"])
+        assert table.get_string().strip() == "abc"
+        assert table.left_padding_width == 0
+        assert table.right_padding_width == 0
+
+    def test_init_asymmetric_zero_padding_widths(self) -> None:
+        table_left_zero = PrettyTable(
+            header=False,
+            padding_width=1,
+            left_padding_width=0,
+            right_padding_width=2,
+            border=True,
+        )
+        table_left_zero.add_row(["a"])
+        assert table_left_zero.get_string().strip() == "+---+\n|a  |\n+---+"
+
+        table_right_zero = PrettyTable(
+            header=False,
+            padding_width=1,
+            left_padding_width=2,
+            right_padding_width=0,
+            border=True,
+        )
+        table_right_zero.add_row(["a"])
+        assert table_right_zero.get_string().strip() == "+---+\n|  a|\n+---+"
+
 
 class TestCustomFormatter:
     def test_init_custom_format_is_empty(self) -> None:
