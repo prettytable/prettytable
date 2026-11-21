@@ -296,14 +296,18 @@ prints:
 
 You can make sure that your tables are filtered by giving `get_string` a `row_filter`
 keyword argument, which must be a function with one argument `row` returning a Boolean
-value. The `row` is the list of fields in a row.
+value. The `row` contains the original cell values, before conversion to strings.
 
 For example, to print the example table we built earlier of Australian capital city
 data, so that cities with a population of at least 1,000,000, we can do this:
 
 ```python
-def filter_function(row: list[str]) -> bool:
-    return row[2] > 999999
+from prettytable import RowType
+
+
+def filter_function(row: RowType) -> bool:
+    return row[2] >= 1_000_000
+
 
 print(table.get_string(row_filter=filter_function))
 ```
@@ -607,7 +611,7 @@ Column-specific options are:
 | Option          | Details                                                                                                                                                                                                                                                                                                    |
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `align`         | Controls alignment of fields, one of "l", "c", or "r" or a dictionary with column and value.                                                                                                                                                                                                               |
-| `custom_format` | Set any format, by setting a function that gets the original value,the formatted representation and returns the new string. E.g. `pf.custom_format["my_col_int"] = lambda f, v: f"{v:,}"`. The type of the callable is `Callable[[str, Any], str]`. This also takes a dictionary with column and function. |
+| `custom_format` | A callable taking the column name and original cell value and returning the displayed string (`Callable[[str, Any], str]`). For example, `table.custom_format["population"] = lambda field, value: f"{value:,}"`. Assign one callable to all current columns or a dictionary mapping columns to callables. |
 | `float_format`  | A string which controls the way floating point data is printed or a dictionary with column and value. This works like: `print("%<float_format>f" % data)`.                                                                                                                                                 |
 | `int_format`    | A string which controls the way integer data is printed or a dictionary with column and value. This works like: `print("%<int_format>d" % data)`.                                                                                                                                                          |
 | `max_width`     | Number of characters used for maximum width of a column or a dictionary with column and value.                                                                                                                                                                                                             |
