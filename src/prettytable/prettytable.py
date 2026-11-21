@@ -88,6 +88,7 @@ if TYPE_CHECKING:
         bottom_left_junction_char: str
         align: dict[str, AlignType]
         valign: dict[str, VAlignType]
+        header_align: AlignType | dict[str, AlignType] | None
         min_width: int | dict[str, int] | None
         max_width: int | dict[str, int] | None
         none_format: str | dict[str, str | None] | None
@@ -198,6 +199,70 @@ class ObservableDict(dict[str, Any]):
         return new
 
 
+class HeaderAlignDict(ObservableDict):
+    """A dictionary for header alignments that falls back to the table's column alignment
+    when no specific header alignment has been set.
+    """
+
+    def __init__(
+        self, table: PrettyTable | None = None, *args: Any, **kwargs: Any
+    ) -> None:
+        super().__init__(*args, **kwargs)
+        self._table_ref = table
+
+    @property
+    def _table(self) -> PrettyTable | None:
+        if self._table_ref is not None:
+            return self._table_ref
+        if self.callback is not None and hasattr(self.callback, "__self__"):
+            return self.callback.__self__  # type: ignore[no-any-return]
+        return None
+
+    def get_explicit(self, key: str) -> AlignType | None:
+        return dict.get(self, key)
+
+    def __getitem__(self, key: str) -> AlignType:
+        val = dict.get(self, key)
+        if val is not None:
+            return val
+        table = self._table
+        if table is not None and hasattr(table, "_align"):
+            if key in table._align and table._align[key] is not None:
+                return table._align[key]
+            return table._align.get(BASE_ALIGN_VALUE, "c")
+        return "c"
+
+    def get(self, key: str, default: Any = None) -> Any:
+        val = dict.get(self, key)
+        if val is not None:
+            return val
+        table = self._table
+        if table is not None and hasattr(table, "_align"):
+            if key in table._align and table._align[key] is not None:
+                return table._align[key]
+            if (
+                BASE_ALIGN_VALUE in table._align
+                and table._align[BASE_ALIGN_VALUE] is not None
+            ):
+                return table._align[BASE_ALIGN_VALUE]
+        return default
+
+    def copy(self) -> HeaderAlignDict:
+        new = HeaderAlignDict(self._table)
+        new.update(self)
+        new.callback = self.callback
+        return new
+
+    def __repr__(self) -> str:
+        return repr({k: self[k] for k in self})
+
+    def items(self) -> list[tuple[str, AlignType]]:  # type: ignore[override]
+        return [(k, self[k]) for k in self]
+
+    def values(self) -> list[AlignType]:  # type: ignore[override]
+        return [self[k] for k in self]
+
+
 @lru_cache
 def _get_size(text: str) -> tuple[int, int]:
     lines = text.split("\n")
@@ -210,6 +275,7 @@ class PrettyTable:
     _xhtml: bool
     _align: dict[str, AlignType]
     _valign: dict[str, VAlignType]
+    _header_align: HeaderAlignDict
     _min_width: dict[str, int]
     _max_width: dict[str, int]
     _min_table_width: int | None
@@ -374,6 +440,7 @@ class PrettyTable:
             "bottom_left_junction_char",
             "align",
             "valign",
+            "header_align",
             "max_width",
             "min_width",
             "none_format",
@@ -400,6 +467,10 @@ class PrettyTable:
 
         self._valign: dict[str, str | None] = ObservableDict()
         self._valign.callback = self._valign_callback
+
+        self._header_align = HeaderAlignDict(self)
+        self._header_align[BASE_ALIGN_VALUE] = None
+        self._header_align.callback = self._header_align_callback
 
         self._max_width: dict[str, int | None] = ObservableDict()
         self._max_width.callback = self._max_width_callback
@@ -509,6 +580,7 @@ class PrettyTable:
         for attr in (
             "align",
             "valign",
+            "header_align",
             "max_width",
             "min_width",
             "int_format",
@@ -621,6 +693,24 @@ class PrettyTable:
             "break_on_hyphens",
         ):
             self._validate_true_or_false(option, val)
+        elif option in ("align", "header_align"):
+            if isinstance(val, str):
+                self._validate_align(val)
+            elif isinstance(val, dict):
+                for v in val.values():
+                    if v is not None:
+                        self._validate_align(v)
+            elif val is not None:
+                self._validate_align(val)
+        elif option == "valign":
+            if isinstance(val, str):
+                self._validate_valign(val)
+            elif isinstance(val, dict):
+                for v in val.values():
+                    if v is not None:
+                        self._validate_valign(v)
+            elif val is not None:
+                self._validate_valign(val)
         elif option == "header_style":
             self._validate_header_style(val)
         elif option == "int_format":
@@ -874,6 +964,16 @@ class PrettyTable:
                 self._align[field_name] = self._align[BASE_ALIGN_VALUE]
         else:
             self.align = "c"
+        if self._header_align and old_names:
+            for old_name, new_name in zip(old_names, val):
+                self._header_align[new_name] = self._header_align.get_explicit(old_name)
+            for old_name in old_names:
+                if old_name not in val:
+                    self._header_align.pop(old_name, None)
+        elif self._header_align:
+            base_header = self._header_align.get_explicit(BASE_ALIGN_VALUE)
+            for field_name in self._field_names:
+                self._header_align[field_name] = base_header
         if self._valign and old_names:
             for old_name, new_name in zip(old_names, val):
                 self._valign[new_name] = self._valign[old_name]
@@ -957,6 +1057,49 @@ class PrettyTable:
         else:
             for field in self._field_names:
                 self._valign[field] = "t"
+
+    def _header_align_callback(self, field_name, old_value, new_value):
+        """Callback to call validators if dict attrs are modified.
+
+        This callback is triggered when a field is modified from header_align dict
+        and calls the validator for the new value.
+
+        Arguments:
+            field_name: Name of the field being modified
+            old_value: Previous value (unused)
+            new_value: New value
+
+        """
+        if new_value is not None:
+            self._validate_align(new_value)
+
+    @property
+    def header_align(self) -> HeaderAlignDict:
+        """Controls alignment of header fields
+        Arguments:
+
+        header_align - header alignment, one of "l", "c", or "r" """
+        return self._header_align
+
+    @header_align.setter
+    def header_align(self, val: AlignType | dict[str, AlignType | None] | None) -> None:
+        if isinstance(val, str):
+            self._validate_align(val)
+            if not self._field_names:
+                self._header_align[BASE_ALIGN_VALUE] = val
+            else:
+                for field in self._field_names:
+                    self._header_align[field] = val
+        elif isinstance(val, dict) and val:
+            for field, fval in val.items():
+                if fval is not None:
+                    self._validate_align(fval)
+                self._header_align[field] = fval
+        elif self._field_names:
+            for field in self._field_names:
+                self._header_align[field] = None
+        else:
+            self._header_align[BASE_ALIGN_VALUE] = None
 
     def _max_width_callback(self, field_name, old_value, new_value):
         """Callback to call validators if dict attrs are modified.
@@ -1913,6 +2056,7 @@ class PrettyTable:
         column: Sequence[Any],
         align: AlignType = "c",
         valign: VAlignType = "t",
+        header_align: AlignType | None = None,
     ) -> None:
         """Add a column to the table.
 
@@ -1924,14 +2068,22 @@ class PrettyTable:
         align - desired alignment for this column - "l" for left, "c" for centre and
             "r" for right
         valign - desired vertical alignment for new columns - "t" for top,
-            "m" for middle and "b" for bottom"""
+            "m" for middle and "b" for bottom
+        header_align - desired alignment for the column header - "l" for left,
+            "c" for centre and "r" for right, or None to follow column alignment"""
 
         if len(self._rows) in (0, len(column)):
             self._validate_align(align)
             self._validate_valign(valign)
+            if header_align is not None:
+                self._validate_align(header_align)
             self._field_names.append(fieldname)
             self._align[fieldname] = align
             self._valign[fieldname] = valign
+            if header_align is not None:
+                self._header_align[fieldname] = header_align
+            elif fieldname in self._header_align:
+                self._header_align[fieldname] = None
             for i in range(len(column)):
                 if len(self._rows) < i + 1:
                     self._rows.append([])
@@ -1951,6 +2103,8 @@ class PrettyTable:
         self._field_names.insert(0, fieldname)
         self._align[fieldname] = self._kwargs["align"] or "c"
         self._valign[fieldname] = self._kwargs["valign"] or "t"
+        if self._kwargs.get("header_align"):
+            self._header_align[fieldname] = self._kwargs["header_align"]
         for i, row in enumerate(self._rows):
             row.insert(0, i + 1)
 
@@ -1972,6 +2126,12 @@ class PrettyTable:
 
         col_index = self._field_names.index(fieldname)
         del self._field_names[col_index]
+        if fieldname in self._align:
+            del self._align[fieldname]
+        if fieldname in self._valign:
+            del self._valign[fieldname]
+        if fieldname in self._header_align:
+            del self._header_align[fieldname]
         for row in self._rows:
             del row[col_index]
 
@@ -2405,6 +2565,42 @@ class PrettyTable:
             )
         return "\n".join(lines)
 
+    def _get_header_align(self, field: str, options: OptionsType) -> AlignType:
+        if "header_align" in options and options["header_align"] is not None:
+            opt_h_align = options["header_align"]
+            if isinstance(opt_h_align, str):
+                return opt_h_align
+            if isinstance(opt_h_align, HeaderAlignDict):
+                explicit = opt_h_align.get_explicit(field)
+                if explicit is not None:
+                    return explicit
+                explicit_base = opt_h_align.get_explicit(BASE_ALIGN_VALUE)
+                if explicit_base is not None:
+                    return explicit_base
+            elif isinstance(opt_h_align, dict):
+                val = opt_h_align.get(field)
+                if val is not None:
+                    return val
+        # Check if table._header_align has an explicit setting for this field
+        explicit = self._header_align.get_explicit(field)
+        if explicit is not None:
+            return explicit
+        explicit_base = self._header_align.get_explicit(BASE_ALIGN_VALUE)
+        if explicit_base is not None:
+            return explicit_base
+        # Fall back to options["align"] or self._align
+        if options.get("align"):
+            opt_align = options["align"]
+            if isinstance(opt_align, str):
+                return opt_align
+            if isinstance(opt_align, dict):
+                val = opt_align.get(field)
+                if val is not None:
+                    return val
+        if field in self._align and self._align[field] is not None:
+            return self._align[field]
+        return self._align.get(BASE_ALIGN_VALUE, "c")
+
     def _stringify_header(self, options: OptionsType) -> str:
         bits: list[str] = []
         lpad, rpad = self._get_padding_widths(options)
@@ -2448,10 +2644,9 @@ class PrettyTable:
                 fieldname = field
             if _str_block_width(fieldname) > width:
                 fieldname = fieldname[:width]
+            h_align = self._get_header_align(field, options)
             bits.append(
-                " " * lpad
-                + self._justify(fieldname, width, self._align[field])
-                + " " * rpad
+                " " * lpad + self._justify(fieldname, width, h_align) + " " * rpad
             )
             if options["border"] or options["preserve_internal_border"]:
                 if options["vrules"] == VRuleStyle.ALL:
@@ -2849,11 +3044,13 @@ class PrettyTable:
                     field = escape(field)
 
                 content = field.replace("\n", linebreak)
+                h_align = self._get_header_align(field, options)
+                th_align = {"l": "left", "r": "right", "c": "center"}[h_align]
                 lines.append(
                     f'            <th style="'
                     f"padding-left: {lpad}em; "
                     f"padding-right: {rpad}em; "
-                    f'text-align: center">{content}</th>'
+                    f'text-align: {th_align}">{content}</th>'
                 )
             lines.append("        </tr>")
             lines.append("    </thead>")
