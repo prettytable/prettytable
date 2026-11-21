@@ -384,8 +384,8 @@ gives:
 
 ##### Other alignment
 
-You can also change the alignment of column headers independently using the `header_align`
-attribute in the same way as the `align` attribute:
+You can also change the alignment of column headers independently using the
+`header_align` attribute in the same way as the `align` attribute:
 
 ```python
 table.header_align["City name"] = "l"
@@ -611,10 +611,10 @@ Table-specific options are:
 | `vertical_char`              | Single character string used to draw vertical lines. Default: `\|`.                                                                         |
 | `vrules`                     | Controls printing of vertical rules between columns. Allowed values: `FRAME`, `ALL`, `NONE`.                                                |
 
-For options that can be set individually for each column (`align`, `valign`, `header_align`,
-`custom_format`, `max_width`, `min_width`, `int_format`, `float_format`, `none_format`)
-you can either set a value, that applies to all columns or set a dict with column names
-and individual values.
+For options that can be set individually for each column (`align`, `valign`,
+`header_align`, `custom_format`, `max_width`, `min_width`, `int_format`, `float_format`,
+`none_format`) you can either set a value, that applies to all columns or set a dict
+with column names and individual values.
 
 Column-specific options are:
 
@@ -623,7 +623,7 @@ Column-specific options are:
 | `align`         | Controls alignment of fields, one of "l", "c", or "r" or a dictionary with column and value.                                                                                                                                                                                                               |
 | `custom_format` | Set any format, by setting a function that gets the original value,the formatted representation and returns the new string. E.g. `pf.custom_format["my_col_int"] = lambda f, v: f"{v:,}"`. The type of the callable is `Callable[[str, Any], str]`. This also takes a dictionary with column and function. |
 | `float_format`  | A string which controls the way floating point data is printed or a dictionary with column and value. This works like: `print("%<float_format>f" % data)`.                                                                                                                                                 |
-| `header_align`  | Controls alignment of header fields, one of "l", "c", or "r" or a dictionary with column and value. If not set, falls back to the column alignment (`align`).                                                                                                                                             |
+| `header_align`  | Controls alignment of header fields, one of "l", "c", or "r" or a dictionary with column and value. If not set, falls back to the column alignment (`align`).                                                                                                                                              |
 | `int_format`    | A string which controls the way integer data is printed or a dictionary with column and value. This works like: `print("%<int_format>d" % data)`.                                                                                                                                                          |
 | `max_width`     | Number of characters used for maximum width of a column or a dictionary with column and value.                                                                                                                                                                                                             |
 | `min_width`     | Number of characters used for minimum width of a column or a dictionary with column and value.                                                                                                                                                                                                             |
