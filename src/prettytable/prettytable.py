@@ -2509,7 +2509,7 @@ class PrettyTable:
             value = "\n".join(lines)
             row[index] = value
 
-        row_height = max(c.count("\n") if "\n" in c else 0 for c in row) + 1
+        row_height = max(c.count("\n") for c in row) + 1
 
         bits: list[list[str]] = []
         lpad, rpad = self._get_padding_widths(options)
