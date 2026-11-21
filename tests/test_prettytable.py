@@ -412,6 +412,136 @@ class TestAlignment:
         assert "c" not in table._align
 
 
+class TestHeaderAlignment:
+    """Make sure header alignment works as expected."""
+
+    def test_default_header_align_follows_align(self) -> None:
+        table = PrettyTable()
+        table.field_names = ["City", "Pop"]
+        table.add_row(["Adelaide", 1295])
+        table.align = "r"
+        # header_align should fall back to align ("r")
+        assert table.header_align["City"] == "r"
+        output = table.get_string()
+        assert "|     City |  Pop |" in output
+        assert "| Adelaide | 1295 |" in output
+
+    def test_header_align_independent_of_body(self) -> None:
+        table = PrettyTable()
+        table.field_names = ["City", "Pop"]
+        table.add_row(["Adelaide", 1295])
+        table.align = "r"
+        table.header_align = "c"
+        assert table.header_align["City"] == "c"
+        assert table.align["City"] == "r"
+        output = table.get_string()
+        assert "|   City   | Pop  |" in output
+        assert "| Adelaide | 1295 |" in output
+
+    def test_header_align_per_column(self) -> None:
+        table = PrettyTable()
+        table.field_names = ["City", "Pop"]
+        table.add_row(["Adelaide", 1295])
+        table.align = "r"
+        table.header_align["City"] = "l"
+        assert table.header_align["City"] == "l"
+        assert table.header_align["Pop"] == "r"
+        output = table.get_string()
+        assert "| City     |  Pop |" in output
+
+    def test_header_align_reset_to_none(self) -> None:
+        table = PrettyTable()
+        table.field_names = ["City", "Pop"]
+        table.add_row(["Adelaide", 1295])
+        table.align = "r"
+        table.header_align = "c"
+        table.header_align = None
+        assert table.header_align["City"] == "r"
+        output = table.get_string()
+        assert "|     City |  Pop |" in output
+
+    def test_header_align_before_field_names(self) -> None:
+        table = PrettyTable()
+        table.align = "r"
+        table.header_align = "l"
+        table.field_names = ["City", "Pop"]
+        table.add_row(["Adelaide", 1295])
+        assert table.header_align["City"] == "l"
+        assert table.align["City"] == "r"
+        output = table.get_string()
+        assert "| City     | Pop  |" in output
+        assert "| Adelaide | 1295 |" in output
+
+    def test_header_align_add_column(self) -> None:
+        table = PrettyTable()
+        table.add_column("City", ["Adelaide"], align="r", header_align="l")
+        table.add_column("Pop", [1295], align="r")
+        assert table.header_align["City"] == "l"
+        assert table.header_align["Pop"] == "r"
+        output = table.get_string()
+        assert "| City     |  Pop |" in output
+        assert "| Adelaide | 1295 |" in output
+
+    def test_header_align_get_string_override(self) -> None:
+        table = PrettyTable()
+        table.field_names = ["City", "Pop"]
+        table.add_row(["Adelaide", 1295])
+        table.align = "r"
+        output = table.get_string(header_align="l")
+        assert "| City     | Pop  |" in output
+        assert "| Adelaide | 1295 |" in output
+
+        output_dict = table.get_string(header_align={"City": "c"})
+        assert "|   City   |  Pop |" in output_dict
+
+    def test_header_align_html_formatted(self) -> None:
+        table = PrettyTable()
+        table.field_names = ["City", "Pop"]
+        table.add_row(["Adelaide", 1295])
+        table.align = "r"
+        table.header_align["City"] = "l"
+        html = table.get_html_string(format=True)
+        assert 'text-align: left">City</th>' in html
+        assert 'text-align: right">Pop</th>' in html
+
+    def test_header_align_validation(self) -> None:
+        table = PrettyTable()
+        table.field_names = ["City", "Pop"]
+        with pytest.raises(ValueError):
+            table.header_align = "invalid"
+        with pytest.raises(ValueError):
+            table.header_align["City"] = "invalid"  # type: ignore[assignment]
+        with pytest.raises(ValueError):
+            table.header_align = {"City": "invalid"}  # type: ignore[dict-item]
+        with pytest.raises(ValueError):
+            PrettyTable(header_align="invalid")
+        with pytest.raises(ValueError):
+            table.get_string(header_align="invalid")
+
+    def test_header_align_copy(self) -> None:
+        table = PrettyTable()
+        table.field_names = ["City", "Pop"]
+        table.add_row(["Adelaide", 1295])
+        table.align = "r"
+        table.header_align["City"] = "l"
+        table_copy = table.copy()
+        assert table_copy.header_align["City"] == "l"
+        assert table_copy.header_align["Pop"] == "r"
+        table_copy.header_align["City"] = "c"
+        assert table.header_align["City"] == "l"
+
+    def test_rename_drops_stale_header_align_keys(self) -> None:
+        table = PrettyTable()
+        table.field_names = ["a", "b", "c"]
+        table.add_row([1, 2, 3])
+        table.header_align["a"] = "l"
+        table.field_names = ["x", "y", "z"]
+        assert set(table.field_names) == {"x", "y", "z"}
+        for old in ("a", "b", "c"):
+            assert old not in table._header_align
+        assert table.header_align["x"] == "l"
+
+
 class TestOptionOverride:
     """Make sure all options are properly overwritten by get_string."""
 
@@ -436,6 +566,7 @@ class TestOptionAttribute:
     def test_set_for_all_columns(self, city_data: PrettyTable) -> None:
         city_data.field_names = sorted(city_data.field_names)
         city_data.align = "l"
+        city_data.header_align = "r"
         city_data.max_width = 10
         city_data.start = 2
         city_data.end = 4
