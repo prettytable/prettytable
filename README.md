@@ -860,8 +860,8 @@ new_table = old_table[0:5]
 
 ## Table dimensions
 
-The read-only `shape` property returns `(row_count, column_count)` for the
-stored table data, excluding the header and title:
+The read-only `shape` property returns `(row_count, column_count)` for the stored table
+data, excluding the header and title:
 
 ```python
 table = PrettyTable(["name", "score"])
@@ -869,11 +869,10 @@ table.add_rows([["Alice", 9], ["Bob", 8]])
 assert table.shape == (2, 2)
 ```
 
-The property updates as rows or columns are added or removed. An empty table
-with field names has shape `(0, number_of_fields)`; a new `PrettyTable()` has
-shape `(0, 0)`. Display options such as `start`, `end`, `fields`, and `header`
-do not change the stored dimensions. For individual counts, use `rowcount`
-and `colcount`.
+The property updates as rows or columns are added or removed. An empty table with field
+names has shape `(0, number_of_fields)`; a new `PrettyTable()` has shape `(0, 0)`.
+Display options such as `start`, `end`, `fields`, and `header` do not change the stored
+dimensions. For individual counts, use `rowcount` and `colcount`.
 
 ## Contributing
 
