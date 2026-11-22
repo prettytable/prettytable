@@ -2124,24 +2124,32 @@ class PrettyTable:
                 title_width = 0
             min_table_width = self.min_table_width or 0
             min_width = max(title_width, min_table_width)
+            # Only the columns selected by "fields" are printed
+            shown = [
+                index
+                for index, field in enumerate(self._field_names)
+                if not options["fields"] or field in options["fields"]
+            ]
             if options["border"]:
-                borders = len(widths) + 1
+                borders = len(shown) + 1
             elif options["preserve_internal_border"]:
-                borders = len(widths)
+                borders = len(shown)
             else:
                 borders = 0
 
             # Subtract padding for each column and borders
-            min_width -= sum([per_col_padding for _ in widths]) + borders
+            min_width -= per_col_padding * len(shown) + borders
             # What is being scaled is content so we sum column widths
-            content_width = sum(widths) or 1
+            content_width = sum(widths[index] for index in shown) or 1
 
             if content_width < min_width:
                 # Grow widths in proportion
                 scale = 1.0 * min_width / content_width
-                widths = [int(w * scale) for w in widths]
-                if sum(widths) < min_width:
-                    widths[-1] += min_width - sum(widths)
+                for index in shown:
+                    widths[index] = int(widths[index] * scale)
+                content_width = sum(widths[index] for index in shown)
+                if content_width < min_width:
+                    widths[shown[-1]] += min_width - content_width
                 self._widths = widths
 
     def _get_padding_widths(self, options: OptionsType) -> tuple[int, int]:
@@ -2397,7 +2405,11 @@ class PrettyTable:
             else " "
         )
         lpad, rpad = self._get_padding_widths(options)
-        sum_widths = sum([n + lpad + rpad + 1 for n in self._widths])
+        sum_widths = sum(
+            width + lpad + rpad + 1
+            for field, width in zip(self._field_names, self._widths)
+            if not options["fields"] or field in options["fields"]
+        )
         for title_line in title.split("\n"):
             padded = " " * lpad + title_line + " " * rpad
             lines.append(
