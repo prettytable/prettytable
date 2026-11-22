@@ -530,6 +530,11 @@ class PrettyTable:
         else:
             return wcwidth.center(text, width)
 
+    @property
+    def shape(self) -> tuple[int, int]:
+        """Return the number of stored data rows and columns."""
+        return len(self._rows), len(self._field_names)
+
     def __getattr__(self, name):
         if name == "rowcount":
             return len(self._rows)
