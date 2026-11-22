@@ -2010,6 +2010,23 @@ class TestFields:
 |   Perth   |      869.4      |
 +-----------+-----------------+""" == table.get_string().strip()
 
+    @pytest.mark.parametrize(
+        "kwargs",
+        [
+            {"title": "T"},
+            {"title": "A title wider than the selected fields"},
+            {"min_table_width": 50},
+        ],
+    )
+    def test_fields_with_title_and_min_table_width(self, kwargs) -> None:
+        table = PrettyTable(CITY_DATA_HEADER, **kwargs)
+        for row in CITY_DATA:
+            table.add_row(row)
+        lines = table.get_string(fields=["City name"]).splitlines()
+        assert len({len(line) for line in lines}) == 1
+        if "min_table_width" in kwargs:
+            assert len(lines[0]) == kwargs["min_table_width"]
+
 
 class TestGeneralOutput:
     def test_copy(self, helper_table: PrettyTable) -> None:
