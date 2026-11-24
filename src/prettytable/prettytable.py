@@ -2156,19 +2156,25 @@ class PrettyTable:
         return lpad, rpad
 
     def _get_rows(self, options: OptionsType) -> list[RowType]:
-        """Return only those data rows that should be printed, based on slicing and
-        sorting.
+        rows, _ = self._get_rows_and_dividers(options)
+        return rows
 
-        Arguments:
-
-        options - dictionary of option settings."""
-
+    def _get_rows_and_dividers(
+        self, options: OptionsType
+    ) -> tuple[list[RowType], list[bool]]:
+        """Select rows with their dividers in display order."""
+        row_slice = slice(options["start"], options["end"])
         if options["oldsortslice"]:
-            rows = self._rows[options["start"] : options["end"]]
+            candidates = zip(self._rows[row_slice], self._dividers[row_slice])
         else:
-            rows = self._rows
+            candidates = zip(self._rows, self._dividers)
 
-        rows = [row for row in rows if options["row_filter"](row)]
+        rows = []
+        dividers = []
+        for row, divider in candidates:
+            if options["row_filter"](row):
+                rows.append(row)
+                dividers.append(divider)
 
         # Sort
         if options["sortby"]:
@@ -2179,28 +2185,14 @@ class PrettyTable:
             rows.sort(reverse=options["reversesort"], key=options["sort_key"])
             # Undecorate
             rows = [row[1:] for row in rows]
+            dividers = [False] * len(rows)
 
         # Slice if necessary
         if not options["oldsortslice"]:
-            rows = rows[options["start"] : options["end"]]
+            rows = rows[row_slice]
+            dividers = dividers[row_slice]
 
-        return rows
-
-    def _get_dividers(self, options: OptionsType) -> list[bool]:
-        """Return only those dividers that should be printed, based on slicing.
-
-        Arguments:
-
-        options - dictionary of option settings."""
-        if options["oldsortslice"]:
-            dividers = self._dividers[options["start"] : options["end"]]
-        else:
-            dividers = self._dividers
-
-        if options["sortby"]:
-            dividers = [False for divider in dividers]
-
-        return dividers
+        return rows, dividers
 
     def _format_row(self, row: RowType) -> list[str]:
         return [
@@ -2276,8 +2268,7 @@ class PrettyTable:
             return ""
 
         # Get the rows we need to print, taking into account slicing, sorting, etc.
-        rows = self._get_rows(options)
-        dividers = self._get_dividers(options)
+        rows, dividers = self._get_rows_and_dividers(options)
 
         # Turn all data in all rows into Unicode, formatted as desired
         formatted_rows = self._format_rows(rows)
