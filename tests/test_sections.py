@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from typing import ClassVar
 
-from prettytable import PrettyTable, TableStyle
+import pytest
+
+from prettytable import PrettyTable, RowType, TableStyle
 
 
 class TestRowEndSection:
@@ -48,6 +50,34 @@ class TestRowEndSection:
         table.add_rows(self.TEST_ROWS[0:2], divider=True)
         table.add_rows(self.TEST_ROWS[2:])
         assert table.get_string().strip() == self.EXPECTED_RESULT
+
+    @pytest.mark.parametrize(
+        ("oldsortslice", "sortby", "expected_values"),
+        [(False, None, [2, 4, 5]), (True, None, [1, 2, 4, 5]), (False, "n", [2, 4, 5])],
+    )
+    def test_dividers_follow_selected_rows(
+        self, oldsortslice: bool, sortby: str | None, expected_values: list[int]
+    ) -> None:
+        table = PrettyTable(["n"])
+        for n in range(6):
+            table.add_row([n], divider=n in (2, 4))
+
+        seen = []
+
+        def keep(row: RowType) -> bool:
+            seen.append(row[0])
+            return row[0] not in (0, 3)
+
+        expected = PrettyTable(["n"])
+        for n in expected_values:
+            expected.add_row([n], divider=sortby is None and n in (2, 4))
+        assert (
+            table.get_string(
+                start=1, oldsortslice=oldsortslice, sortby=sortby, row_filter=keep
+            )
+            == expected.get_string()
+        )
+        assert seen == list(range(1 if oldsortslice else 0, 6))
 
 
 class TestClearing:
