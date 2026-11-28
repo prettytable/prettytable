@@ -1307,6 +1307,32 @@ class TestFromDB:
         assert from_db_cursor(db_cursor) is None
 
 
+class TestInternalBorderMultiline:
+    def test_preserve_internal_border_multiline_cell(self) -> None:
+        table = PrettyTable(
+            ["Field 1", "Field 2"], border=False, preserve_internal_border=True
+        )
+        table.add_row(["value 1", "value2\nsecond line"])
+        table.add_row(["value 3", "value4"])
+        assert table.get_string().split("\n") == [
+            " Field 1 |   Field 2    ",
+            "---------+-------------",
+            " value 1 |    value2    ",
+            "         | second line  ",
+            " value 3 |    value4    ",
+        ]
+
+    def test_preserve_internal_border_multiline_cell_no_header(self) -> None:
+        table = PrettyTable(
+            ["a", "b"], border=False, preserve_internal_border=True, header=False
+        )
+        table.add_row(["1", "x\ny\nz"])
+        lines = table.get_string().split("\n")
+        assert len(lines) == 3
+        assert all(line.count("|") == 1 for line in lines)
+        assert all(not line.rstrip().endswith("|") for line in lines)
+
+
 class TestCsvOutput:
     def test_csv_output(self, helper_table: PrettyTable) -> None:
         assert helper_table.get_csv_string(delimiter="\t", header=False) == (
