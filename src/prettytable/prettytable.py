@@ -2553,10 +2553,11 @@ class PrettyTable:
                         bits[y].append(" ")
 
         # If only preserve_internal_border is true, then we just appended
-        # a vertical character at the end when we wanted a space
+        # a vertical character at the end of every line when we wanted a space
         if not options["border"] and options["preserve_internal_border"]:
-            bits[-1].pop()
-            bits[-1].append(" ")
+            for y in range(row_height):
+                bits[y].pop()
+                bits[y].append(" ")
 
         # If vrules is FRAME, then we just appended a space at the end
         # of the last field, when we really want a vertical character
